@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Service Invoice · Extra Clean Auto Detailing</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --silver:#b8c8d6;--silver-l:#d4e2ec;--silver-d:#586878;
+  --black:#0a0a0a;--s1:#111;--s2:#181818;--s3:#1e1e1e;
+  --border:rgba(184,200,214,0.22);--bsoft:rgba(255,255,255,0.06);
+  --text:#f0ede6;--muted:#8a8378;--dim:#5a574f;
+  --green:#4caf82;--copper:#c9783c;--copper-l:#e8a46a;
+}
+body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-weight:300;min-height:100vh;padding:32px 20px}
+.wrap{max-width:600px;margin:0 auto}
+.screen-only{display:block}
+
+/* Form controls */
+.controls{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:24px;margin-bottom:24px}
+.controls h2{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--silver-l);margin-bottom:18px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fg{display:flex;flex-direction:column;gap:5px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+.fg input,.fg select,.fg textarea{background:var(--s3);border:1px solid var(--bsoft);border-radius:4px;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;padding:9px 11px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.fg input:focus,.fg select:focus{border-color:var(--silver-d)}
+.fg select option{background:#1a1a1a}
+.fg textarea{resize:vertical;min-height:60px}
+.addon-row{display:flex;gap:8px;margin-bottom:6px}
+.addon-row input{flex:1}
+.addon-row input.price{width:100px;flex:none}
+.btn{background:var(--silver);color:#000;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:10px 20px;border-radius:4px;border:none;cursor:pointer;transition:background .2s}
+.btn:hover{background:var(--silver-l)}
+.btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--bsoft)}
+.btn.ghost:hover{border-color:var(--border);color:var(--text)}
+.btn.print-btn{background:var(--green);color:#000;width:100%;padding:13px;margin-top:12px;font-size:12px}
+.btn-row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+
+/* Invoice preview */
+.invoice{background:#fff;color:#111;border-radius:10px;padding:40px;font-family:'Sora',sans-serif;font-weight:300}
+.inv-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;padding-bottom:20px;border-bottom:2px solid #e8e8e8}
+.inv-brand-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:#0a0a0a;letter-spacing:.02em}
+.inv-brand-sub{font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:#888;margin-top:2px}
+.inv-brand-tag{font-size:10px;color:#aaa;font-style:italic;margin-top:4px}
+.inv-right{text-align:right}
+.inv-number{font-size:11px;color:#888;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.inv-date{font-family:'Cormorant Garamond',serif;font-size:18px;color:#333}
+.inv-section{margin-bottom:22px}
+.inv-section-title{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#999;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #eee}
+.inv-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.inv-field{padding:8px 0}
+.inv-label{font-size:10px;color:#999;margin-bottom:2px}
+.inv-val{font-size:13px;color:#111}
+.inv-table{width:100%;border-collapse:collapse;margin-bottom:16px}
+.inv-table th{font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#999;padding:8px 10px;text-align:left;border-bottom:1px solid #eee}
+.inv-table td{padding:10px;font-size:13px;color:#111;border-bottom:1px solid #f5f5f5}
+.inv-table td.right{text-align:right}
+.inv-table tr.total td{font-weight:600;font-size:15px;border-top:2px solid #111;border-bottom:none;padding-top:12px}
+.inv-table tr.total td.right{color:#0a0a0a}
+.inv-status{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 12px;border-radius:2px}
+.inv-status.paid{background:#e8f5ef;color:#2d8a5e}
+.inv-status.pending{background:#fef5e4;color:#b07d2a}
+.inv-footer{margin-top:24px;padding-top:16px;border-top:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
+.inv-footer-brand{font-size:10px;color:#bbb;letter-spacing:.1em}
+.inv-footer-contact{font-size:10px;color:#bbb;text-align:right}
+.inv-next{background:#f8f8f8;border-radius:6px;padding:12px 16px;margin-top:16px}
+.inv-next-label{font-size:9px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#999;margin-bottom:3px}
+.inv-next-val{font-size:13px;color:#333}
+
+/* Print */
+@media print{
+  body{background:#fff;padding:0}
+  .screen-only{display:none!important}
+  .invoice{box-shadow:none;border-radius:0;padding:32px}
+  .wrap{max-width:100%}
+}
+@media(max-width:520px){
+  .form-grid{grid-template-columns:1fr}
+  .inv-header{flex-direction:column;gap:12px}
+  .inv-right{text-align:left}
+  .inv-grid{grid-template-columns:1fr}
+  .inv-footer{flex-direction:column;gap:8px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- CONTROLS -->
+  <div class="controls screen-only">
+    <h2>Fill in Job Details</h2>
+    <div class="form-grid">
+      <div class="fg"><label>Invoice #</label><input type="text" id="inv-num" placeholder="001"></div>
+      <div class="fg"><label>Date</label><input type="date" id="inv-date"></div>
+      <div class="fg"><label>Client Name</label><input type="text" id="cl-name" placeholder="Full name"></div>
+      <div class="fg"><label>Phone / WhatsApp</label><input type="text" id="cl-phone" placeholder="(876) 000-0000"></div>
+      <div class="fg full"><label>Vehicle</label><input type="text" id="cl-vehicle" placeholder="2021 Toyota Corolla — Silver — AB 1234"></div>
+      <div class="fg full"><label>Service Address</label><input type="text" id="cl-addr" placeholder="Service location"></div>
+      <div class="fg full"><label>Service Tier</label>
+        <select id="svc-tier">
+          <option>Tier 0 — Quick Wash</option>
+          <option>Tier 1 — Full Clean</option>
+          <option>Tier 2 — Deep Clean</option>
+          <option>Tier 3 — Showroom Detail</option>
+          <option>Cabin Revival — Refresh</option>
+          <option>Cabin Revival — Restore</option>
+          <option>Maintenance Plan Service</option>
+        </select>
+      </div>
+      <div class="fg"><label>Service Amount (JMD)</label><input type="number" id="svc-amount" placeholder="0" oninput="calcTotal()"></div>
+      <div class="fg"><label>Payment Status</label>
+        <select id="svc-status">
+          <option>Paid</option>
+          <option>Pending</option>
+          <option>Partial</option>
+        </select>
+      </div>
+      <div class="fg"><label>Payment Method</label>
+        <select id="svc-method">
+          <option>Cash</option>
+          <option>Bank Transfer</option>
+          <option>Mobile Payment</option>
+        </select>
+      </div>
+      <div class="fg"><label>Next Service Due</label><input type="date" id="svc-next"></div>
+      <div class="fg full"><label>Add-Ons</label>
+        <div id="addon-list">
+          <div class="addon-row">
+            <input type="text" placeholder="Add-on name" class="addon-name" oninput="calcTotal()">
+            <input type="number" placeholder="0" class="addon-price price" oninput="calcTotal()">
+          </div>
+        </div>
+        <button class="btn ghost" style="margin-top:8px;font-size:10px;padding:7px 14px" onclick="addAddonRow()">+ Add Row</button>
+      </div>
+      <div class="fg full"><label>Notes</label><textarea id="svc-notes" placeholder="Any special instructions, concerns addressed, or additional context..."></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" onclick="generateInvoice()">Generate Invoice</button>
+      <button class="btn ghost" onclick="resetForm()">Reset</button>
+    </div>
+    <button class="btn print-btn" onclick="window.print()">&#128438; Print / Save as PDF</button>
+  </div>
+
+  <!-- INVOICE -->
+  <div class="invoice" id="invoice">
+    <div class="inv-header">
+      <div>
+        <div class="inv-brand-name">Extra Clean Auto Detailing</div>
+        <div class="inv-brand-sub">Mobile Professional Detailing &middot; Jamaica</div>
+        <div class="inv-brand-tag">Not just a wash&hellip; a standard.</div>
+      </div>
+      <div class="inv-right">
+        <div class="inv-number">Invoice <span id="out-num">#001</span></div>
+        <div class="inv-date" id="out-date">—</div>
+      </div>
+    </div>
+
+    <div class="inv-section">
+      <div class="inv-section-title">Client</div>
+      <div class="inv-grid">
+        <div class="inv-field"><div class="inv-label">Name</div><div class="inv-val" id="out-name">—</div></div>
+        <div class="inv-field"><div class="inv-label">Phone</div><div class="inv-val" id="out-phone">—</div></div>
+        <div class="inv-field"><div class="inv-label">Vehicle</div><div class="inv-val" id="out-vehicle">—</div></div>
+        <div class="inv-field"><div class="inv-label">Location</div><div class="inv-val" id="out-addr">—</div></div>
+      </div>
+    </div>
+
+    <div class="inv-section">
+      <div class="inv-section-title">Services</div>
+      <table class="inv-table">
+        <thead><tr><th>Description</th><th class="right">Amount (JMD)</th></tr></thead>
+        <tbody id="out-items"></tbody>
+        <tr class="total"><td>Total</td><td class="right" id="out-total">JMD 0</td></tr>
+      </table>
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+        <span class="inv-status paid" id="out-status-badge">Paid</span>
+        <span style="font-size:12px;color:#888" id="out-method">Cash</span>
+      </div>
+    </div>
+
+    <div class="inv-next" id="out-next-wrap" style="display:none">
+      <div class="inv-next-label">Next Service Due</div>
+      <div class="inv-next-val" id="out-next-date">—</div>
+    </div>
+
+    <div id="out-notes-wrap" style="display:none;margin-top:16px;padding:12px 16px;background:#f8f8f8;border-radius:6px">
+      <div class="inv-label" style="margin-bottom:4px">Notes</div>
+      <div style="font-size:12px;color:#555;line-height:1.6" id="out-notes"></div>
+    </div>
+
+    <div class="inv-footer">
+      <div class="inv-footer-brand">ecadja.com &nbsp;&middot;&nbsp; @extracleanautoja</div>
+      <div class="inv-footer-contact">(876) 817-6193<br>extracleancarwash@gmail.com</div>
+    </div>
+  </div>
+
+</div>
+<script>
+// Set today's date
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('inv-date').value = today;
+const next35 = new Date(); next35.setDate(next35.getDate()+35);
+document.getElementById('svc-next').value = next35.toISOString().split('T')[0];
+
+function addAddonRow() {
+  const row = document.createElement('div');
+  row.className = 'addon-row';
+  row.innerHTML = '<input type="text" placeholder="Add-on name" class="addon-name" oninput="calcTotal()"><input type="number" placeholder="0" class="addon-price price" oninput="calcTotal()">';
+  document.getElementById('addon-list').appendChild(row);
+}
+
+function calcTotal() {
+  const base = parseFloat(document.getElementById('svc-amount').value) || 0;
+  const addons = [...document.querySelectorAll('.addon-price')].reduce((s,el) => s + (parseFloat(el.value)||0), 0);
+  return base + addons;
+}
+
+function fmt(n) { return 'JMD ' + Number(n).toLocaleString('en-JM', {minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+function generateInvoice() {
+  const num = document.getElementById('inv-num').value || '001';
+  const date = document.getElementById('inv-date').value;
+  const status = document.getElementById('svc-status').value;
+
+  document.getElementById('out-num').textContent = '#' + num;
+  document.getElementById('out-date').textContent = date ? new Date(date).toLocaleDateString('en-JM',{year:'numeric',month:'long',day:'numeric'}) : '—';
+  document.getElementById('out-name').textContent = document.getElementById('cl-name').value || '—';
+  document.getElementById('out-phone').textContent = document.getElementById('cl-phone').value || '—';
+  document.getElementById('out-vehicle').textContent = document.getElementById('cl-vehicle').value || '—';
+  document.getElementById('out-addr').textContent = document.getElementById('cl-addr').value || '—';
+
+  // Build line items
+  const tbody = document.getElementById('out-items');
+  tbody.innerHTML = '';
+  const tier = document.getElementById('svc-tier').value;
+  const baseAmt = parseFloat(document.getElementById('svc-amount').value) || 0;
+  tbody.innerHTML += `<tr><td>${tier}</td><td class="right">${fmt(baseAmt)}</td></tr>`;
+
+  let total = baseAmt;
+  document.querySelectorAll('.addon-row').forEach(row => {
+    const name = row.querySelector('.addon-name').value.trim();
+    const price = parseFloat(row.querySelector('.addon-price').value) || 0;
+    if (name || price) {
+      tbody.innerHTML += `<tr><td>${name || 'Add-on'}</td><td class="right">${fmt(price)}</td></tr>`;
+      total += price;
+    }
+  });
+
+  document.getElementById('out-total').textContent = fmt(total);
+
+  const badge = document.getElementById('out-status-badge');
+  badge.textContent = status;
+  badge.className = 'inv-status ' + (status === 'Paid' ? 'paid' : 'pending');
+  document.getElementById('out-method').textContent = document.getElementById('svc-method').value;
+
+  const nextDate = document.getElementById('svc-next').value;
+  const nextWrap = document.getElementById('out-next-wrap');
+  if (nextDate) {
+    nextWrap.style.display = 'block';
+    document.getElementById('out-next-date').textContent = new Date(nextDate).toLocaleDateString('en-JM',{year:'numeric',month:'long',day:'numeric'});
+  } else { nextWrap.style.display = 'none'; }
+
+  const notes = document.getElementById('svc-notes').value.trim();
+  const notesWrap = document.getElementById('out-notes-wrap');
+  if (notes) { notesWrap.style.display = 'block'; document.getElementById('out-notes').textContent = notes; }
+  else { notesWrap.style.display = 'none'; }
+}
+
+function resetForm() {
+  ['inv-num','cl-name','cl-phone','cl-vehicle','cl-addr','svc-amount','svc-notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('inv-date').value = today;
+  document.getElementById('svc-next').value = next35.toISOString().split('T')[0];
+  document.getElementById('addon-list').innerHTML = '<div class="addon-row"><input type="text" placeholder="Add-on name" class="addon-name" oninput="calcTotal()"><input type="number" placeholder="0" class="addon-price price" oninput="calcTotal()"></div>';
+}
+
+// Generate on load with defaults
+generateInvoice();
+</script>
+</body>
+</html>

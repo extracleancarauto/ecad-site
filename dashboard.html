@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard · Extra Clean Auto Detailing</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:300;min-height:100vh}
+:root{
+  --sl:#b8c8d6;--sl-l:#d4e2ec;--sl-d:#586878;--navy:#162340;
+  --s1:#111;--s2:#181818;--s3:#1e1e1e;
+  --bo:rgba(184,200,214,0.22);--bs:rgba(255,255,255,0.06);
+  --tx:#f0ede6;--mu:#8a8378;--di:#5a574f;
+  --gn:#4caf82;--rd:#cf5b5b;--am:#c9a84c;--cu:#c9783c;--cu-l:#e8a46a;
+}
+
+/* LOGIN */
+.lw{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.lc{background:var(--s1);border:1px solid var(--bo);border-radius:12px;padding:44px 36px;width:100%;max-width:360px;text-align:center}
+.lt{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:300;color:var(--sl-l);margin-bottom:4px}
+.ls{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--di);margin-bottom:28px}
+.lc label{display:block;font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--mu);margin-bottom:6px;text-align:left}
+.lc input{width:100%;background:var(--s3);border:1px solid var(--bs);border-radius:4px;color:var(--tx);font-family:'Sora',sans-serif;font-size:13px;padding:11px 13px;outline:none;margin-bottom:12px;-webkit-appearance:none}
+.lc input:focus{border-color:var(--sl-d)}
+.lerr{font-size:11px;color:var(--rd);margin-bottom:10px;display:none}
+.btn{background:var(--sl);color:#000;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:11px 22px;border-radius:4px;border:none;cursor:pointer;transition:background .2s}
+.btn:hover{background:var(--sl-l)}
+.btn.sm{padding:7px 14px;font-size:10px}
+.btn.gho{background:transparent;color:var(--mu);border:1px solid var(--bs)}
+.btn.gho:hover{border-color:var(--bo);color:var(--tx)}
+.btn.grn{background:var(--gn);color:#000}
+.btn.red{background:var(--rd);color:#fff}
+.btn.cop{background:var(--cu);color:#fff}
+
+/* APP */
+#app{display:none;flex-direction:column;min-height:100vh}
+.tb{background:rgba(10,10,10,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--bo);padding:0 20px;position:sticky;top:0;z-index:100}
+.tb-i{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:58px}
+.tb-logo{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--sl-l)}
+.tb-logo span{font-size:9px;font-family:'Sora',sans-serif;color:var(--mu);letter-spacing:.15em;text-transform:uppercase;margin-left:10px}
+.tb-acts{display:flex;gap:8px;align-items:center}
+.main{max-width:1100px;margin:0 auto;padding:28px 20px}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.stat{background:var(--s1);border:1px solid var(--bs);border-radius:8px;padding:16px 18px}
+.stat-lbl{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--di);margin-bottom:6px}
+.stat-val{font-family:'Cormorant Garamond',serif;font-size:26px;color:var(--tx);line-height:1}
+.stat-sub{font-size:10px;color:var(--mu);margin-top:3px}
+
+/* DUE SOON */
+.due{background:rgba(201,120,60,.06);border:1px solid rgba(201,120,60,.2);border-radius:8px;padding:14px 18px;margin-bottom:20px;display:none}
+.due-ttl{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--cu);margin-bottom:10px}
+.due-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--mu);padding:6px 0;border-bottom:1px solid var(--bs)}
+.due-row:last-child{border-bottom:none}
+.due-row strong{color:var(--tx);font-weight:500}
+
+/* TABS */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--bs);margin-bottom:20px}
+.tab{font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color .2s,border-color .2s}
+.tab.on{color:var(--sl-l);border-bottom-color:var(--sl)}
+
+/* SEARCH */
+.sr{display:flex;gap:10px;margin-bottom:18px}
+.sr input{flex:1;background:var(--s2);border:1px solid var(--bs);border-radius:4px;color:var(--tx);font-family:'Sora',sans-serif;font-size:13px;padding:10px 13px;outline:none}
+.sr input:focus{border-color:var(--sl-d)}
+
+/* CLIENT LIST */
+.cl-row{background:var(--s1);border:1px solid var(--bs);border-radius:8px;padding:14px 18px;display:grid;grid-template-columns:1fr auto;align-items:center;cursor:pointer;transition:border-color .2s,transform .2s;margin-bottom:2px}
+.cl-row:hover{border-color:var(--bo);transform:translateX(2px)}
+.cl-name{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--tx);margin-bottom:3px}
+.cl-meta{font-size:11px;color:var(--mu);display:flex;gap:12px;flex-wrap:wrap}
+.badge{font-size:9px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:2px}
+.b-plan{background:rgba(76,175,130,.12);color:var(--gn);border:1px solid rgba(76,175,130,.3)}
+.b-due{background:rgba(201,120,60,.12);color:var(--cu-l);border:1px solid rgba(201,120,60,.3)}
+.b-ov{background:rgba(207,91,91,.12);color:#e08080;border:1px solid rgba(207,91,91,.3)}
+.b-pd{background:rgba(76,175,130,.1);color:var(--gn)}
+.b-pe{background:rgba(201,168,76,.1);color:var(--am)}
+.empty{text-align:center;padding:48px 20px;color:var(--di)}
+.empty-ic{font-size:36px;margin-bottom:12px}
+.empty-t{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--mu);margin-bottom:6px}
+
+/* SVC LIST */
+.sv-row{background:var(--s1);border:1px solid var(--bs);border-radius:8px;padding:14px 18px;margin-bottom:2px}
+.sv-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:5px}
+.sv-tier{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--tx)}
+.sv-who{font-size:11px;color:var(--mu)}
+.sv-amt{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--sl-l);text-align:right}
+.sv-det{font-size:11px;color:var(--mu)}
+
+/* PANEL */
+.panel{display:none;position:fixed;inset:0;background:rgba(5,5,8,.88);z-index:200;overflow-y:auto;padding:20px}
+.panel.open{display:flex;align-items:flex-start;justify-content:center}
+.pc{background:var(--s1);border:1px solid var(--bo);border-radius:12px;width:100%;max-width:680px;overflow:hidden}
+.ph{padding:22px 26px;border-bottom:1px solid var(--bs);display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.ph-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--tx);margin-bottom:3px}
+.ph-sub{font-size:11px;color:var(--mu)}
+.ph-acts{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.pb{padding:22px 26px}
+.ps-title{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--sl-d);margin-bottom:10px;padding-bottom:7px;border-bottom:1px solid var(--bs)}
+.ps{margin-bottom:20px}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ii{background:var(--s2);border:1px solid var(--bs);border-radius:4px;padding:11px 13px}
+.ii.full{grid-column:1/-1}
+.ii-lbl{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--di);margin-bottom:3px}
+.ii-val{font-size:13px;color:var(--tx)}
+.vc{background:var(--s2);border:1px solid var(--bs);border-radius:6px;padding:13px 15px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.vc-n{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--tx)}
+.vc-m{font-size:11px;color:var(--mu)}
+.sr-card{background:var(--s2);border:1px solid var(--bs);border-radius:6px;padding:13px 15px;margin-bottom:6px}
+.src-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.src-tier{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--tx)}
+.src-date{font-size:11px;color:var(--mu)}
+.src-amt{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--sl-l)}
+.src-det{font-size:11px;color:var(--mu);margin-top:4px}
+
+/* FORMS */
+.fg{display:flex;flex-direction:column;gap:6px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:9px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
+.fg input,.fg select,.fg textarea{background:var(--s3);border:1px solid var(--bs);border-radius:4px;color:var(--tx);font-family:'Sora',sans-serif;font-size:13px;padding:10px 12px;outline:none;-webkit-appearance:none;width:100%;transition:border-color .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--sl-d)}
+.fg select option{background:#1a1a1a}
+.fg textarea{resize:vertical;min-height:70px}
+.fg input[type=checkbox]{width:18px;height:18px;accent-color:var(--sl);flex-shrink:0}
+.cb-row{display:flex;align-items:center;gap:10px;padding:8px 0}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fa{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+.al{padding:11px 14px;border-radius:4px;font-size:12px;margin-bottom:12px;display:none}
+.al.ok{background:rgba(76,175,130,.1);border:1px solid rgba(76,175,130,.3);color:var(--gn)}
+.al.er{background:rgba(207,91,91,.1);border:1px solid rgba(207,91,91,.3);color:#e08080}
+
+@media(max-width:820px){
+  .stats{grid-template-columns:1fr 1fr}
+  .ig{grid-template-columns:1fr}
+  .fgrid{grid-template-columns:1fr}
+  .ph{flex-direction:column}
+}
+@media(max-width:540px){
+  .stats{grid-template-columns:1fr 1fr}
+  .panel{padding:10px}
+  .pb,.ph{padding:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login" class="lw">
+  <div class="lc">
+    <div class="lt">Extra Clean</div>
+    <div class="ls">Client Dashboard &middot; Private</div>
+    <label for="un">Username</label>
+    <input type="text" id="un" placeholder="Your username" autocomplete="username">
+    <label for="pw">Password</label>
+    <input type="password" id="pw" placeholder="Your password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="lerr" id="lerr">Incorrect username or password.</div>
+    <button class="btn" style="width:100%;margin-top:4px" onclick="doLogin()">Enter Dashboard</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <div class="tb">
+    <div class="tb-i">
+      <div class="tb-logo">ECAD <span id="tb-user">Dashboard</span></div>
+      <div class="tb-acts">
+        <button class="btn sm grn" id="btn-add-cl" onclick="openAddClient()">+ Add Client</button>
+        <a href="/availability" class="btn sm gho">Availability</a>
+        <button class="btn sm gho" onclick="doLogout()">Log Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <div class="stats">
+      <div class="stat"><div class="stat-lbl">Total Clients</div><div class="stat-val" id="st-cl">—</div><div class="stat-sub">All time</div></div>
+      <div class="stat"><div class="stat-lbl">Maintenance Plans</div><div class="stat-val" id="st-pl">—</div><div class="stat-sub">Active</div></div>
+      <div class="stat"><div class="stat-lbl">Total Revenue</div><div class="stat-val" id="st-rv">—</div><div class="stat-sub">JMD all time</div></div>
+      <div class="stat"><div class="stat-lbl">Jobs Completed</div><div class="stat-val" id="st-jb">—</div><div class="stat-sub">All time</div></div>
+    </div>
+
+    <div class="due" id="due-wrap">
+      <div class="due-ttl">&#9888; Maintenance Due Within 7 Days</div>
+      <div id="due-list"></div>
+    </div>
+
+    <div class="tabs">
+      <div class="tab on" onclick="switchTab('clients',this)">Clients</div>
+      <div class="tab" onclick="switchTab('services',this)">Service History</div>
+    </div>
+
+    <div class="sr">
+      <input id="search" placeholder="Search by name or phone..." oninput="doSearch()">
+      <button class="btn sm gho" onclick="clearSearch()">Clear</button>
+    </div>
+
+    <div id="tab-clients"><div id="cl-list"></div></div>
+    <div id="tab-services" style="display:none"><div id="sv-list"></div></div>
+
+  </div>
+</div>
+
+<!-- CLIENT DETAIL PANEL -->
+<div class="panel" id="pnl-client">
+  <div class="pc">
+    <div class="ph">
+      <div>
+        <div class="ph-title" id="d-name"></div>
+        <div class="ph-sub" id="d-sub"></div>
+      </div>
+      <div class="ph-acts" id="d-acts">
+        <button class="btn sm cop" id="d-btn-svc" onclick="openAddService()">+ Service</button>
+        <button class="btn sm" id="d-btn-veh" onclick="openAddVehicle()">+ Vehicle</button>
+        <button class="btn sm gho" id="d-btn-edit" onclick="openEditClient()">Edit</button>
+        <button class="btn sm red" id="d-btn-del" onclick="deleteClient()">Delete</button>
+        <button class="btn sm gho" onclick="closePanel('pnl-client')">&#10005;</button>
+      </div>
+    </div>
+    <div class="pb">
+      <div class="ps"><div class="ps-title">Contact</div><div class="ig" id="d-contact"></div></div>
+      <div class="ps"><div class="ps-title">Vehicles</div><div id="d-vehicles"></div></div>
+      <div class="ps"><div class="ps-title">Service History</div><div id="d-services"></div></div>
+      <div class="ps"><div class="ps-title">Notes</div><div class="ii full"><div class="ii-val" id="d-notes"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD/EDIT CLIENT PANEL -->
+<div class="panel" id="pnl-addcl">
+  <div class="pc">
+    <div class="ph"><div><div class="ph-title" id="acl-title">Add New Client</div></div><button class="btn sm gho" onclick="closePanel('pnl-addcl')">&#10005;</button></div>
+    <div class="pb">
+      <div class="al ok" id="acl-ok">Client saved.</div>
+      <div class="al er" id="acl-er">Error — please try again.</div>
+      <div class="fgrid">
+        <div class="fg full"><label>Full Name *</label><input id="cf-name" placeholder="Full name"></div>
+        <div class="fg"><label>Phone *</label><input type="tel" id="cf-phone" placeholder="(876) 000-0000"></div>
+        <div class="fg"><label>Email</label><input type="email" id="cf-email" placeholder="email@example.com"></div>
+        <div class="fg full"><label>Service Address</label><input id="cf-addr" placeholder="Home / work address"></div>
+        <div class="fg"><label>Referral Source</label>
+          <select id="cf-ref"><option value="">Select</option><option>Referral</option><option>Instagram</option><option>TikTok</option><option>WhatsApp</option><option>Word of Mouth</option><option>Website</option><option>Other</option></select>
+        </div>
+        <div class="fg"><label>Contact Preference</label>
+          <select id="cf-pref"><option>WhatsApp</option><option>Call</option><option>Text</option><option>Email</option></select>
+        </div>
+        <div class="fg"><label>Preferred Day</label>
+          <select id="cf-day"><option value="">No preference</option><option>Monday</option><option>Tuesday</option><option>Wednesday</option><option>Thursday</option><option>Friday</option><option>Saturday</option><option>Sunday</option></select>
+        </div>
+        <div class="fg"><label>Preferred Time</label>
+          <select id="cf-time"><option value="">No preference</option><option>Early Morning (7-9 AM)</option><option>Morning (9-11 AM)</option><option>Midday (11AM-1PM)</option><option>Afternoon (1-3 PM)</option><option>Late Afternoon (3-5 PM)</option></select>
+        </div>
+        <div class="fg full">
+          <div class="cb-row"><input type="checkbox" id="cf-plan"><label for="cf-plan" style="text-transform:none;letter-spacing:0;font-size:13px;color:var(--tx);font-weight:300">On Maintenance Plan</label></div>
+        </div>
+        <div class="fg full" id="cf-due-wrap" style="display:none"><label>Next Service Due</label><input type="date" id="cf-due"></div>
+        <div class="fg full"><label>Notes</label><textarea id="cf-notes" placeholder="Preferences, referrals, anything worth remembering..."></textarea></div>
+      </div>
+      <div class="fa">
+        <button class="btn sm gho" onclick="closePanel('pnl-addcl')">Cancel</button>
+        <button class="btn sm" id="cf-save" onclick="saveClient()">Save Client</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD VEHICLE PANEL -->
+<div class="panel" id="pnl-veh">
+  <div class="pc">
+    <div class="ph"><div><div class="ph-title">Add Vehicle</div></div><button class="btn sm gho" onclick="closePanel('pnl-veh')">&#10005;</button></div>
+    <div class="pb">
+      <div class="al ok" id="veh-ok">Vehicle saved.</div>
+      <div class="al er" id="veh-er">Error saving vehicle.</div>
+      <div class="fgrid">
+        <div class="fg"><label>Make</label><input id="vf-make" placeholder="Toyota"></div>
+        <div class="fg"><label>Model</label><input id="vf-model" placeholder="Corolla"></div>
+        <div class="fg"><label>Year</label><input id="vf-year" placeholder="2021"></div>
+        <div class="fg"><label>Color</label><input id="vf-color" placeholder="Silver"></div>
+        <div class="fg"><label>Plate</label><input id="vf-plate" placeholder="AB 1234"></div>
+        <div class="fg"><label>Type</label>
+          <select id="vf-type"><option>Sedan / Car</option><option>SUV / Crossover</option><option>Pickup / Van</option></select>
+        </div>
+        <div class="fg full"><label>Notes</label><textarea id="vf-notes" placeholder="Condition, modifications, sensitive areas..."></textarea></div>
+      </div>
+      <div class="fa"><button class="btn sm gho" onclick="closePanel('pnl-veh')">Cancel</button><button class="btn sm" onclick="saveVehicle()">Save</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD SERVICE PANEL -->
+<div class="panel" id="pnl-svc">
+  <div class="pc">
+    <div class="ph"><div><div class="ph-title">Add Service Record</div></div><button class="btn sm gho" onclick="closePanel('pnl-svc')">&#10005;</button></div>
+    <div class="pb">
+      <div class="al ok" id="svc-ok">Service record saved.</div>
+      <div class="al er" id="svc-er">Error saving record.</div>
+      <div class="fgrid">
+        <div class="fg"><label>Date *</label><input type="date" id="sf-date"></div>
+        <div class="fg"><label>Vehicle</label><select id="sf-veh"><option value="">No specific vehicle</option></select></div>
+        <div class="fg full"><label>Service Tier *</label>
+          <select id="sf-tier">
+            <option>Tier 0 — Quick Wash</option><option>Tier 1 — Full Clean</option>
+            <option>Tier 2 — Deep Clean</option><option>Tier 3 — Showroom Detail</option>
+            <option>Cabin Revival — Refresh</option><option>Cabin Revival — Restore</option>
+            <option>Maintenance Plan Service</option>
+          </select>
+        </div>
+        <div class="fg full"><label>Add-Ons</label><input id="sf-adds" placeholder="e.g. Pet Hair Removal, Clay Bar..."></div>
+        <div class="fg"><label>Amount (JMD)</label><input type="number" id="sf-amt" placeholder="0"></div>
+        <div class="fg"><label>Payment Method</label>
+          <select id="sf-meth"><option>Cash</option><option>Bank Transfer</option><option>Mobile Payment</option></select>
+        </div>
+        <div class="fg"><label>Payment Status</label>
+          <select id="sf-stat"><option>Paid</option><option>Pending</option><option>Partial</option></select>
+        </div>
+        <div class="fg"><label>Next Service Due</label><input type="date" id="sf-next"></div>
+        <div class="fg full"><label>Notes</label><textarea id="sf-notes" placeholder="Stains treated, client feedback, special requests..."></textarea></div>
+      </div>
+      <div class="fa"><button class="btn sm gho" onclick="closePanel('pnl-svc')">Cancel</button><button class="btn sm cop" onclick="saveService()">Save Record</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+var SB_URL = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co';
+var SB_KEY = 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI';
+var { createClient } = supabase;
+var db = createClient(SB_URL, SB_KEY);
+
+var USERS = {
+  'hyperion': { pw: 'ecad2026', role: 'admin',     name: 'Hyperion' },
+  'axion':    { pw: 'Ax#7291',  role: 'view-only', name: 'Axion'    }
+};
+
+var role = null;
+var allClients  = [];
+var allServices = [];
+var currentClient = null;
+var editingId = null;
+
+// \u2500\u2500 LOGIN \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function doLogin() {
+  var un = document.getElementById('un').value.trim().toLowerCase();
+  var pw = document.getElementById('pw').value;
+  var u  = USERS[un];
+  if (u && u.pw === pw) {
+    role = u.role;
+    document.getElementById('lerr').style.display = 'none';
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('tb-user').textContent = u.name + ' \u00b7 ' + (role === 'admin' ? 'Full Access' : 'View Only');
+    applyRole();
+    loadAll();
+  } else {
+    var e = document.getElementById('lerr');
+    e.style.display = 'block';
+    setTimeout(function() { e.style.display = 'none'; }, 3000);
+  }
+}
+
+function doLogout() {
+  role = null;
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login').style.display = 'flex';
+  document.getElementById('un').value = '';
+  document.getElementById('pw').value = '';
+}
+
+document.getElementById('pw').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+
+function applyRole() {
+  if (role === 'view-only') {
+    document.getElementById('btn-add-cl').style.display = 'none';
+  }
+}
+
+function applyPanelRole() {
+  if (role === 'view-only') {
+    ['d-btn-svc','d-btn-veh','d-btn-edit','d-btn-del'].forEach(function(id) {
+      var b = document.getElementById(id);
+      if (b) b.style.display = 'none';
+    });
+  }
+}
+
+// \u2500\u2500 LOAD \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+async function loadAll() {
+  var r1 = await db.from('clients').select('*').order('created_at', {ascending:false});
+  var r2 = await db.from('service_records').select('*, clients(full_name), vehicles(make,model)').order('service_date', {ascending:false});
+  if (!r1.error) { allClients = r1.data; renderClients(allClients); }
+  if (!r2.error) { allServices = r2.data; renderServices(allServices); }
+  updateStats();
+  checkDue();
+}
+
+function updateStats() {
+  document.getElementById('st-cl').textContent = allClients.length;
+  document.getElementById('st-pl').textContent = allClients.filter(function(c) { return c.maintenance_plan; }).length;
+  var rev = allServices.filter(function(s) { return s.payment_status === 'Paid'; }).reduce(function(t,s) { return t + (parseFloat(s.amount_paid)||0); }, 0);
+  document.getElementById('st-rv').textContent = rev >= 1000 ? (rev/1000).toFixed(1) + 'k' : rev.toFixed(0);
+  document.getElementById('st-jb').textContent = allServices.length;
+}
+
+function checkDue() {
+  var today = new Date();
+  var in7   = new Date(); in7.setDate(today.getDate()+7);
+  var due   = allClients.filter(function(c) {
+    return c.maintenance_plan && c.next_service_due && new Date(c.next_service_due) <= in7;
+  });
+  var wrap = document.getElementById('due-wrap');
+  if (!due.length) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+  document.getElementById('due-list').innerHTML = due.map(function(c) {
+    var d    = new Date(c.next_service_due);
+    var diff = Math.ceil((d - today) / 86400000);
+    var lbl  = diff < 0
+      ? '<span style="color:#e08080">Overdue by ' + Math.abs(diff) + ' day(s)</span>'
+      : diff === 0 ? '<span style="color:var(--cu-l)">Due today</span>'
+      : '<span>Due in ' + diff + ' day(s) \u2014 ' + d.toLocaleDateString('en-JM') + '</span>';
+    var num  = (c.phone||'').replace(/[^0-9]/g,'');
+    if (!num.startsWith('1')) num = '1' + num;
+    var adminBtn = role === 'admin'
+      ? '<button class="btn sm cop" data-name="' + c.full_name + '" data-num="' + num + '" onclick="event.stopPropagation();waRemindBtn(this)">Remind</button>'
+      : '';
+    return '<div class="due-row"><strong>' + c.full_name + '</strong>' + lbl + adminBtn + '</div>';
+  }).join('');
+}
+
+function waRemindBtn(btn) {
+  var name = btn.getAttribute('data-name');
+  var num  = btn.getAttribute('data-num');
+  var msg  = encodeURIComponent('Hey ' + name + ', you are due for your maintenance clean this week. Same day and time works for you? - Extra Clean Auto Detailing');
+  window.open('https://wa.me/' + num + '?text=' + msg, '_blank');
+}
+
+// \u2500\u2500 RENDER \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function renderClients(list) {
+  var el = document.getElementById('cl-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ic">&#128100;</div><div class="empty-t">No clients yet</div><p style="font-size:12px;color:var(--di)">Click + Add Client to get started</p></div>';
+    return;
+  }
+  var today = new Date();
+  el.innerHTML = list.map(function(c) {
+    var plan = c.maintenance_plan ? '<span class="badge b-plan">Plan</span>' : '';
+    var dueBadge = '';
+    if (c.maintenance_plan && c.next_service_due) {
+      var d = new Date(c.next_service_due);
+      var diff = Math.ceil((d - today) / 86400000);
+      if (diff < 0) dueBadge = '<span class="badge b-ov">Overdue</span>';
+      else if (diff <= 7) dueBadge = '<span class="badge b-due">Due Soon</span>';
+    }
+    return '<div class="cl-row" data-id="' + c.id + '" onclick="viewClient(this.dataset.id)">'
+      + '<div><div class="cl-name">' + c.full_name + ' ' + plan + ' ' + dueBadge + '</div>'
+      + '<div class="cl-meta"><span>&#128222; ' + (c.phone||'\u2014') + '</span>'
+      + (c.service_address ? '<span>&#128205; ' + c.service_address + '</span>' : '')
+      + (c.referral_source ? '<span>&#128279; ' + c.referral_source + '</span>' : '')
+      + '</div></div></div>';
+  }).join('');
+}
+
+function renderServices(list) {
+  var el = document.getElementById('sv-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-ic">&#128663;</div><div class="empty-t">No service records yet</div></div>';
+    return;
+  }
+  el.innerHTML = list.map(function(s) {
+    return '<div class="sv-row">'
+      + '<div class="sv-top"><div><div class="sv-tier">' + s.service_tier + '</div>'
+      + '<div class="sv-who">' + (s.clients ? s.clients.full_name : '\u2014') + ' \u00b7 ' + new Date(s.service_date).toLocaleDateString('en-JM') + '</div></div>'
+      + '<div><div class="sv-amt">JMD ' + (s.amount_paid ? Number(s.amount_paid).toLocaleString() : '\u2014') + '</div>'
+      + '<span class="badge ' + (s.payment_status==='Paid'?'b-pd':'b-pe') + '">' + s.payment_status + '</span></div></div>'
+      + (s.add_ons ? '<div class="sv-det">Add-ons: ' + s.add_ons + '</div>' : '')
+      + (s.job_notes ? '<div class="sv-det" style="margin-top:4px">' + s.job_notes + '</div>' : '')
+      + '</div>';
+  }).join('');
+}
+
+// \u2500\u2500 SEARCH \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function doSearch() {
+  var q = document.getElementById('search').value.toLowerCase();
+  if (!q) { renderClients(allClients); return; }
+  renderClients(allClients.filter(function(c) {
+    return (c.full_name||'').toLowerCase().includes(q)
+      || (c.phone||'').includes(q)
+      || (c.service_address||'').toLowerCase().includes(q);
+  }));
+}
+function clearSearch() { document.getElementById('search').value = ''; renderClients(allClients); }
+
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('on'); });
+  el.classList.add('on');
+  document.getElementById('tab-clients').style.display  = tab === 'clients'  ? 'block' : 'none';
+  document.getElementById('tab-services').style.display = tab === 'services' ? 'block' : 'none';
+}
+
+// \u2500\u2500 VIEW CLIENT \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+async function viewClient(id) {
+  var c = allClients.find(function(x) { return x.id === id; });
+  if (!c) return;
+  currentClient = c;
+  document.getElementById('d-name').textContent = c.full_name;
+  var planTxt = c.maintenance_plan ? '\u2713 Maintenance Plan' : 'No plan';
+  var dueTxt  = c.next_service_due ? ' \u00b7 Due: ' + new Date(c.next_service_due).toLocaleDateString('en-JM') : '';
+  document.getElementById('d-sub').textContent = planTxt + dueTxt;
+  document.getElementById('d-contact').innerHTML =
+    '<div class="ii"><div class="ii-lbl">Phone</div><div class="ii-val">' + (c.phone||'\u2014') + '</div></div>'
+    + '<div class="ii"><div class="ii-lbl">Email</div><div class="ii-val">' + (c.email||'\u2014') + '</div></div>'
+    + '<div class="ii full"><div class="ii-lbl">Address</div><div class="ii-val">' + (c.service_address||'\u2014') + '</div></div>'
+    + '<div class="ii"><div class="ii-lbl">Preferred Day</div><div class="ii-val">' + (c.preferred_day||'\u2014') + '</div></div>'
+    + '<div class="ii"><div class="ii-lbl">Preferred Time</div><div class="ii-val">' + (c.preferred_time||'\u2014') + '</div></div>'
+    + '<div class="ii"><div class="ii-lbl">Contact Via</div><div class="ii-val">' + (c.communication_pref||'\u2014') + '</div></div>'
+    + '<div class="ii"><div class="ii-lbl">Source</div><div class="ii-val">' + (c.referral_source||'\u2014') + '</div></div>';
+
+  var vr = await db.from('vehicles').select('*').eq('client_id', id);
+  document.getElementById('d-vehicles').innerHTML = (!vr.data||!vr.data.length)
+    ? '<p style="font-size:12px;color:var(--di)">No vehicles added yet.</p>'
+    : vr.data.map(function(v) {
+        return '<div class="vc"><div><div class="vc-n">' + (v.year||'') + ' ' + (v.make||'') + ' ' + (v.model||'') + '</div>'
+          + '<div class="vc-m">' + (v.vehicle_type||'') + (v.color?' \u00b7 '+v.color:'') + (v.plate?' \u00b7 '+v.plate:'') + '</div>'
+          + (v.vehicle_notes?'<div class="vc-m" style="margin-top:3px">'+v.vehicle_notes+'</div>':'')
+          + '</div></div>';
+      }).join('');
+
+  var sr = await db.from('service_records').select('*, vehicles(make,model)').eq('client_id', id).order('service_date', {ascending:false});
+  var svcs = sr.data || [];
+  var total = svcs.filter(function(s) { return s.payment_status==='Paid'; }).reduce(function(t,s) { return t+(parseFloat(s.amount_paid)||0); }, 0);
+  document.getElementById('d-services').innerHTML = !svcs.length
+    ? '<p style="font-size:12px;color:var(--di)">No service records yet.</p>'
+    : '<p style="font-size:11px;color:var(--mu);margin-bottom:10px">' + svcs.length + ' service(s) \u00b7 Lifetime: <strong style="color:var(--sl-l)">JMD ' + total.toLocaleString() + '</strong></p>'
+      + svcs.map(function(s) {
+          return '<div class="sr-card"><div class="src-top"><div><div class="src-tier">' + s.service_tier + '</div>'
+            + '<div class="src-date">' + new Date(s.service_date).toLocaleDateString('en-JM') + (s.vehicles?' \u00b7 '+s.vehicles.make+' '+s.vehicles.model:'') + '</div></div>'
+            + '<div><div class="src-amt">JMD ' + (s.amount_paid?Number(s.amount_paid).toLocaleString():'\u2014') + '</div>'
+            + '<span class="badge ' + (s.payment_status==='Paid'?'b-pd':'b-pe') + '">' + s.payment_status + '</span></div></div>'
+            + (s.add_ons?'<div class="src-det">Add-ons: '+s.add_ons+'</div>':'')
+            + (s.job_notes?'<div class="src-det" style="margin-top:4px;font-style:italic">'+s.job_notes+'</div>':'')
+            + (s.next_service_due?'<div class="src-det" style="color:var(--cu-l);margin-top:4px">Next due: '+new Date(s.next_service_due).toLocaleDateString('en-JM')+'</div>':'')
+            + '</div>';
+        }).join('');
+
+  document.getElementById('d-notes').textContent = c.relationship_notes || 'No notes added.';
+  openPanel('pnl-client');
+  applyPanelRole();
+}
+
+// \u2500\u2500 ADD/EDIT CLIENT \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function openAddClient() {
+  editingId = null;
+  document.getElementById('acl-title').textContent = 'Add New Client';
+  document.getElementById('cf-save').textContent = 'Save Client';
+  ['cf-name','cf-phone','cf-email','cf-addr','cf-notes'].forEach(function(i) { document.getElementById(i).value = ''; });
+  ['cf-ref','cf-day','cf-time'].forEach(function(i) { document.getElementById(i).selectedIndex = 0; });
+  document.getElementById('cf-plan').checked = false;
+  document.getElementById('cf-due').value = '';
+  document.getElementById('cf-due-wrap').style.display = 'none';
+  hideAlerts('acl');
+  openPanel('pnl-addcl');
+}
+
+function openEditClient() {
+  if (!currentClient) return;
+  editingId = currentClient.id;
+  document.getElementById('acl-title').textContent = 'Edit Client';
+  document.getElementById('cf-save').textContent = 'Update';
+  document.getElementById('cf-name').value  = currentClient.full_name || '';
+  document.getElementById('cf-phone').value = currentClient.phone || '';
+  document.getElementById('cf-email').value = currentClient.email || '';
+  document.getElementById('cf-addr').value  = currentClient.service_address || '';
+  document.getElementById('cf-notes').value = currentClient.relationship_notes || '';
+  document.getElementById('cf-plan').checked = currentClient.maintenance_plan || false;
+  document.getElementById('cf-due').value   = currentClient.next_service_due || '';
+  document.getElementById('cf-due-wrap').style.display = currentClient.maintenance_plan ? 'block' : 'none';
+  setSel('cf-ref',  currentClient.referral_source);
+  setSel('cf-day',  currentClient.preferred_day);
+  setSel('cf-time', currentClient.preferred_time);
+  setSel('cf-pref', currentClient.communication_pref);
+  hideAlerts('acl');
+  closePanel('pnl-client');
+  openPanel('pnl-addcl');
+}
+
+document.getElementById('cf-plan').addEventListener('change', function() {
+  document.getElementById('cf-due-wrap').style.display = this.checked ? 'block' : 'none';
+});
+
+async function saveClient() {
+  var name  = document.getElementById('cf-name').value.trim();
+  var phone = document.getElementById('cf-phone').value.trim();
+  if (!name || !phone) { showAlert('acl','er','Name and Phone are required.'); return; }
+  var payload = {
+    full_name: name, phone,
+    email: document.getElementById('cf-email').value.trim() || null,
+    service_address: document.getElementById('cf-addr').value.trim() || null,
+    referral_source: document.getElementById('cf-ref').value || null,
+    communication_pref: document.getElementById('cf-pref').value,
+    preferred_day: document.getElementById('cf-day').value || null,
+    preferred_time: document.getElementById('cf-time').value || null,
+    maintenance_plan: document.getElementById('cf-plan').checked,
+    next_service_due: document.getElementById('cf-due').value || null,
+    relationship_notes: document.getElementById('cf-notes').value.trim() || null
+  };
+  var err;
+  if (editingId) {
+    ({ error: err } = await db.from('clients').update(payload).eq('id', editingId));
+  } else {
+    ({ error: err } = await db.from('clients').insert([payload]));
+  }
+  if (err) { showAlert('acl','er','Error saving. Try again.'); return; }
+  showAlert('acl','ok', editingId ? 'Client updated.' : 'Client saved.');
+  await loadAll();
+  setTimeout(function() { closePanel('pnl-addcl'); }, 1000);
+}
+
+async function deleteClient() {
+  if (!currentClient) return;
+  if (!confirm('Delete ' + currentClient.full_name + '? This also removes their vehicles and service records.')) return;
+  await db.from('clients').delete().eq('id', currentClient.id);
+  closePanel('pnl-client');
+  await loadAll();
+}
+
+// \u2500\u2500 VEHICLE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function openAddVehicle() {
+  ['vf-make','vf-model','vf-year','vf-color','vf-plate','vf-notes'].forEach(function(i) { document.getElementById(i).value=''; });
+  hideAlerts('veh');
+  openPanel('pnl-veh');
+}
+async function saveVehicle() {
+  if (!currentClient) return;
+  var payload = {
+    client_id: currentClient.id,
+    make: document.getElementById('vf-make').value.trim()||null,
+    model: document.getElementById('vf-model').value.trim()||null,
+    year: document.getElementById('vf-year').value.trim()||null,
+    color: document.getElementById('vf-color').value.trim()||null,
+    plate: document.getElementById('vf-plate').value.trim()||null,
+    vehicle_type: document.getElementById('vf-type').value,
+    vehicle_notes: document.getElementById('vf-notes').value.trim()||null
+  };
+  var { error } = await db.from('vehicles').insert([payload]);
+  if (error) { showAlert('veh','er','Error saving vehicle.'); return; }
+  showAlert('veh','ok','Vehicle saved.');
+  setTimeout(function() { closePanel('pnl-veh'); viewClient(currentClient.id); }, 900);
+}
+
+// \u2500\u2500 SERVICE \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+async function openAddService() {
+  if (!currentClient) return;
+  document.getElementById('sf-date').value = new Date().toISOString().split('T')[0];
+  var nd = new Date(); nd.setDate(nd.getDate()+35);
+  document.getElementById('sf-next').value = nd.toISOString().split('T')[0];
+  ['sf-adds','sf-notes'].forEach(function(i) { document.getElementById(i).value=''; });
+  document.getElementById('sf-amt').value = '';
+  var vr = await db.from('vehicles').select('*').eq('client_id', currentClient.id);
+  var sel = document.getElementById('sf-veh');
+  sel.innerHTML = '<option value="">No specific vehicle</option>'
+    + (vr.data||[]).map(function(v) {
+        return '<option value="' + v.id + '">' + (v.year||'') + ' ' + (v.make||'') + ' ' + (v.model||'') + (v.plate?' ('+v.plate+')':'') + '</option>';
+      }).join('');
+  hideAlerts('svc');
+  openPanel('pnl-svc');
+}
+async function saveService() {
+  if (!currentClient) return;
+  var date = document.getElementById('sf-date').value;
+  if (!date) { showAlert('svc','er','Date is required.'); return; }
+  var next = document.getElementById('sf-next').value||null;
+  var payload = {
+    client_id: currentClient.id,
+    vehicle_id: document.getElementById('sf-veh').value||null,
+    service_date: date,
+    service_tier: document.getElementById('sf-tier').value,
+    add_ons: document.getElementById('sf-adds').value.trim()||null,
+    amount_paid: parseFloat(document.getElementById('sf-amt').value)||null,
+    payment_method: document.getElementById('sf-meth').value,
+    payment_status: document.getElementById('sf-stat').value,
+    job_notes: document.getElementById('sf-notes').value.trim()||null,
+    next_service_due: next
+  };
+  var { error } = await db.from('service_records').insert([payload]);
+  if (error) { showAlert('svc','er','Error saving.'); return; }
+  if (next) await db.from('clients').update({next_service_due:next}).eq('id',currentClient.id);
+  showAlert('svc','ok','Service record saved.');
+  await loadAll();
+  setTimeout(function() { closePanel('pnl-svc'); viewClient(currentClient.id); }, 900);
+}
+
+// \u2500\u2500 HELPERS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+function openPanel(id) {
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closePanel(id) {
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+function showAlert(pre, type, msg) {
+  var el = document.getElementById(pre + '-' + (type==='ok'?'ok':'er'));
+  if (el) { el.textContent = msg; el.style.display = 'block'; setTimeout(function() { el.style.display='none'; }, 3000); }
+}
+function hideAlerts(pre) {
+  ['ok','er'].forEach(function(t) { var e=document.getElementById(pre+'-'+t); if(e) e.style.display='none'; });
+}
+function setSel(id, val) {
+  var s = document.getElementById(id);
+  if (!s || !val) return;
+  for (var i=0; i<s.options.length; i++) {
+    if (s.options[i].value===val || s.options[i].text===val) { s.selectedIndex=i; break; }
+  }
+}
+
+// Close panels on backdrop click
+document.querySelectorAll('.panel').forEach(function(p) {
+  p.addEventListener('click', function(e) { if (e.target===p) closePanel(p.id); });
+});
+</script>
+</body>
+</html>

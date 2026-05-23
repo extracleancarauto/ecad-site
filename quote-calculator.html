@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get a Quote · Extra Clean Auto Detailing</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:300;min-height:100vh;padding:48px 20px}
+:root{
+  --sl:#b8c8d6;--sl-l:#d4e2ec;--sl-d:#586878;
+  --s1:#111111;--s2:#181818;--s3:#1e1e1e;
+  --bo:rgba(184,200,214,0.22);--bs:rgba(255,255,255,0.06);
+  --tx:#f0ede6;--mu:#8a8378;--di:#5a574f;
+  --gn:#4caf82;--cu:#c9783c;--cu-l:#e8a46a;
+}
+.wrap{max-width:520px;margin:0 auto}
+.hdr{text-align:center;margin-bottom:36px}
+.hdr h1{font-family:'Cormorant Garamond',serif;font-size:40px;font-weight:300;color:var(--sl-l);margin-bottom:6px}
+.hdr p{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--di)}
+.card{background:var(--s1);border:1px solid var(--bs);border-radius:10px;padding:26px;margin-bottom:14px}
+.card-lbl{font-size:9px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--sl-d);margin-bottom:14px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opts.three{grid-template-columns:1fr 1fr 1fr}
+.opt{background:var(--s3);border:1px solid var(--bs);border-radius:6px;padding:13px 12px;cursor:pointer;transition:background .15s,border-color .15s;-webkit-tap-highlight-color:transparent;user-select:none}
+.opt:hover{border-color:var(--sl-d)}
+.opt.on{background:rgba(184,200,214,.09);border-color:var(--sl)}
+.opt-n{font-size:13px;color:var(--tx);margin-bottom:2px;line-height:1.2}
+.opt.on .opt-n{color:var(--sl-l)}
+.opt-d{font-size:10px;color:var(--mu)}
+.opt.on .opt-d{color:var(--sl-d)}
+.addon{display:flex;align-items:center;gap:12px;padding:11px 13px;background:var(--s3);border:1px solid var(--bs);border-radius:6px;margin-bottom:6px;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;transition:border-color .15s}
+.addon:last-child{margin-bottom:0}
+.addon:hover{border-color:var(--sl-d)}
+.addon.on{background:rgba(184,200,214,.06);border-color:rgba(184,200,214,.28)}
+.abox{width:18px;height:18px;border:1.5px solid var(--sl-d);border-radius:3px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:transparent;transition:all .15s}
+.addon.on .abox{background:var(--gn);border-color:var(--gn);color:#000}
+.a-lbl{flex:1;font-size:12px;color:var(--tx)}
+.a-pr{font-family:'Cormorant Garamond',serif;font-size:15px;color:var(--mu);white-space:nowrap}
+.addon.on .a-pr{color:var(--sl-l)}
+.result{background:linear-gradient(135deg,#0d1520,#111e30);border:1px solid var(--sl-d);border-radius:10px;padding:28px;text-align:center;display:none}
+.r-lbl{font-size:9px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--sl-d);margin-bottom:8px}
+.r-tier{font-size:12px;color:var(--mu);margin-bottom:6px}
+.r-price{font-family:'Cormorant Garamond',serif;font-size:56px;font-weight:300;color:var(--sl-l);line-height:1;margin-bottom:8px}
+.r-price small{font-family:'Sora',sans-serif;font-size:16px;font-weight:300;color:var(--sl-d);margin-right:4px}
+.r-break{font-size:11px;color:var(--mu);line-height:1.9;margin-bottom:20px;white-space:pre-line}
+.r-btn{display:block;background:var(--sl);color:#000;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:13px;border-radius:4px;text-decoration:none;transition:background .2s}
+.r-btn:hover{background:var(--sl-l)}
+.note{font-size:11px;color:var(--di);text-align:center;margin-top:12px;line-height:1.65}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="hdr">
+    <h1>Get a Quote</h1>
+    <p>Extra Clean Auto Detailing &middot; Instant Estimate</p>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Step 1 &mdash; Vehicle Type</div>
+    <div class="opts three" id="g-vtype">
+      <div class="opt" data-grp="vtype" data-val="sedan" onclick="pickOpt(this)">
+        <div class="opt-n">Sedan / Car</div>
+        <div class="opt-d">Standard cars</div>
+      </div>
+      <div class="opt" data-grp="vtype" data-val="suv" onclick="pickOpt(this)">
+        <div class="opt-n">SUV / Crossover</div>
+        <div class="opt-d">Mid to large</div>
+      </div>
+      <div class="opt" data-grp="vtype" data-val="pickup" onclick="pickOpt(this)">
+        <div class="opt-n">Pickup / Van</div>
+        <div class="opt-d">Trucks &amp; vans</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Step 2 &mdash; Service</div>
+    <div class="opts" id="g-tier">
+      <div class="opt" data-grp="tier" data-val="t0" onclick="pickOpt(this)">
+        <div class="opt-n">Quick Wash</div>
+        <div class="opt-d">Exterior only &middot; 30&ndash;40 min</div>
+      </div>
+      <div class="opt" data-grp="tier" data-val="t1" onclick="pickOpt(this)">
+        <div class="opt-n">Full Clean</div>
+        <div class="opt-d">Interior + exterior &middot; 75&ndash;90 min</div>
+      </div>
+      <div class="opt" data-grp="tier" data-val="t2" onclick="pickOpt(this)">
+        <div class="opt-n">Deep Clean</div>
+        <div class="opt-d">Full restoration &middot; 2&ndash;3 hrs</div>
+      </div>
+      <div class="opt" data-grp="tier" data-val="t3" onclick="pickOpt(this)">
+        <div class="opt-n">Showroom Detail</div>
+        <div class="opt-d">Elite + ceramic &middot; 4+ hrs</div>
+      </div>
+      <div class="opt" data-grp="tier" data-val="cr" onclick="pickOpt(this)">
+        <div class="opt-n">Cabin Refresh</div>
+        <div class="opt-d">Interior only &middot; 45&ndash;75 min</div>
+      </div>
+      <div class="opt" data-grp="tier" data-val="crs" onclick="pickOpt(this)">
+        <div class="opt-n">Cabin Restore</div>
+        <div class="opt-d">Full interior &middot; 2.5&ndash;3.5 hrs</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-lbl">Step 3 &mdash; Add-Ons (Optional)</div>
+    <div class="addon" data-mn="2000" data-mx="4000" onclick="toggleAddon(this)">
+      <div class="abox">&#10003;</div>
+      <div class="a-lbl">Pet Hair Removal</div>
+      <div class="a-pr">+2,000&ndash;4,000</div>
+    </div>
+    <div class="addon" data-mn="3000" data-mx="3000" onclick="toggleAddon(this)">
+      <div class="abox">&#10003;</div>
+      <div class="a-lbl">Odour / Ozone Treatment</div>
+      <div class="a-pr">+3,000</div>
+    </div>
+    <div class="addon" data-mn="3500" data-mx="3500" onclick="toggleAddon(this)">
+      <div class="abox">&#10003;</div>
+      <div class="a-lbl">Cerakote Ceramic Sealant</div>
+      <div class="a-pr">+3,500</div>
+    </div>
+    <div class="addon" data-mn="3000" data-mx="3000" onclick="toggleAddon(this)">
+      <div class="abox">&#10003;</div>
+      <div class="a-lbl">Clay Bar Decontamination</div>
+      <div class="a-pr">+3,000</div>
+    </div>
+    <div class="addon" data-mn="2500" data-mx="4000" onclick="toggleAddon(this)">
+      <div class="abox">&#10003;</div>
+      <div class="a-lbl">Water Spot Removal</div>
+      <div class="a-pr">+2,500&ndash;4,000</div>
+    </div>
+    <div class="addon" data-mn="1500" data-mx="1500" onclick="toggleAddon(this)">
+      <div class="abox">&#10003;</div>
+      <div class="a-lbl">Child Seat Detail</div>
+      <div class="a-pr">+1,500</div>
+    </div>
+  </div>
+
+  <div class="result" id="result">
+    <div class="r-lbl">Estimated Price</div>
+    <div class="r-tier" id="r-tier"></div>
+    <div class="r-price"><small>JMD</small><span id="r-price"></span></div>
+    <div class="r-break" id="r-break"></div>
+    <a class="r-btn" href="/book">Book This Service &rarr;</a>
+  </div>
+  <p class="note">Estimates based on standard vehicle condition. Final price confirmed before work begins.</p>
+
+</div>
+<script>
+var vtype = null;
+var tier  = null;
+
+var P = {
+  sedan:  {t0:[5000,6000],  t1:[8000,10000],  t2:[13000,16000], t3:[21000,26000], cr:[4000,5500],  crs:[8000,10000]},
+  suv:    {t0:[6000,7000],  t1:[10000,12000], t2:[16000,19000], t3:[26000,33000], cr:[5500,7000],  crs:[11000,13000]},
+  pickup: {t0:[7000,8000],  t1:[12000,14000], t2:[19000,22000], t3:[31000,39000], cr:[6500,8000],  crs:[13000,15000]}
+};
+
+var TN = {
+  t0:'Quick Wash', t1:'Full Clean', t2:'Deep Clean',
+  t3:'Showroom Detail', cr:'Cabin Revival \u2014 Refresh', crs:'Cabin Revival \u2014 Restore'
+};
+
+function pickOpt(el) {
+  var grp = el.getAttribute('data-grp');
+  var val = el.getAttribute('data-val');
+  document.querySelectorAll('.opt[data-grp="' + grp + '"]').forEach(function(o) {
+    o.classList.remove('on');
+  });
+  el.classList.add('on');
+  if (grp === 'vtype') vtype = val;
+  if (grp === 'tier')  tier  = val;
+  recalc();
+}
+
+function toggleAddon(el) {
+  el.classList.toggle('on');
+  recalc();
+}
+
+function recalc() {
+  if (!vtype || !tier) return;
+  var base = P[vtype][tier];
+  var addMin = 0, addMax = 0, lines = [];
+
+  document.querySelectorAll('.addon.on').forEach(function(a) {
+    var mn = parseInt(a.getAttribute('data-mn'));
+    var mx = parseInt(a.getAttribute('data-mx'));
+    addMin += mn; addMax += mx;
+    lines.push(a.querySelector('.a-lbl').textContent + ': +' + fmt(mn) + (mn !== mx ? '\u2013' + fmt(mx) : ''));
+  });
+
+  var tMin = base[0] + addMin;
+  var tMax = base[1] + addMax;
+  var prStr = fmt(tMin) + (tMin !== tMax ? ' \u2013 ' + fmt(tMax) : '');
+  var brk = TN[tier] + ': ' + fmt(base[0]) + '\u2013' + fmt(base[1]);
+  if (lines.length) brk += '\n' + lines.join('\n');
+
+  document.getElementById('r-tier').textContent = TN[tier];
+  document.getElementById('r-price').textContent = prStr;
+  document.getElementById('r-break').textContent = brk;
+  document.getElementById('result').style.display = 'block';
+}
+
+function fmt(n) { return n.toLocaleString(); }
+</script>
+</body>
+</html>
