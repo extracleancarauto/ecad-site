@@ -171,12 +171,16 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
       <div class="tb-acts">
         <button class="btn sm grn" id="btn-add-cl" onclick="openAddClient()">+ Add Client</button>
         <a href="/availability" class="btn sm gho">Availability</a>
+        <button class="btn sm gho" onclick="refreshData()">&#8635; Refresh</button>
         <button class="btn sm gho" onclick="doLogout()">Log Out</button>
       </div>
     </div>
   </div>
 
-  <div class="main">
+  <div id="rt-alert" style="display:none;background:rgba(76,175,130,.12);border-bottom:1px solid rgba(76,175,130,.3);padding:10px 20px;text-align:center;font-size:12px;color:#4caf82;cursor:pointer;" onclick="dismissAlert()">
+  &#128276; <strong>New booking received</strong> — <span id="rt-msg"></span> &nbsp;<span style="opacity:.6;font-size:11px;">Tap to dismiss &amp; refresh</span>
+</div>
+<div class="main">
 
     <div class="stats">
       <div class="stat"><div class="stat-lbl">Total Clients</div><div class="stat-val" id="st-cl">—</div><div class="stat-sub">All time</div></div>
@@ -356,6 +360,11 @@ function doLogin() {
     document.getElementById('tb-user').textContent = u.name + ' \u00b7 ' + (role === 'admin' ? 'Full Access' : 'View Only');
     applyRole();
     loadAll();
+    setupRealtime();
+    // Request notification permission
+    if (window.Notification && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
   } else {
     var e = document.getElementById('lerr');
     e.style.display = 'block';
