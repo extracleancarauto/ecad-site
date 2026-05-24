@@ -11,9 +11,9 @@ body{
   background:#0a0a0a;color:#f0ede6;
   font-family:'Sora',sans-serif;font-weight:300;
   min-height:100vh;display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
+  align-items:center;justify-content:flex-start;
   padding:48px 24px;
-  position:relative;overflow:hidden;
+  position:relative;overflow-y:auto;
 }
 body::before{
   content:'';position:fixed;inset:0;
@@ -112,10 +112,14 @@ body::after{
   background:#b8c8d6;color:#000;
   font-family:'Sora',sans-serif;font-size:12px;
   font-weight:600;letter-spacing:.12em;text-transform:uppercase;
-  padding:13px;border-radius:4px;text-decoration:none;
+  padding:16px;border-radius:4px;text-decoration:none;
   transition:background .2s;
+  -webkit-appearance:none;
+  box-sizing:border-box;
+  margin-top:8px;
+  text-align:center;
 }
-.btn:hover{background:#d4e2ec}
+.btn:hover,.btn:active{background:#d4e2ec}
 .footer-note{
   margin-top:20px;font-size:10px;
   color:#5a574f;line-height:1.65;
