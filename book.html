@@ -216,6 +216,37 @@ async function submitIntake() {
   );
   window.open('https://wa.me/18768176193?text=' + msg, '_blank');
 
+  // Send emails and wait before redirecting
+  var emailPromises = [];
+
+  if (email) {
+    emailPromises.push(
+      emailjs.send('service_zesixiz', 'template_gya3qb7', {
+        to_email:    email,
+        client_name: name,
+        service:     svc,
+        date:        date || 'To be confirmed',
+        time:        time || 'To be confirmed',
+        address:     addr,
+        phone:       phone
+      }).catch(function(e) { console.log('Customer email:', e); })
+    );
+  }
+
+  emailPromises.push(
+    emailjs.send('service_zesixiz', 'template_kr6ydp8', {
+      to_email:    'extracleancarwash@gmail.com',
+      client_name: name,
+      phone:       phone,
+      service:     svc,
+      date:        date || 'To be confirmed',
+      time:        time || 'To be confirmed',
+      address:     addr
+    }).catch(function(e) { console.log('Owner email:', e); })
+  );
+
+  await Promise.all(emailPromises);
+
   // WhatsApp to owner silently
   var waFrame = document.createElement('iframe');
   waFrame.style.display = 'none';

@@ -917,18 +917,39 @@ async function submitForm() {
   var emailInput = document.getElementById('f-notes');
   var emailVal = ''; // main form has no dedicated email field — skip silently
 
-  // Send customer confirmation email silently
+  // Send emails and wait for both before redirecting
+  var emailPromises = [];
+
   var fEmail = document.getElementById('f-email');
   if (fEmail && fEmail.value.trim()) {
-    emailjs.send('service_zesixiz', 'template_gya3qb7', {
-      to_email:    fEmail.value.trim(),
+    emailPromises.push(
+      emailjs.send('service_zesixiz', 'template_gya3qb7', {
+        to_email:    fEmail.value.trim(),
+        client_name: name,
+        service:     svc,
+        date:        date,
+        time:        time,
+        address:     addr,
+        phone:       phone
+      }).catch(function(e) { console.log('Customer email:', e); })
+    );
+  }
+
+  emailPromises.push(
+    emailjs.send('service_zesixiz', 'template_kr6ydp8', {
+      to_email:    'extracleancarwash@gmail.com',
       client_name: name,
+      phone:       phone,
       service:     svc,
       date:        date,
       time:        time,
-      address:     addr,
-      phone:       phone
-    }).catch(function(e) { console.log('Email note:', e); });
+      address:     addr
+    }).catch(function(e) { console.log('Owner email:', e); })
+  );
+
+  await Promise.all(emailPromises);
+
+  if (false) { // close the if block that was opened
   }
 
   // WhatsApp to owner silently via hidden iframe
