@@ -214,7 +214,7 @@ async function submitIntake() {
     (time ? '*Time:* ' + time + '\n' : '') +
     (notes ? '*Notes:* ' + notes : '')
   );
-  window.open('https://wa.me/18768176193?text=' + msg, '_blank');
+  // WhatsApp removed
 
   // Send emails and wait before redirecting
   var emailPromises = [];
@@ -247,12 +247,7 @@ async function submitIntake() {
 
   await Promise.all(emailPromises);
 
-  // WhatsApp to owner silently
-  var waFrame = document.createElement('iframe');
-  waFrame.style.display = 'none';
-  waFrame.src = 'https://wa.me/18768176193?text=' + msg;
-  document.body.appendChild(waFrame);
-  setTimeout(function() { document.body.removeChild(waFrame); }, 3000);
+  // WhatsApp removed — email handles owner alerts
 
   // Redirect to thank you page
   var tyParams = new URLSearchParams({

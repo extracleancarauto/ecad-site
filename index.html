@@ -901,18 +901,7 @@ async function submitForm() {
     console.log('DB note:', e);
   }
 
-  // Send WhatsApp notification
-  const msg = encodeURIComponent(
-    '*New Booking Request — Extra Clean Auto Detailing*\n\n' +
-    '*Name:* ' + name + '\n' +
-    '*Phone:* ' + phone + '\n' +
-    '*Address:* ' + addr + '\n' +
-    '*Vehicle:* ' + vtype + (vd ? ' — ' + vd : '') + '\n' +
-    '*Service:* ' + svc + '\n' +
-    '*Date:* ' + date + '\n' +
-    '*Time:* ' + time + '\n' +
-    (notes ? '*Notes:* ' + notes : '')
-  );
+  // Notification handled by email
   // Customer email confirmation
   var emailInput = document.getElementById('f-notes');
   var emailVal = ''; // main form has no dedicated email field — skip silently
@@ -952,12 +941,7 @@ async function submitForm() {
   if (false) { // close the if block that was opened
   }
 
-  // WhatsApp to owner silently via hidden iframe
-  var waFrame = document.createElement('iframe');
-  waFrame.style.display = 'none';
-  waFrame.src = 'https://wa.me/18768176193?text=' + msg;
-  document.body.appendChild(waFrame);
-  setTimeout(function() { document.body.removeChild(waFrame); }, 3000);
+  // WhatsApp removed — email notification handles owner alerts
 
   // Redirect customer to thank you page with booking summary
   var tyParams = new URLSearchParams({
