@@ -7,6 +7,7 @@
 <title>Extra Clean Auto Detailing — Jamaica</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script></script></script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMGEwYTBhIiByeD0iNiIvPgogIDx0ZXh0IHg9IjQiIHk9IjI0IiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiNiOGM4ZDYiPkVDPC90ZXh0Pgo8L3N2Zz4=">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -916,7 +917,7 @@ async function submitForm() {
   var emailInput = document.getElementById('f-notes');
   var emailVal = ''; // main form has no dedicated email field — skip silently
 
-  // Send customer email confirmation if provided
+  // Send customer confirmation email silently
   var fEmail = document.getElementById('f-email');
   if (fEmail && fEmail.value.trim()) {
     emailjs.send('service_zesixiz', 'template_gya3qb7', {
@@ -930,11 +931,18 @@ async function submitForm() {
     }).catch(function(e) { console.log('Email note:', e); });
   }
 
-  // WhatsApp to owner
-  window.open('https://wa.me/18768176193?text=' + msg, '_blank');
-  document.getElementById('book-form').style.display = 'none';
-  document.getElementById('book-success').style.display = 'block';
-  document.getElementById('book-success').scrollIntoView({ behavior: 'smooth' });
+  // WhatsApp to owner silently via hidden iframe
+  var waFrame = document.createElement('iframe');
+  waFrame.style.display = 'none';
+  waFrame.src = 'https://wa.me/18768176193?text=' + msg;
+  document.body.appendChild(waFrame);
+  setTimeout(function() { document.body.removeChild(waFrame); }, 3000);
+
+  // Redirect customer to thank you page with booking summary
+  var tyParams = new URLSearchParams({
+    name: name, svc: svc, date: date, time: time, addr: addr
+  });
+  window.location.href = '/thankyou?' + tyParams.toString();
 }
 </script>
 </body>

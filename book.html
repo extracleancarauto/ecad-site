@@ -216,8 +216,19 @@ async function submitIntake() {
   );
   window.open('https://wa.me/18768176193?text=' + msg, '_blank');
 
-  document.getElementById('form-wrap').style.display = 'none';
-  document.getElementById('success-wrap').style.display = 'block';
+  // WhatsApp to owner silently
+  var waFrame = document.createElement('iframe');
+  waFrame.style.display = 'none';
+  waFrame.src = 'https://wa.me/18768176193?text=' + msg;
+  document.body.appendChild(waFrame);
+  setTimeout(function() { document.body.removeChild(waFrame); }, 3000);
+
+  // Redirect to thank you page
+  var tyParams = new URLSearchParams({
+    name: name, svc: svc,
+    date: date || '', time: time || '', addr: addr
+  });
+  window.location.href = '/thankyou?' + tyParams.toString();
 }
 </script>
 </body>
