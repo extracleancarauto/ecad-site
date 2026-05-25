@@ -1145,7 +1145,7 @@ function closeMenu() {
 
 // Supabase
 const { createClient } = supabase;
-emailjs.init('v8hsDP3tvGl5hTKRPOA7f');
+emailjs.init({ publicKey: 'v8hsDP3tvGl5hTKRPOA7f' });
 const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
 
 // ── AVAILABILITY BANNER ──────────────────────────────────────────
