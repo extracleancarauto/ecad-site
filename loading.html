@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Extra Clean — Preparing Your Booking</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden}
+body{
+  background:#0a0a0a;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  font-family:'Sora',sans-serif;
+  color:#f0ede6;
+}
+
+/* ── SCENE ── */
+.scene{
+  position:relative;
+  width:340px;height:180px;
+  margin-bottom:44px;
+}
+
+/* ── CAR BODY (SVG sport silhouette) ── */
+.car-wrap{
+  position:absolute;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  animation:carFloat 2.2s ease-in-out infinite;
+}
+@keyframes carFloat{
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-6px)}
+}
+
+/* ── BUBBLES ── */
+.bubbles{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+.bubble{
+  position:absolute;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, rgba(255,255,255,0.55), rgba(184,200,214,0.08));
+  border:1px solid rgba(184,200,214,0.35);
+  animation:bubbleRise var(--dur) ease-in var(--delay) infinite;
+  opacity:0;
+  bottom:30px;
+}
+@keyframes bubbleRise{
+  0%{opacity:0;transform:translateY(0) scale(0.4)}
+  15%{opacity:1}
+  80%{opacity:0.6}
+  100%{opacity:0;transform:translateY(-140px) translateX(var(--drift)) scale(1.1)}
+}
+
+/* ── SHINE SWEEP ── */
+.shine{
+  position:absolute;
+  top:0;left:-80px;
+  width:60px;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.13),transparent);
+  transform:skewX(-18deg);
+  animation:shineSweep 2.8s ease-in-out 0.5s infinite;
+}
+@keyframes shineSweep{
+  0%{left:-80px;opacity:0}
+  20%{opacity:1}
+  60%{left:340px;opacity:0.4}
+  100%{left:340px;opacity:0}
+}
+
+/* ── GROUND REFLECTION ── */
+.ground{
+  position:absolute;
+  bottom:0;left:50%;
+  transform:translateX(-50%);
+  width:220px;height:14px;
+  background:radial-gradient(ellipse,rgba(184,200,214,0.18) 0%,transparent 70%);
+  animation:carFloat 2.2s ease-in-out infinite;
+}
+
+/* ── SOAP SPRAY DOTS ── */
+.spray{
+  position:absolute;
+  width:4px;height:4px;
+  border-radius:50%;
+  background:rgba(184,200,214,0.7);
+  animation:sprayBurst var(--sd) ease-out var(--ss) infinite;
+  opacity:0;
+}
+@keyframes sprayBurst{
+  0%{opacity:0;transform:translate(0,0) scale(0)}
+  20%{opacity:1;transform:translate(var(--sx),var(--sy)) scale(1)}
+  100%{opacity:0;transform:translate(calc(var(--sx)*2.5),calc(var(--sy)*2)) scale(0.3)}
+}
+
+/* ── TEXT ── */
+.label{
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+  color:#b8c8d6;
+  margin-bottom:14px;
+  opacity:0;
+  animation:fadeIn .8s ease .4s forwards;
+}
+.sub{
+  font-size:12px;
+  color:#5a574f;
+  letter-spacing:.08em;
+  opacity:0;
+  animation:fadeIn .8s ease .7s forwards;
+}
+@keyframes fadeIn{to{opacity:1}}
+
+/* ── PROGRESS BAR ── */
+.bar-wrap{
+  width:220px;height:2px;
+  background:rgba(255,255,255,0.06);
+  border-radius:2px;
+  margin-top:22px;
+  overflow:hidden;
+  opacity:0;
+  animation:fadeIn .5s ease .9s forwards;
+}
+.bar-fill{
+  height:100%;
+  background:linear-gradient(90deg,#4caf82,#5b8ecf);
+  border-radius:2px;
+  width:0%;
+  animation:barGrow 2.4s cubic-bezier(.4,0,.2,1) 1s forwards;
+}
+@keyframes barGrow{to{width:100%}}
+
+/* ── NOISE OVERLAY ── */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;opacity:.28;z-index:0;
+}
+.scene,.label,.sub,.bar-wrap{position:relative;z-index:1}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div class="scene">
+  <!-- Ground glow -->
+  <div class="ground"></div>
+
+  <!-- Shine sweep -->
+  <div class="shine"></div>
+
+  <!-- Sport car SVG -->
+  <div class="car-wrap">
+    <svg width="260" height="110" viewBox="0 0 260 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Shadow -->
+      <ellipse cx="130" cy="103" rx="110" ry="6" fill="rgba(0,0,0,0.45)"/>
+      <!-- Body lower -->
+      <path d="M18 72 Q20 88 40 90 L220 90 Q240 88 242 72 L238 60 L22 60 Z" fill="#c8c4bc"/>
+      <!-- Body upper -->
+      <path d="M55 60 Q62 34 88 26 L172 26 Q198 34 205 60 Z" fill="#dedad4"/>
+      <!-- Roof -->
+      <path d="M80 60 Q85 30 100 24 L160 24 Q175 30 180 60 Z" fill="#eae6e0"/>
+      <!-- Windshield -->
+      <path d="M84 58 Q90 34 104 28 L130 26 L130 58 Z" fill="rgba(120,160,200,0.55)" stroke="rgba(180,200,220,0.3)" stroke-width="0.5"/>
+      <!-- Rear window -->
+      <path d="M130 26 L156 28 Q170 34 176 58 L130 58 Z" fill="rgba(100,140,180,0.45)" stroke="rgba(180,200,220,0.3)" stroke-width="0.5"/>
+      <!-- Door line -->
+      <line x1="130" y1="26" x2="130" y2="60" stroke="rgba(100,100,100,0.4)" stroke-width="0.8"/>
+      <!-- Body trim line -->
+      <path d="M30 72 Q130 68 230 72" stroke="rgba(180,180,180,0.35)" stroke-width="1" fill="none"/>
+      <!-- Front bumper -->
+      <path d="M22 60 L18 72 Q16 80 22 84 L40 86 L42 60 Z" fill="#b8b4ac"/>
+      <!-- Rear bumper -->
+      <path d="M238 60 L242 72 Q244 80 238 84 L220 86 L218 60 Z" fill="#b8b4ac"/>
+      <!-- Front grille -->
+      <rect x="20" y="66" width="16" height="10" rx="2" fill="#2a2a2a"/>
+      <line x1="20" y1="71" x2="36" y2="71" stroke="rgba(180,180,180,0.3)" stroke-width="0.6"/>
+      <!-- Headlight -->
+      <ellipse cx="30" cy="64" rx="8" ry="4" fill="rgba(220,230,245,0.85)"/>
+      <ellipse cx="30" cy="64" rx="5" ry="2.5" fill="rgba(255,255,255,0.95)"/>
+      <!-- Headlight glow -->
+      <ellipse cx="30" cy="64" rx="10" ry="5" fill="rgba(180,210,255,0.15)" style="animation:headlightPulse 2s ease-in-out infinite"/>
+      <!-- Tail light -->
+      <rect x="226" y="60" width="14" height="8" rx="2" fill="rgba(200,50,50,0.7)"/>
+      <rect x="228" y="61" width="10" height="6" rx="1.5" fill="rgba(255,80,80,0.6)"/>
+      <!-- Front wheel well -->
+      <ellipse cx="68" cy="90" rx="26" ry="8" fill="#1a1a1a"/>
+      <!-- Rear wheel well -->
+      <ellipse cx="192" cy="90" rx="26" ry="8" fill="#1a1a1a"/>
+      <!-- Front wheel -->
+      <circle cx="68" cy="90" r="20" fill="#222"/>
+      <circle cx="68" cy="90" r="15" fill="#2e2e2e"/>
+      <circle cx="68" cy="90" r="7" fill="#3a3a3a"/>
+      <circle cx="68" cy="90" r="3" fill="#555"/>
+      <!-- Front wheel spokes -->
+      <line x1="68" y1="75" x2="68" y2="83" stroke="#4a4a4a" stroke-width="2"/>
+      <line x1="68" y1="97" x2="68" y2="105" stroke="#4a4a4a" stroke-width="2"/>
+      <line x1="53" y1="90" x2="61" y2="90" stroke="#4a4a4a" stroke-width="2"/>
+      <line x1="75" y1="90" x2="83" y2="90" stroke="#4a4a4a" stroke-width="2"/>
+      <line x1="57.4" y1="79.4" x2="63" y2="84.9" stroke="#4a4a4a" stroke-width="1.5"/>
+      <line x1="73" y1="95" x2="78.6" y2="100.6" stroke="#4a4a4a" stroke-width="1.5"/>
+      <line x1="78.6" y1="79.4" x2="73" y2="84.9" stroke="#4a4a4a" stroke-width="1.5"/>
+      <line x1="63" y1="95" x2="57.4" y2="100.6" stroke="#4a4a4a" stroke-width="1.5"/>
+      <!-- Rear wheel -->
+      <circle cx="192" cy="90" r="20" fill="#222"/>
+      <circle cx="192" cy="90" r="15" fill="#2e2e2e"/>
+      <circle cx="192" cy="90" r="7" fill="#3a3a3a"/>
+      <circle cx="192" cy="90" r="3" fill="#555"/>
+      <line x1="192" y1="75" x2="192" y2="83" stroke="#4a4a4a" stroke-width="2"/>
+      <line x1="192" y1="97" x2="192" y2="105" stroke="#4a4a4a" stroke-width="2"/>
+      <line x1="177" y1="90" x2="185" y2="90" stroke="#4a4a4a" stroke-width="2"/>
+      <line x1="199" y1="90" x2="207" y2="90" stroke="#4a4a4a" stroke-width="2"/>
+      <line x1="181.4" y1="79.4" x2="187" y2="84.9" stroke="#4a4a4a" stroke-width="1.5"/>
+      <line x1="197" y1="95" x2="202.6" y2="100.6" stroke="#4a4a4a" stroke-width="1.5"/>
+      <line x1="202.6" y1="79.4" x2="197" y2="84.9" stroke="#4a4a4a" stroke-width="1.5"/>
+      <line x1="187" y1="95" x2="181.4" y2="100.6" stroke="#4a4a4a" stroke-width="1.5"/>
+      <!-- Door handle -->
+      <rect x="118" y="50" width="14" height="3" rx="1.5" fill="rgba(150,150,150,0.5)"/>
+      <!-- Side mirror -->
+      <path d="M44 46 L52 44 L52 50 L44 50 Z" fill="#c0bcb4"/>
+    </svg>
+  </div>
+
+  <!-- Bubbles -->
+  <div class="bubbles" id="bubbles"></div>
+</div>
+
+<p class="label">Confirming your booking</p>
+<p class="sub">Please wait a moment&hellip;</p>
+<div class="bar-wrap"><div class="bar-fill"></div></div>
+
+<script>
+// ── Generate bubbles ──────────────────────────────────────────
+const bc = document.getElementById('bubbles');
+const bubbleConfig = [
+  {size:8,  left:'68px', dur:'2.1s', delay:'0s',    drift:'12px'},
+  {size:5,  left:'95px', dur:'2.8s', delay:'0.3s',  drift:'-8px'},
+  {size:11, left:'120px',dur:'3.2s', delay:'0.7s',  drift:'16px'},
+  {size:6,  left:'145px',dur:'2.4s', delay:'0.2s',  drift:'-6px'},
+  {size:9,  left:'170px',dur:'2.9s', delay:'1.1s',  drift:'10px'},
+  {size:4,  left:'85px', dur:'3.5s', delay:'1.4s',  drift:'4px'},
+  {size:7,  left:'200px',dur:'2.6s', delay:'0.5s',  drift:'-12px'},
+  {size:5,  left:'110px',dur:'3.1s', delay:'1.8s',  drift:'7px'},
+  {size:10, left:'60px', dur:'2.7s', delay:'2.1s',  drift:'-9px'},
+  {size:6,  left:'155px',dur:'3.3s', delay:'0.9s',  drift:'5px'},
+  {size:8,  left:'130px',dur:'2.2s', delay:'1.5s',  drift:'-14px'},
+  {size:4,  left:'185px',dur:'3.8s', delay:'2.4s',  drift:'11px'},
+];
+bubbleConfig.forEach(b => {
+  const el = document.createElement('div');
+  el.className = 'bubble';
+  el.style.cssText = `width:${b.size}px;height:${b.size}px;left:${b.left};--dur:${b.dur};--delay:${b.delay};--drift:${b.drift}`;
+  bc.appendChild(el);
+});
+
+// Spray dots
+const sprayConfig = [
+  {top:'50px',left:'100px',sx:'-18px',sy:'-22px',sd:'1.8s',ss:'0.4s'},
+  {top:'55px',left:'108px',sx:'14px', sy:'-18px',sd:'2.1s',ss:'0.8s'},
+  {top:'48px',left:'92px', sx:'-8px', sy:'-28px',sd:'1.6s',ss:'1.2s'},
+  {top:'52px',left:'160px',sx:'20px', sy:'-16px',sd:'2.0s',ss:'0.2s'},
+  {top:'58px',left:'155px',sx:'-12px',sy:'-24px',sd:'1.9s',ss:'1.6s'},
+];
+sprayConfig.forEach(s => {
+  const el = document.createElement('div');
+  el.className = 'spray';
+  el.style.cssText = `top:${s.top};left:${s.left};--sx:${s.sx};--sy:${s.sy};--sd:${s.sd};--ss:${s.ss}`;
+  document.querySelector('.scene').appendChild(el);
+});
+
+// ── Redirect after animation completes ──────────────────────────
+const params = new URLSearchParams(window.location.search);
+const dest   = params.get('dest') || '/thankyou';
+const extra  = params.get('q')    || '';
+setTimeout(() => {
+  window.location.href = dest + (extra ? '?' + extra : '');
+}, 3200);
+</script>
+</body>
+</html>

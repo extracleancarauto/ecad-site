@@ -244,6 +244,39 @@ nav {
 .mdisc { font-family: 'Cormorant Garamond', serif; font-size: 21px; color: var(--silver-l); line-height: 1; }
 .msave { display: inline-block; font-size: 9px; font-weight: 600; letter-spacing: .1em; color: #000; background: var(--green); padding: 2px 7px; border-radius: 2px; margin-top: 3px; }
 
+/* ── FLEET ─────────────────────────────────────────────────────── */
+.fleet-sec { padding: 80px 0; background: var(--s2); border-top: 1px solid var(--bsoft); border-bottom: 1px solid var(--bsoft); position: relative; z-index: 1; }
+.fleet-intro { display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; margin-bottom: 36px; }
+.fi { background: rgba(76,175,130,.06); border: 1px solid rgba(76,175,130,.2); border-radius: 4px; padding: 18px 22px; }
+.fi-l { font-size: 9px; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+.fi-v { font-size: 12px; color: var(--muted); line-height: 1.65; }
+.fi-v strong { color: var(--text); font-weight: 500; }
+.fleet-tiers { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 28px; }
+.ft { background: var(--s1); border: 1px solid var(--bsoft); border-radius: 10px; border-top: 3px solid var(--green); padding: 26px; position: relative; transition: border-color .3s, transform .3s; }
+.ft:hover { transform: translateY(-2px); }
+.ft.featured { background: linear-gradient(160deg,rgba(76,175,130,.06) 0%,var(--s1) 60%); border-color: rgba(76,175,130,.45); }
+.ft-badge { position: absolute; top: -1px; right: 18px; background: var(--green); color: #000; font-size: 8px; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; padding: 4px 10px; border-radius: 0 0 4px 4px; }
+.ft-size { font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--green); margin-bottom: 7px; }
+.ft-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 400; margin-bottom: 4px; line-height: 1; }
+.ft-vehicles { font-size: 12px; color: var(--muted); margin-bottom: 16px; letter-spacing: .03em; }
+.ft-discount { font-family: 'Cormorant Garamond', serif; font-size: 42px; color: var(--green); line-height: 1; margin-bottom: 4px; }
+.ft-discount-label { font-size: 10px; color: var(--muted); letter-spacing: .06em; margin-bottom: 18px; padding-bottom: 16px; border-bottom: 1px solid var(--bsoft); }
+.ft-perks { display: flex; flex-direction: column; gap: 8px; }
+.ft-perk { font-size: 11px; color: var(--muted); display: flex; align-items: flex-start; gap: 9px; line-height: 1.5; }
+.ft-perk::before { content: '→'; color: var(--green); font-size: 11px; flex-shrink: 0; }
+.ft-perk.strong { color: var(--text); }
+.fleet-benefits { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 2px; margin-bottom: 28px; }
+.fb { background: var(--s1); border: 1px solid var(--bsoft); border-radius: 4px; padding: 18px 20px; transition: border-color .2s; }
+.fb:hover { border-color: rgba(76,175,130,.25); }
+.fb-icon { font-size: 17px; margin-bottom: 9px; }
+.fb-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 5px; letter-spacing: .04em; }
+.fb-body { font-size: 11px; color: var(--muted); line-height: 1.65; }
+.fleet-cta { display: flex; align-items: center; justify-content: space-between; background: rgba(76,175,130,.04); border: 1px solid rgba(76,175,130,.22); border-radius: 10px; padding: 30px 34px; gap: 24px; }
+.fcta-left h3 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; color: var(--text); margin-bottom: 7px; line-height: 1.1; }
+.fcta-left p { font-size: 12px; color: var(--muted); line-height: 1.75; max-width: 540px; }
+.btn-fleet { background: var(--green); color: #000; font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; padding: 13px 22px; border-radius: 4px; text-decoration: none; white-space: nowrap; transition: opacity .2s, transform .2s; display: inline-block; flex-shrink: 0; }
+.btn-fleet:hover { opacity: .88; transform: translateY(-1px); }
+
 /* ── NOTES ─────────────────────────────────────────────────────── */
 .notes-sec { padding: 44px 0; position: relative; z-index: 1; }
 .notes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 2px; }
@@ -282,6 +315,67 @@ textarea { resize: vertical; min-height: 88px; }
 .form-success h3 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 300; margin-bottom: 9px; color: var(--silver-l); }
 .form-success p { font-size: 13px; color: var(--muted); }
 
+
+/* ── WHATSAPP FLOAT ────────────────────────────────────────────── */
+.wa-float { position:fixed; bottom:22px; right:22px; z-index:999; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+.wa-btn { width:54px; height:54px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(37,211,102,.45); text-decoration:none; transition:transform .2s,box-shadow .2s; }
+.wa-btn:hover { transform:scale(1.1); box-shadow:0 6px 28px rgba(37,211,102,.6); }
+.wa-btn svg { width:28px; height:28px; fill:#fff; }
+.wa-pulse { position:absolute; width:54px; height:54px; border-radius:50%; background:rgba(37,211,102,.35); animation:waPulse 2.2s ease-out infinite; }
+@keyframes waPulse { 0%{transform:scale(1);opacity:.7} 100%{transform:scale(1.9);opacity:0} }
+.wa-label { background:rgba(10,10,10,.92); border:1px solid rgba(184,200,214,.15); color:#b8c8d6; font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:6px 12px; border-radius:4px; white-space:nowrap; opacity:0; transform:translateX(10px); transition:opacity .2s,transform .2s; pointer-events:none; }
+.wa-float:hover .wa-label { opacity:1; transform:translateX(0); }
+
+
+/* ── GALLERY ───────────────────────────────────────────────────── */
+.gallery-sec { padding:80px 0; background:var(--s1); border-top:1px solid var(--bsoft); position:relative; z-index:1; }
+.gallery-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.gcard { border-radius:10px; overflow:hidden; border:1px solid var(--bsoft); position:relative; background:var(--s2); }
+.gcard:hover .gc-after { opacity:1; }
+.gc-label { position:absolute; top:12px; left:12px; font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; padding:4px 10px; border-radius:2px; z-index:3; }
+.gc-label.before { background:rgba(10,10,10,.8); color:var(--muted); border:1px solid var(--bsoft); }
+.gc-label.after  { background:var(--silver); color:#000; }
+.gc-vehicle { position:absolute; bottom:12px; left:12px; font-size:10px; font-weight:500; letter-spacing:.08em; color:var(--silver-l); background:rgba(10,10,10,.75); padding:4px 10px; border-radius:2px; z-index:3; backdrop-filter:blur(4px); }
+.gc-service { position:absolute; bottom:12px; right:12px; font-size:9px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--green); background:rgba(10,10,10,.75); padding:4px 10px; border-radius:2px; z-index:3; backdrop-filter:blur(4px); }
+.gcard img { width:100%; height:340px; object-fit:cover; display:block; transition:transform .5s ease; }
+.gcard:hover img { transform:scale(1.03); }
+.gc-pair { display:contents; }
+.pair-label { grid-column:1/-1; font-size:10px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); padding:8px 0 2px; }
+
+/* ── HOW IT WORKS ──────────────────────────────────────────────── */
+.hiw-sec { padding:80px 0; position:relative; z-index:1; }
+.hiw-steps { display:grid; grid-template-columns:repeat(4,1fr); gap:2px; margin-top:44px; }
+.hiw-step { background:var(--s1); border:1px solid var(--bsoft); border-radius:4px; padding:26px 22px; position:relative; transition:border-color .2s; }
+.hiw-step:hover { border-color:var(--border); }
+.hiw-step::after { content:''; position:absolute; top:50%; right:-1px; width:1px; height:40%; background:linear-gradient(to bottom, transparent, var(--silver-d), transparent); transform:translateY(-50%); }
+.hiw-step:last-child::after { display:none; }
+.hiw-num { font-family:'Cormorant Garamond',serif; font-size:42px; font-weight:300; color:rgba(184,200,214,0.12); line-height:1; margin-bottom:12px; }
+.hiw-icon { font-size:20px; margin-bottom:10px; }
+.hiw-title { font-size:12px; font-weight:600; color:var(--text); margin-bottom:6px; letter-spacing:.04em; }
+.hiw-body { font-size:11px; color:var(--muted); line-height:1.65; }
+
+/* ── SERVICE AREA ──────────────────────────────────────────────── */
+.area-sec { padding:60px 0; background:var(--s1); border-top:1px solid var(--bsoft); border-bottom:1px solid var(--bsoft); position:relative; z-index:1; }
+.area-inner { display:grid; grid-template-columns:1fr auto; gap:36px; align-items:center; }
+.area-zones { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+.zone { background:rgba(184,200,214,.06); border:1px solid var(--border); border-radius:4px; padding:8px 16px; font-size:12px; color:var(--silver-l); display:flex; align-items:center; gap:7px; }
+.zone::before { content:''; width:6px; height:6px; border-radius:50%; background:var(--green); flex-shrink:0; }
+.zone.limited { opacity:.6; }
+.zone.limited::before { background:var(--copper); }
+.area-note { font-size:11px; color:var(--dim); margin-top:16px; line-height:1.7; }
+.area-note strong { color:var(--muted); }
+.area-cta-block { text-align:center; padding:28px 32px; background:rgba(184,200,214,.03); border:1px solid var(--bsoft); border-radius:10px; min-width:200px; }
+.area-cta-block .big { font-family:'Cormorant Garamond',serif; font-size:34px; color:var(--silver-l); line-height:1; margin-bottom:4px; }
+.area-cta-block .sm { font-size:10px; color:var(--dim); letter-spacing:.12em; text-transform:uppercase; }
+
+/* ── TESTIMONIALS ──────────────────────────────────────────────── */
+.testi-sec { padding:80px 0; position:relative; z-index:1; }
+.testi-coming { border:1px solid var(--bsoft); border-radius:10px; padding:44px; text-align:center; background:rgba(184,200,214,.02); }
+.testi-coming-icon { font-size:32px; margin-bottom:16px; opacity:.4; }
+.testi-coming h3 { font-family:'Cormorant Garamond',serif; font-size:24px; font-weight:300; color:var(--silver-l); margin-bottom:8px; }
+.testi-coming p { font-size:12px; color:var(--dim); max-width:380px; margin:0 auto; line-height:1.75; }
+
+
 /* ── FOOTER ────────────────────────────────────────────────────── */
 footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bsoft); position: relative; z-index: 1; }
 .foot-logo { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--text); margin-bottom: 6px; }
@@ -304,6 +398,9 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
   .ci { border-right: none; border-bottom: 1px solid var(--copper-b); }
   .ci:last-child { border-bottom: none; }
   .contact-grid { grid-template-columns: 1fr; }
+  .fleet-tiers { grid-template-columns: 1fr; }
+  .fleet-intro { grid-template-columns: 1fr; }
+  .fleet-cta { flex-direction: column; gap: 18px; }
 }
 @media (max-width: 640px) {
   .nav-links, .nav-cta { display: none; }
@@ -314,6 +411,9 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
   .hero-btns { flex-direction: column; align-items: center; }
   .cabin-bridge { flex-direction: column; gap: 12px; }
   .mplan-prices { flex-direction: column; }
+  .hiw-steps { grid-template-columns:1fr 1fr; }
+  .area-inner { grid-template-columns:1fr; }
+  .gallery-grid { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -333,10 +433,13 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       </div>
     </a>
     <ul class="nav-links">
-      <li><a href="#packages">Packages</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#gallery">Gallery</a>
+    <a href="#packages">Packages</a></li>
       <li><a href="#interior">Interior</a></li>
       <li><a href="#addons">Add-Ons</a></li>
       <li><a href="#plans">Maintenance</a></li>
+      <li><a href="#fleet">Fleet</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <a class="nav-cta" href="#booking">Book Now</a>
@@ -345,10 +448,12 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
     </button>
   </div>
   <div class="mob-menu" id="mobMenu">
+    <a href="#gallery" onclick="closeMenu()">Gallery</a>
     <a href="#packages" onclick="closeMenu()">Packages</a>
     <a href="#interior" onclick="closeMenu()">Interior</a>
     <a href="#addons" onclick="closeMenu()">Add-Ons</a>
     <a href="#plans" onclick="closeMenu()">Maintenance</a>
+    <a href="#fleet" onclick="closeMenu()">Fleet</a>
     <a href="#contact" onclick="closeMenu()">Contact</a>
     <a href="#booking" class="cta-m" onclick="closeMenu()">Book Now &rarr;</a>
   </div>
@@ -375,6 +480,80 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
     </div>
   </div>
 </section>
+
+<section id="gallery" class="gallery-sec">
+  <div class="wrap">
+    <div class="sec-head fade">
+      <span class="sec-label">Our Work</span>
+      <h2>Before &amp; <span class="silver">After</span></h2>
+      <p>Real results on real vehicles, in Jamaica. Every job photographed before and after — no filters, no staging.</p>
+    </div>
+    <div class="gallery-grid fade">
+      <div class="gcard">
+        <span class="gc-label before">Before</span>
+        <span class="gc-vehicle">BMW 5 Series</span>
+        <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/bmw_before.jpg" alt="BMW 5 Series before detailing" loading="lazy">
+      </div>
+      <div class="gcard">
+        <span class="gc-label after">After</span>
+        <span class="gc-vehicle">BMW 5 Series</span>
+        <span class="gc-service">Full Clean</span>
+        <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/bmw-final.png" alt="BMW 5 Series after detailing" loading="lazy">
+      </div>
+      <div class="gcard">
+        <span class="gc-label before">Before</span>
+        <span class="gc-vehicle">Nissan Sport</span>
+        <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/nissan_before.jpg" alt="Nissan before detailing" loading="lazy">
+      </div>
+      <div class="gcard">
+        <span class="gc-label after">After</span>
+        <span class="gc-vehicle">Nissan Sport</span>
+        <span class="gc-service">Full Clean</span>
+        <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/nissan_after.jpg" alt="Nissan after detailing" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="div">
+
+
+<section class="hiw-sec">
+  <div class="wrap">
+    <div class="sec-head fade">
+      <span class="sec-label">Simple Process</span>
+      <h2>How It <span class="silver">Works</span></h2>
+      <p>Four steps from booking to a spotless vehicle. No hidden steps, no surprises.</p>
+    </div>
+    <div class="hiw-steps fade">
+      <div class="hiw-step">
+        <div class="hiw-num">01</div>
+        <div class="hiw-icon">&#128203;</div>
+        <div class="hiw-title">Book Online or WhatsApp</div>
+        <div class="hiw-body">Fill in the booking form or message us directly. We confirm your slot and pricing within a few hours — no upfront payment required.</div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">02</div>
+        <div class="hiw-icon">&#128205;</div>
+        <div class="hiw-title">We Come to You</div>
+        <div class="hiw-body">We arrive at your location fully equipped — own water supply, own power, own products. You don't need to arrange anything.</div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">03</div>
+        <div class="hiw-icon">&#10024;</div>
+        <div class="hiw-title">We Detail Your Vehicle</div>
+        <div class="hiw-body">Walk-around inspection first, pre-existing damage noted. Then we work to your booked service tier — no shortcuts, no rushing.</div>
+      </div>
+      <div class="hiw-step">
+        <div class="hiw-num">04</div>
+        <div class="hiw-icon">&#9989;</div>
+        <div class="hiw-title">You Approve &amp; Pay</div>
+        <div class="hiw-body">Final walk-around with you before we collect payment. Cash, bank transfer, or mobile payment — all accepted on completion.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <hr class="div">
 
 <section id="packages" class="pkg-sec">
@@ -416,6 +595,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
           <div class="ttag">Interior &amp; exterior &middot; Complete service &middot; 75&ndash;90 min</div>
           <div class="tincs">
             <span class="inc">Everything in Quick Wash</span>
+            <span class="inc">Prewash dwell</span>
             <span class="inc hi">Interior vacuum</span>
             <span class="inc hi">APC dashboard &amp; console</span>
             <span class="inc">Interior glass &amp; mirrors</span>
@@ -647,7 +827,145 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
   </div>
 </section>
 
-<section class="notes-sec">
+
+<section class="area-sec">
+  <div class="wrap">
+    <div class="area-inner fade">
+      <div>
+        <span class="sec-label">Coverage</span>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(24px,3.5vw,38px);font-weight:300;margin-bottom:6px;">Where We <span style="color:var(--silver-l)">Operate</span></h2>
+        <p style="font-size:13px;color:var(--muted);max-width:480px;line-height:1.75;">Fully mobile across Kingston, St. Andrew, and St. Catherine. We come to your home, office, or compound — you stay put.</p>
+        <div class="area-zones">
+          <span class="zone">Kingston</span>
+          <span class="zone">St. Andrew</span>
+          <span class="zone">St. Catherine</span>
+          <span class="zone limited">Portmore</span>
+          <span class="zone limited">St. Thomas</span>
+        </div>
+        <p class="area-note"><strong>Green zones</strong> — standard pricing &nbsp;&middot;&nbsp; <strong style="color:var(--copper-l)">Amber zones</strong> — travel surcharge applies &middot; Confirmed at booking</p>
+      </div>
+      <div class="area-cta-block">
+        <div class="big">Mobile</div>
+        <div class="sm">Fully self-contained</div>
+        <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.7;">Own water &middot; Own power<br>Own products &middot; We come to you</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fleet" class="fleet-sec">
+  <div class="wrap">
+    <div class="sec-head fade">
+      <span class="sec-label" style="color:var(--green);">Section 04 &middot; Corporate &amp; Fleet</span>
+      <h2>Fleet &amp; Corporate <span class="silver">Accounts</span></h2>
+      <p>Structured, scheduled detailing for businesses operating three or more vehicles. Fixed rates, consolidated invoicing, and a rotation built around how your operation actually runs.</p>
+    </div>
+
+    <div class="fleet-intro fade">
+      <div class="fi">
+        <div class="fi-l">Who qualifies</div>
+        <div class="fi-v">Any business with <strong>3 or more vehicles</strong> &mdash; rental companies, delivery fleets, corporate pools, JUTA &amp; charter operators, taxis, contractors</div>
+      </div>
+      <div class="fi">
+        <div class="fi-l">How it works</div>
+        <div class="fi-v">Choose a service tier per vehicle. We build a rotation around your schedule. <strong>One invoice. One contact. One standard.</strong></div>
+      </div>
+      <div class="fi">
+        <div class="fi-l">Pricing structure</div>
+        <div class="fi-v">Volume discount applied per vehicle. Rates locked in for the agreement term. <strong>No mid-visit surprises.</strong></div>
+      </div>
+    </div>
+
+    <div class="fleet-tiers fade">
+      <div class="ft">
+        <div class="ft-size">Fleet Tier A</div>
+        <div class="ft-name">Small Fleet</div>
+        <div class="ft-vehicles">3 &ndash; 5 vehicles</div>
+        <div class="ft-discount">10%</div>
+        <div class="ft-discount-label">off standard per-vehicle pricing</div>
+        <div class="ft-perks">
+          <div class="ft-perk">Scheduled monthly rotation</div>
+          <div class="ft-perk">Consolidated single invoice</div>
+          <div class="ft-perk">Per-vehicle condition log</div>
+          <div class="ft-perk">Priority booking over retail clients</div>
+          <div class="ft-perk">WhatsApp schedule reminders</div>
+        </div>
+      </div>
+      <div class="ft featured">
+        <div class="ft-badge">Most Common</div>
+        <div class="ft-size">Fleet Tier B</div>
+        <div class="ft-name">Business Fleet</div>
+        <div class="ft-vehicles">6 &ndash; 14 vehicles</div>
+        <div class="ft-discount">15%</div>
+        <div class="ft-discount-label">off standard per-vehicle pricing</div>
+        <div class="ft-perks">
+          <div class="ft-perk strong">Everything in Small Fleet</div>
+          <div class="ft-perk">Bi-weekly scheduling windows</div>
+          <div class="ft-perk">Dedicated fleet service contact</div>
+          <div class="ft-perk">Mixed service tiers per vehicle</div>
+          <div class="ft-perk">Quarterly condition reporting</div>
+          <div class="ft-perk">Off-peak &amp; early morning slots</div>
+        </div>
+      </div>
+      <div class="ft">
+        <div class="ft-size">Fleet Tier C</div>
+        <div class="ft-name">Corporate Fleet</div>
+        <div class="ft-vehicles">15+ vehicles</div>
+        <div class="ft-discount">20%</div>
+        <div class="ft-discount-label">off standard per-vehicle pricing</div>
+        <div class="ft-perks">
+          <div class="ft-perk strong">Everything in Business Fleet</div>
+          <div class="ft-perk">Custom schedule &amp; rotation plan</div>
+          <div class="ft-perk">Monthly itemised invoicing</div>
+          <div class="ft-perk">GCT receipt on request</div>
+          <div class="ft-perk">Weekend &amp; on-site compound visits</div>
+          <div class="ft-perk">Annual contract rate lock-in</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="fleet-benefits fade">
+      <div class="fb">
+        <div class="fb-icon">&#128203;</div>
+        <div class="fb-title">Per-Vehicle Service Records</div>
+        <div class="fb-body">Every vehicle gets its own documented history &mdash; service dates, condition notes, and before-and-after photos on file.</div>
+      </div>
+      <div class="fb">
+        <div class="fb-icon">&#128197;</div>
+        <div class="fb-title">Rotation Scheduling</div>
+        <div class="fb-body">We build a schedule around your operation. Vehicles serviced in rotation so your fleet stays consistent without disrupting your day.</div>
+      </div>
+      <div class="fb">
+        <div class="fb-icon">&#129534;</div>
+        <div class="fb-title">Consolidated Invoicing</div>
+        <div class="fb-body">One invoice covers the full fleet. Bank transfer or mobile payment accepted. GCT receipts available for eligible businesses.</div>
+      </div>
+      <div class="fb">
+        <div class="fb-icon">&#128274;</div>
+        <div class="fb-title">Locked-In Rates</div>
+        <div class="fb-body">Fleet pricing is agreed upfront and protected for the duration of your contract. No mid-term increases.</div>
+      </div>
+      <div class="fb">
+        <div class="fb-icon">&#128663;</div>
+        <div class="fb-title">Any Vehicle Type</div>
+        <div class="fb-body">Sedans, SUVs, pickups, vans, minibuses &mdash; mixed fleets serviced across all tiers with pricing adjusted per vehicle class.</div>
+      </div>
+      <div class="fb">
+        <div class="fb-icon">&#128205;</div>
+        <div class="fb-title">On-Site at Your Location</div>
+        <div class="fb-body">We come to you &mdash; office carpark, compound, or lot. Fully mobile with our own water supply. No disruption to your workflow.</div>
+      </div>
+    </div>
+
+    <div class="fleet-cta fade">
+      <div class="fcta-left">
+        <h3>Request a Fleet Quote</h3>
+        <p>Send us your vehicle count, types, and preferred service frequency. We&rsquo;ll respond with a custom rate structure within 24 hours.<br>Reach us directly: <strong style="color:var(--text);">extracleancarwash@gmail.com &nbsp;&middot;&nbsp; (876) 817-6193</strong></p>
+      </div>
+      <a class="btn-fleet" href="#booking">Get Fleet Quote &rarr;</a>
+    </div>
+  </div>
+</section>
   <div class="wrap">
     <div class="notes-grid fade">
       <div class="ni"><div class="ni-icon">&#9888;&#65039;</div><div class="ni-title">Vehicle Condition</div><div class="ni-body">Heavily soiled or neglected vehicles may attract a surcharge of JMD 2,000&ndash;5,000. Always communicated and agreed before work begins.</div></div>
@@ -661,7 +979,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
 <section id="contact" class="contact-sec">
   <div class="wrap">
     <div class="sec-head fade">
-      <span class="sec-label">Section 04</span>
+      <span class="sec-label">Section 05</span>
       <h2>Get in <span class="silver">Touch</span></h2>
       <p>Reach out directly before booking. We respond fastest on WhatsApp &mdash; most messages answered within the hour.</p>
     </div>
@@ -705,7 +1023,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
 <section id="booking" class="booking-sec">
   <div class="wrap">
     <div class="sec-head fade" style="text-align:center;max-width:520px;margin:0 auto;">
-      <span class="sec-label" style="display:block;text-align:center;">Section 05</span>
+      <span class="sec-label" style="display:block;text-align:center;">Section 06</span>
       <h2>Book Your <span class="silver">Service</span></h2>
       <p>Fill in your details and we&rsquo;ll confirm your booking via WhatsApp within a few hours.</p>
     </div>
@@ -741,6 +1059,11 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
               <optgroup label="── Maintenance Plan ──">
                 <option>Maintenance Plan Enrolment</option>
               </optgroup>
+              <optgroup label="── Fleet &amp; Corporate ──">
+                <option>Fleet Account &mdash; Small Fleet (3&ndash;5 vehicles)</option>
+                <option>Fleet Account &mdash; Business Fleet (6&ndash;14 vehicles)</option>
+                <option>Fleet Account &mdash; Corporate Fleet (15+ vehicles)</option>
+              </optgroup>
             </select>
           </div>
           <div class="fg"><label for="f-date">Preferred Date</label><input type="date" id="f-date"></div>
@@ -773,15 +1096,26 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
   <div class="foot-logo"><span>Extra Clean</span> Auto Detailing</div>
   <div class="foot-tag">Mobile Professional Detailing &middot; Jamaica &middot; Not just a wash, a standard</div>
   <div class="foot-links">
+    <a href="#gallery">Gallery</a>
     <a href="#packages">Packages</a>
     <a href="#interior">Interior</a>
     <a href="#addons">Add-Ons</a>
     <a href="#plans">Maintenance</a>
+    <a href="#fleet">Fleet</a>
     <a href="#contact">Contact</a>
     <a href="#booking">Book Now</a>
   </div>
   <div class="foot-copy">All prices quoted in Jamaican Dollars (JMD) &middot; Subject to change with 30 days notice &middot; Vehicle condition surcharges apply where applicable<br>(876) 817-6193 &middot; extracleancarwash@gmail.com &middot; @extracleanautoja &middot; @extra.clean.auto &middot; ecadja.com</div>
 </footer>
+
+<!-- WhatsApp Float -->
+<div class="wa-float">
+  <span class="wa-label">Chat on WhatsApp</span>
+  <a class="wa-btn" href="https://wa.me/18768176193" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+    <div class="wa-pulse"></div>
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.549 4.112 1.51 5.845L.057 23.887c-.067.234.004.485.18.651a.638.638 0 00.666.138l6.288-2.064A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.754 9.754 0 01-5.062-1.41l-.362-.214-3.737 1.226 1.248-3.624-.236-.373A9.755 9.755 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+  </a>
+</div>
 
 <script>
 // Scroll fade-in
@@ -947,7 +1281,8 @@ async function submitForm() {
   var tyParams = new URLSearchParams({
     name: name, svc: svc, date: date, time: time, addr: addr
   });
-  window.location.href = '/thankyou?' + tyParams.toString();
+  var loadParams = new URLSearchParams({dest:'/thankyou', q:tyParams.toString()});
+  window.location.href = '/loading?' + loadParams.toString();
 }
 </script>
 </body>
