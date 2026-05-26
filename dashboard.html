@@ -593,12 +593,27 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
   .topbar-label { display: none; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
 }
-@media (max-width: 500px) {
-  .login-card { padding: 36px 26px 32px; }
-  .topbar { padding: 0 14px; }
-  .main { padding: 20px 14px; }
-  .stat-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+/* ── MAINTENANCE EXTRAS ─────────────────────────────────────────── */
+.b-maint {
+  background: rgba(22,35,64,.6);
+  color: var(--silver);
+  border-color: rgba(184,200,214,.25);
+  border-radius: 3px;
+  white-space: nowrap;
 }
+.btn-sig {
+  background: rgba(184,200,214,.06);
+  color: var(--silver-d);
+  border-color: rgba(184,200,214,.2);
+  font-size: 9px;
+}
+.btn-sig:hover { background: rgba(184,200,214,.14); color: var(--silver-l); border-color: var(--silver-d); }
+.btn-del {
+  background: var(--red-d);
+  color: var(--red);
+  border-color: rgba(207,91,91,.3);
+}
+.btn-del:hover { background: rgba(207,91,91,.25); }
 </style>
 </head>
 <body>
@@ -705,6 +720,17 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
             <line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>
           </svg>
           Service Records
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <span class="nav-sec-label">Recurring</span>
+        <button class="nav-btn" id="nb-maintenance" onclick="goTo('maintenance')">
+          <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          Maintenance Plan
+          <span class="nav-badge" id="badge-maint">0</span>
         </button>
       </div>
 
@@ -822,6 +848,23 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         </div>
       </div>
 
+      <!-- ── MAINTENANCE PLAN ─────────────────────────────────── -->
+      <div class="view" id="v-maintenance">
+        <div class="view-head">
+          <span class="view-eyebrow">Recurring Revenue</span>
+          <h1 class="view-h1">Maintenance <em>Plan Clients</em></h1>
+        </div>
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Enrolled Members</span>
+            <span class="sc-meta" id="maint-meta">—</span>
+          </div>
+          <div class="tbl-scroll" id="maintenance-wrap">
+            <div class="loading">Loading</div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div><!-- /dash-body -->
 </div><!-- /dashboard -->
@@ -859,6 +902,20 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 <div id="toast">
   <span class="toast-dot"></span>
   <span id="toast-msg"></span>
+</div>
+
+<!-- SIGNATURE MODAL -->
+<div class="modal-bg" id="sig-modal-bg" onclick="bgCloseSig(event)">
+  <div class="modal" style="max-width:560px">
+    <h2 class="modal-title" id="sig-modal-title">Client Signature</h2>
+    <div style="background:#181818;border:1px solid rgba(255,255,255,.06);border-radius:8px;padding:16px;text-align:center">
+      <img id="sig-img" src="" alt="Client signature" style="max-width:100%;max-height:220px;border-radius:4px;">
+    </div>
+    <div id="sig-detail-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px"></div>
+    <div class="mactions">
+      <button class="btn-cancel" onclick="document.getElementById('sig-modal-bg').classList.remove('open')">Close</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -948,7 +1005,7 @@ function playChime() {
 }
 
 // ── NAVIGATION ───────────────────────────────────────────────────
-const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records'];
+const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance'];
 
 function goTo(name) {
   VIEWS.forEach(v => {
@@ -958,11 +1015,12 @@ function goTo(name) {
   document.getElementById('v-' + name).classList.add('active');
   document.getElementById('nb-' + name).classList.add('active');
 
-  if (name === 'overview') loadOverview();
-  if (name === 'pending')  loadPending();
-  if (name === 'bookings') loadBookings();
-  if (name === 'clients')  loadClients();
-  if (name === 'records')  loadRecords();
+  if (name === 'overview')    loadOverview();
+  if (name === 'pending')     loadPending();
+  if (name === 'bookings')    loadBookings();
+  if (name === 'clients')     loadClients();
+  if (name === 'records')     loadRecords();
+  if (name === 'maintenance') loadMaintenance();
 
   // Close sidebar on mobile
   if (window.innerWidth <= 820) closeSidebar();
@@ -1349,6 +1407,83 @@ async function markComplete(id) {
   } catch(e) { toast(e.message, 'err'); }
 }
 
+
+// ── MAINTENANCE CLIENTS ───────────────────────────────────────────
+async function loadMaintenance() {
+  const wrap = document.getElementById('maintenance-wrap');
+  const meta = document.getElementById('maint-meta');
+  wrap.innerHTML = '<div class="loading">Loading</div>';
+
+  const { data, error } = await db.from('maintenance_clients')
+    .select('*').order('enrolled_at', { ascending: false });
+
+  if (error) {
+    wrap.innerHTML = `<div class="empty"><div class="empty-ico">⚠️</div><p class="empty-txt" style="color:var(--red)">${x(error.message)}</p></div>`;
+    return;
+  }
+  if (!data.length) {
+    wrap.innerHTML = '<div class="empty"><div class="empty-ico">🛡️</div><p class="empty-txt">No maintenance plan clients enrolled yet.</p></div>';
+    meta.textContent = '0 enrolled';
+    return;
+  }
+
+  meta.textContent = `${data.length} enrolled`;
+
+  // Update sidebar badge
+  const b = document.getElementById('badge-maint');
+  b.textContent = data.length; b.classList.add('vis');
+
+  const planLabel = p => {
+    if (!p) return '—';
+    if (p.includes('sedan')) return 'Sedan · $7,200';
+    if (p.includes('suv'))   return 'SUV · $9,000';
+    if (p.includes('van'))   return 'Van · $10,800';
+    return p;
+  };
+
+  wrap.innerHTML = tblHtml(
+    ['Client', 'Vehicle', 'Plan', 'Start Date', 'Pref. Day', 'Enrolled', 'Sig.'],
+    data.map(m => {
+      const enc = m.signature_data ? encodeURIComponent(m.signature_data) : '';
+      return [
+        `<span class="td-name">${x(m.full_name||'—')}</span><div class="td-phone">${x(m.phone||'')}</div>`,
+        `<span class="td-m">${x(m.vehicle_make_model||'—')}</span><div style="font-size:10px;color:var(--dim)">${x(m.colour||'')}${m.plate?' · '+x(m.plate):''}</div>`,
+        `<span class="badge b-maint">${x(planLabel(m.plan))}</span>`,
+        `<span class="td-m">${fd(m.start_date)}</span>`,
+        `<span class="td-m">${x(m.preferred_day||'—')}</span>`,
+        `<span class="td-d">${fd(m.enrolled_at)}</span>`,
+        m.signature_data
+          ? `<button class="btn-act btn-sig" onclick="viewSignature('${x(m.full_name)}','${x(m.vehicle_make_model)}','${x(m.plan)}','${x(m.start_date)}','${x(m.preferred_day)}','${enc}')">View</button>`
+          : `<span class="td-d">None</span>`
+      ];
+    })
+  );
+}
+
+function viewSignature(name, vehicle, plan, startDate, prefDay, encodedSig) {
+  const planLabel = p => {
+    if (!p || p==='undefined') return '—';
+    if (p.includes('sedan')) return 'Sedan / Car · JMD 7,200';
+    if (p.includes('suv'))   return 'SUV / Crossover · JMD 9,000';
+    if (p.includes('van'))   return 'Pickup / Van · JMD 10,800';
+    return p;
+  };
+  document.getElementById('sig-modal-title').textContent = name + ' — Signature';
+  document.getElementById('sig-img').src = decodeURIComponent(encodedSig);
+  document.getElementById('sig-detail-grid').innerHTML = [
+    ['Vehicle', vehicle || '—'],
+    ['Plan', planLabel(plan)],
+    ['Start Date', startDate || '—'],
+    ['Preferred Day', prefDay || '—'],
+  ].map(([lbl, val]) => `
+    <div style="background:var(--s3);border:1px solid rgba(255,255,255,.05);border-radius:6px;padding:10px 13px">
+      <div style="font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:4px">${lbl}</div>
+      <div style="font-size:12px;color:var(--text)">${x(val)}</div>
+    </div>`).join('');
+  document.getElementById('sig-modal-bg').classList.add('open');
+}
+
+function bgCloseSig(e) { if (e.target.id === 'sig-modal-bg') document.getElementById('sig-modal-bg').classList.remove('open'); }
 
 let toastTimer;
 function toast(msg, type) {
