@@ -112,7 +112,7 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
 </div>
 
 <script>
-emailjs.init('v8hsDP3tvGl5hTKRPOA7f');
+emailjs.init({ publicKey: 'b3LqB5Gho1tr958F5' });
 const { createClient } = supabase;
 const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
 
@@ -189,33 +189,6 @@ async function submitIntake() {
     }
   } catch(e) { console.log('DB:', e); }
 
-  // Customer email confirmation
-  if (email) {
-    emailjs.send('service_zesixiz', 'template_gya3qb7', {
-      to_email:    email,
-      client_name: name,
-      service:     svc,
-      date:        date || 'To be confirmed',
-      time:        time || 'To be confirmed',
-      address:     addr,
-      phone:       phone
-    }).catch(function(e) { console.log('Email note:', e); });
-  }
-
-  // WhatsApp to owner
-  const msg = encodeURIComponent(
-    '*New Booking — Extra Clean Auto Detailing*\n\n' +
-    '*Name:* ' + name + '\n' +
-    '*Phone:* ' + phone + '\n' +
-    '*Address:* ' + addr + '\n' +
-    '*Vehicle:* ' + vtype + (vdetail ? ' — ' + vdetail : '') + (plate ? ' (' + plate + ')' : '') + '\n' +
-    '*Service:* ' + svc + '\n' +
-    (date ? '*Date:* ' + date + '\n' : '') +
-    (time ? '*Time:* ' + time + '\n' : '') +
-    (notes ? '*Notes:* ' + notes : '')
-  );
-  // WhatsApp removed
-
   // Send emails and wait before redirecting
   var emailPromises = [];
 
@@ -246,8 +219,6 @@ async function submitIntake() {
   );
 
   await Promise.all(emailPromises);
-
-  // WhatsApp removed — email handles owner alerts
 
   // Redirect through loading screen to thank you page
   var tyParams   = new URLSearchParams({ name: name, svc: svc, date: date||'', time: time||'', addr: addr });
