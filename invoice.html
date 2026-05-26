@@ -207,23 +207,67 @@ document.getElementById('svc-next').value = next35.toISOString().split('T')[0];
 
 // ── Pre-fill from dashboard URL params ──────────────────────────────
 (function() {
-  var params = new URLSearchParams(window.location.search);
-  var name  = params.get('name');
-  var phone = params.get('phone');
-  var addr  = params.get('addr');
+  var p       = new URLSearchParams(window.location.search);
+  var name    = p.get('name')    || '';
+  var phone   = p.get('phone')   || '';
+  var addr    = p.get('address') || p.get('addr') || '';
+  var service = p.get('service') || '';
+  var date    = p.get('date')    || '';
+  var time    = p.get('time')    || '';
+  var notes   = p.get('notes')   || '';
+
+  if (!name && !phone) return; // not coming from dashboard — leave form as-is
+
+  // Text fields
   if (name)  document.getElementById('cl-name').value  = name;
   if (phone) document.getElementById('cl-phone').value = phone;
   if (addr)  document.getElementById('cl-addr').value  = addr;
-  // Auto-generate & show download button if we came from dashboard
-  if (name || phone) {
-    generateInvoice();
-    // Show a prominent download prompt
-    var dlBar = document.createElement('div');
-    dlBar.style.cssText = 'background:rgba(201,120,60,.12);border:1px solid rgba(201,120,60,.4);border-radius:6px;padding:12px 16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
-    dlBar.innerHTML = '<span style="font-size:12px;color:#e8a46a">&#128438; Invoice pre-filled for <strong>' + (name||phone) + '</strong> — fill in cost, then download.</span>'
-      + '<button class="btn print-btn" style="margin-top:0;width:auto;padding:10px 20px" onclick="window.print()">Download / Print</button>';
-    document.querySelector('.controls').insertBefore(dlBar, document.querySelector('.controls').firstChild);
+  if (notes) document.getElementById('svc-notes').value = notes;
+
+  // Service date → invoice date field
+  if (date)  document.getElementById('inv-date').value = date;
+
+  // Match service string to the nearest <select> option (case-insensitive substring)
+  if (service) {
+    var sel  = document.getElementById('svc-tier');
+    var sLow = service.toLowerCase();
+    var matched = false;
+    for (var i = 0; i < sel.options.length; i++) {
+      var optLow = sel.options[i].value.toLowerCase();
+      if (optLow.includes(sLow) || sLow.includes(optLow.split('—')[0].trim())) {
+        sel.selectedIndex = i;
+        matched = true;
+        break;
+      }
+    }
+    // If no option matched, append and select a custom option so nothing is lost
+    if (!matched) {
+      var opt = document.createElement('option');
+      opt.value = service;
+      opt.textContent = service;
+      sel.appendChild(opt);
+      sel.value = service;
+    }
   }
+
+  // Pre-generate the invoice preview immediately
+  generateInvoice();
+
+  // Notification banner
+  var timeStr = time ? ' · ' + time : '';
+  var dlBar   = document.createElement('div');
+  dlBar.style.cssText = 'background:rgba(201,120,60,.12);border:1px solid rgba(201,120,60,.4);border-radius:6px;padding:13px 18px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap';
+  dlBar.innerHTML =
+    '<div>'
+    + '<div style="font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:4px">Pre-filled from Dashboard</div>'
+    + '<div style="font-size:12px;color:var(--copper-l)"><strong>' + name + '</strong>'
+    + (date ? ' &nbsp;·&nbsp; ' + new Date(date + 'T00:00:00').toLocaleDateString('en-JM',{weekday:'short',month:'short',day:'numeric'}) : '')
+    + timeStr
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-top:3px">Add the service amount, then generate &amp; print.</div>'
+    + '</div>'
+    + '<button class="btn print-btn" style="margin-top:0;width:auto;padding:10px 20px;flex-shrink:0" onclick="window.print()">&#128438; Print / Save PDF</button>';
+  document.querySelector('.controls').insertBefore(dlBar, document.querySelector('.controls').firstChild);
 })();
 
 function addAddonRow() {
