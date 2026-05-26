@@ -1058,7 +1058,7 @@ async function loadPending() {
       ['Client', 'Phone', 'Service', 'Date', 'Time', 'Address', 'Notes', 'Actions'],
       data.map(b => {
         const bdate = b.service_date || b.preferred_date || b.booking_date || b.date || '';
-        const inv = btoa(JSON.stringify({
+        const inv = encodeURIComponent(JSON.stringify({
           name:    b.client_name  || '',
           phone:   b.phone        || '',
           service: b.service      || '',
@@ -1294,7 +1294,7 @@ async function loadRecords() {
         pBadge(r.payment_status),
         `<span class="td-d" style="max-width:180px;white-space:normal;display:inline-block;">${x(r.job_notes || '—')}</span>`,
         `<div style="display:flex;gap:6px;flex-wrap:wrap;">
-           <button class="btn-act btn-inv" data-inv="${btoa(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',service:r.service_tier||'',date:r.service_date||'',notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
+           <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',service:r.service_tier||'',date:r.service_date||'',notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
            ${(r.payment_status||'').toLowerCase() !== 'paid' && (r.payment_status||'').toLowerCase() !== 'completed'
              ? `<button class="btn-act btn-approve" onclick="markComplete('${r.id}')">✓ Complete</button>`
              : '<span class="badge b-approved" style="align-self:center;">Done</span>'}
@@ -1355,7 +1355,7 @@ function countUp(id, target) {
 
 // ── INVOICE REDIRECT ──────────────────────────────────────────────
 function goInvoice(el) {
-  const info = JSON.parse(atob(el.dataset.inv));
+  const info = JSON.parse(decodeURIComponent(el.dataset.inv));
   const invParams  = new URLSearchParams({
     name:    info.name    || '',
     phone:   info.phone   || '',
