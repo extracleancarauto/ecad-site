@@ -87,6 +87,7 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>emailjs.init('v8hsDP3tvGl5hTKRPOA7f');</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -144,7 +145,7 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
       <button class="btn" onclick="generateInvoice(); sendConfirmationEmails();">Generate Invoice</button>
       <button class="btn ghost" onclick="resetForm()">Reset</button>
     </div>
-    <button class="btn print-btn" onclick="window.print()">&#128438; Print / Save as PDF</button>
+    <button class="btn print-btn" onclick="downloadPDF()">&#11015; Download Invoice PDF</button>
   </div>
 
   <!-- INVOICE -->
@@ -274,7 +275,7 @@ document.getElementById('svc-next').value = next35.toISOString().split('T')[0];
     + '</div>'
     + '<div style="font-size:11px;color:var(--muted);margin-top:3px">Add the service amount, then generate &amp; print.</div>'
     + '</div>'
-    + '<button class="btn print-btn" style="margin-top:0;width:auto;padding:10px 20px;flex-shrink:0" onclick="window.print()">&#128438; Print / Save PDF</button>';
+    + '<button class="btn print-btn" style="margin-top:0;width:auto;padding:10px 20px;flex-shrink:0" onclick="downloadPDF()">&#11015; Download PDF</button>';
   document.querySelector('.controls').insertBefore(dlBar, document.querySelector('.controls').firstChild);
 })();
 
@@ -315,6 +316,24 @@ function sendConfirmationEmails() {
       ...emailData, to_email: clientEmail, reply_to: clientEmail
     }).catch(e => console.log('Customer email:', e));
   }
+}
+
+function downloadPDF() {
+  generateInvoice();
+  const element  = document.getElementById('invoice');
+  const invNum   = document.getElementById('inv-num').value.trim() || '001';
+  const client   = document.getElementById('cl-name').value.trim().replace(/\s+/g, '-') || 'Client';
+  const filename = 'ECAD-Invoice-' + invNum + '-' + client + '.pdf';
+
+  const opt = {
+    margin:     [8, 8, 8, 8],
+    filename:   filename,
+    image:      { type: 'jpeg', quality: 0.98 },
+    html2canvas:{ scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
+    jsPDF:      { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  html2pdf().set(opt).from(element).save();
 }
 
 function generateInvoice() {
