@@ -961,7 +961,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <h3>Request a Fleet Quote</h3>
         <p>Send us your vehicle count, types, and preferred service frequency. We&rsquo;ll respond with a custom rate structure within 24 hours.<br>Reach us directly: <strong style="color:var(--text);">extracleancarwash@gmail.com &nbsp;&middot;&nbsp; (876) 817-6193</strong></p>
       </div>
-      <a class="btn-fleet" href="/fleet-quote">Get Fleet Quote &rarr;</a>
+      <a class="btn-fleet" href="#booking">Get Fleet Quote &rarr;</a>
     </div>
   </div>
 </section>
@@ -1031,7 +1031,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="form-grid">
           <div class="fg"><label for="f-name">Full Name</label><input type="text" id="f-name" placeholder="Your full name" autocomplete="name"></div>
           <div class="fg"><label for="f-phone">WhatsApp / Phone</label><input type="tel" id="f-phone" placeholder="+1 (876) 000-0000" autocomplete="tel"></div>
-          <div class="fg"><label for="f-email">Email (for confirmation)</label><input type="email" id="f-email" placeholder="your@email.com" autocomplete="email"></div>
+          <div class="fg"><label for="f-email">Email (for confirmation)</label><input type="email" id="f-email" placeholder="your@email.com" autocomplete="email" required></div>
           <div class="fg full"><label for="f-addr">Service Address</label><input type="text" id="f-addr" placeholder="Where should we come to? Include area / community"></div>
           <div class="fg"><label for="f-vtype">Vehicle Type</label>
             <select id="f-vtype">
@@ -1193,8 +1193,10 @@ async function submitForm() {
   const date  = document.getElementById('f-date').value;
   const time  = document.getElementById('f-time').value;
 
-  if (!name || !phone || !addr || !vtype || !svc || !date || !time) {
-    alert('Please fill in all required fields before submitting.');
+  const email = document.getElementById('f-email') ? document.getElementById('f-email').value.trim() : '';
+
+  if (!name || !phone || !addr || !vtype || !svc || !date || !time || !email) {
+    alert('Please fill in all required fields before submitting, including your email address.');
     return;
   }
 
@@ -1205,46 +1207,54 @@ async function submitForm() {
   btn.textContent = 'Sending...';
   btn.disabled = true;
 
-  // Save to Supabase bookings table
+  // Save to Supabase — upsert client then write to service_records
   try {
-    await db.from('bookings').insert([{
-      name: name,
-      phone: phone,
-      address: addr,
-      vehicle: (vd ? vtype + ' — ' + vd : vtype),
-      service: svc,
-      preferred_date: date,
-      preferred_time: time,
-      notes: notes || null,
-      status: 'pending'
-    }]);
+    const { data: existing } = await db.from('clients').select('id').eq('phone', phone).maybeSingle();
+    let clientId = existing?.id;
+
+    if (!clientId) {
+      const { data: nc } = await db.from('clients').insert([{
+        full_name: name, phone, email: email || null,
+        service_address: addr, referral_source: 'Website — Home Page'
+      }]).select('id').single();
+      clientId = nc?.id;
+    }
+
+    if (clientId) {
+      const jobNotes = [
+        vd ? 'Vehicle detail: ' + vd : null,
+        date ? 'Requested date: ' + date : null,
+        time ? 'Requested time: ' + time : null,
+        notes || null
+      ].filter(Boolean).join(' | ');
+
+      await db.from('service_records').insert([{
+        client_id:      clientId,
+        service_date:   date || new Date().toISOString().split('T')[0],
+        service_tier:   svc,
+        job_notes:      jobNotes || null,
+        payment_status: 'Pending'
+      }]);
+    }
   } catch(e) {
     console.log('DB note:', e);
   }
 
-  // Notification handled by email
-  // Customer email confirmation
-  var emailInput = document.getElementById('f-notes');
-  var emailVal = ''; // main form has no dedicated email field — skip silently
-
   // Send emails and wait for both before redirecting
   var emailPromises = [];
 
-  var fEmail = document.getElementById('f-email');
-  if (fEmail && fEmail.value.trim()) {
-    emailPromises.push(
-      emailjs.send('service_zesixiz', 'template_gya3qb7', {
-        to_email:    fEmail.value.trim(),
-        client_name: name,
-        service:     svc,
-        date:        date,
-        time:        time,
-        address:     addr,
-        phone:       phone,
-        reply_to:    fEmail.value.trim()
-      }).catch(function(e) { console.log('Customer email:', e); })
-    );
-  }
+  emailPromises.push(
+    emailjs.send('service_zesixiz', 'template_gya3qb7', {
+      to_email:    email,
+      client_name: name,
+      service:     svc,
+      date:        date,
+      time:        time,
+      address:     addr,
+      phone:       phone,
+      reply_to:    email
+    }).catch(function(e) { console.log('Customer email:', e); })
+  );
 
   emailPromises.push(
     emailjs.send('service_zesixiz', 'template_kr6ydp8', {
