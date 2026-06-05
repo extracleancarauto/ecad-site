@@ -55,7 +55,7 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
       <div class="form-grid">
         <div class="fg full"><label>Full Name *</label><input type="text" id="b-name" placeholder="Your full name" autocomplete="name"></div>
         <div class="fg"><label>WhatsApp / Phone *</label><input type="tel" id="b-phone" placeholder="(876) 000-0000" autocomplete="tel"></div>
-        <div class="fg"><label>Email</label><input type="email" id="b-email" placeholder="email@example.com" autocomplete="email" required></div>
+        <div class="fg"><label>Email *</label><input type="email" id="b-email" placeholder="email@example.com" autocomplete="email" required></div>
         <div class="fg full"><label>Service Address *</label><input type="text" id="b-addr" placeholder="Where should we come to?"></div>
         <div class="fg"><label>Vehicle Type *</label>
           <select id="b-vtype">
@@ -126,19 +126,22 @@ async function submitIntake() {
   const addr  = document.getElementById('b-addr').value.trim();
   const vtype = document.getElementById('b-vtype').value;
   const svc   = document.getElementById('b-service').value;
+  const email = document.getElementById('b-email').value.trim();
 
   if (!name || !phone || !addr || !vtype || !svc || !email) {
     alert('Please fill in all required fields, including your email address.');
     return;
   }
 
-  const email   = document.getElementById('b-email').value.trim();
   const vdetail = document.getElementById('b-vdetail').value.trim();
   const plate   = document.getElementById('b-plate').value.trim();
   const color   = document.getElementById('b-color').value.trim();
   const date    = document.getElementById('b-date').value;
   const time    = document.getElementById('b-time').value;
   const notes   = document.getElementById('b-notes').value.trim();
+
+  // Build a single vehicle string for invoice prefill and job notes
+  const vehicleStr = [vtype, vdetail, color, plate].filter(Boolean).join(' — ');
 
   const btn = document.querySelector('.btn');
   btn.textContent = 'Sending...'; btn.disabled = true;
@@ -171,9 +174,9 @@ async function submitIntake() {
         vehicleId = veh?.id;
       }
 
-      // Add service record as pending
+      // Add service record as pending — use 'Vehicle detail:' prefix so dashboard extractVehicle() can parse it
       const jobNotes = [
-        vdetail ? 'Vehicle: ' + vdetail : null,
+        vehicleStr ? 'Vehicle detail: ' + vehicleStr : null,
         date ? 'Requested date: ' + date : null,
         time ? 'Requested time: ' + time : null,
         notes || null

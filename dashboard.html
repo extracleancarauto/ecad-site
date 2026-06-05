@@ -614,18 +614,6 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
   border-color: rgba(207,91,91,.3);
 }
 .btn-del:hover { background: rgba(207,91,91,.25); }
-.live-clock {
-  font-size: 10px;
-  color: var(--silver-d);
-  letter-spacing: .06em;
-  font-family: 'Sora', sans-serif;
-  font-weight: 300;
-  white-space: nowrap;
-  padding: 4px 10px;
-  background: rgba(255,255,255,.03);
-  border: 1px solid var(--bsoft);
-  border-radius: 4px;
-}
 </style>
 </head>
 <body>
@@ -674,7 +662,6 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
     <div class="topbar-sep"></div>
     <span class="topbar-label">Operations Dashboard</span>
     <div class="topbar-right">
-      <span class="live-clock" id="live-clock"></span>
       <span class="topbar-user-pill">
         <span class="user-dot"></span>
         <span id="uname-display">—</span>
@@ -1113,7 +1100,7 @@ async function loadPending() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone, service_address)')
+      .select('*, clients(full_name, phone, email, service_address)')
       .eq('payment_status', 'Pending')
       .order('created_at', { ascending: false });
 
@@ -1135,9 +1122,11 @@ async function loadPending() {
         const inv = encodeURIComponent(JSON.stringify({
           name:    r.clients?.full_name        || '',
           phone:   r.clients?.phone            || '',
+          email:   r.clients?.email            || '',
           service: r.service_tier              || '',
           date:    r.service_date              || '',
           address: r.clients?.service_address  || '',
+          vehicle: extractVehicle(r.job_notes),
           notes:   r.job_notes                 || '',
           id:      r.id
         }));
@@ -1201,7 +1190,7 @@ async function loadBookings() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone)')
+      .select('*, clients(full_name, phone, email, service_address)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -1311,7 +1300,7 @@ async function loadRecords() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone)')
+      .select('*, clients(full_name, phone, email, service_address)')
       .order('service_date', { ascending: false });
 
     if (error) throw error;
@@ -1332,7 +1321,7 @@ async function loadRecords() {
         pBadge(r.payment_status),
         `<span class="td-d" style="max-width:180px;white-space:normal;display:inline-block;">${x(r.job_notes || '—')}</span>`,
         `<div style="display:flex;gap:6px;flex-wrap:wrap;">
-           <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',service:r.service_tier||'',date:r.service_date||'',notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
+           <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',email:r.clients?.email||'',service:r.service_tier||'',date:r.service_date||'',address:r.clients?.service_address||'',vehicle:extractVehicle(r.job_notes),notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
            ${(r.payment_status||'').toLowerCase() !== 'paid' && (r.payment_status||'').toLowerCase() !== 'completed'
              ? `<button class="btn-act btn-approve" onclick="markComplete('${r.id}')">✓ Complete</button>`
              : '<span class="badge b-approved" style="align-self:center;">Done</span>'}
@@ -1392,15 +1381,23 @@ function countUp(id, target) {
 }
 
 // ── INVOICE REDIRECT ──────────────────────────────────────────────
+function extractVehicle(notes) {
+  if (!notes) return '';
+  const m = notes.match(/Vehicle detail:\s*([^|]+)/i);
+  return m ? m[1].trim() : '';
+}
+
 function goInvoice(el) {
   const info = JSON.parse(decodeURIComponent(el.dataset.inv));
   const invParams  = new URLSearchParams({
     name:    info.name    || '',
     phone:   info.phone   || '',
+    email:   info.email   || '',
     service: info.service || '',
     date:    info.date    || '',
     time:    info.time    || '',
     address: info.address || '',
+    vehicle: info.vehicle || '',
     notes:   info.notes   || '',
     id:      info.id      || ''
   });
@@ -1508,27 +1505,6 @@ function toast(msg, type) {
   el.classList.add('show');
   toastTimer = setTimeout(() => el.classList.remove('show'), 3400);
 }
-
-// ── LIVE CLOCK ───────────────────────────────────────────────────
-(function startClock() {
-  const DAYS   = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  function tick() {
-    const now  = new Date();
-    const day  = DAYS[now.getDay()];
-    const date = now.getDate();
-    const mon  = MONTHS[now.getMonth()];
-    let   h    = now.getHours();
-    const m    = String(now.getMinutes()).padStart(2,'0');
-    const s    = String(now.getSeconds()).padStart(2,'0');
-    const ap   = h >= 12 ? 'PM' : 'AM';
-    h = h % 12 || 12;
-    const el = document.getElementById('live-clock');
-    if (el) el.textContent = `${day}, ${date} ${mon}  ·  ${h}:${m}:${s} ${ap}`;
-  }
-  tick();
-  setInterval(tick, 1000);
-})();
 </script>
 </body>
 </html>

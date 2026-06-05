@@ -230,8 +230,10 @@ document.getElementById('svc-next').value = next35.toISOString().split('T')[0];
   if (phone) document.getElementById('cl-phone').value = phone;
   if (addr)  document.getElementById('cl-addr').value  = addr;
   if (notes) document.getElementById('svc-notes').value = notes;
-  var email = p.get('email') || '';
-  if (email) document.getElementById('cl-email').value = email;
+  var email   = p.get('email')   || '';
+  var vehicle = p.get('vehicle') || '';
+  if (email)   document.getElementById('cl-email').value   = email;
+  if (vehicle) document.getElementById('cl-vehicle').value = vehicle;
 
   // Service date → invoice date field
   if (date)  document.getElementById('inv-date').value = date;
