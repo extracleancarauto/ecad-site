@@ -328,11 +328,31 @@ function downloadPDF() {
   const filename = 'ECAD-Invoice-' + invNum + '-' + client + '.pdf';
 
   const opt = {
-    margin:     [8, 8, 8, 8],
+    margin:     [10, 10, 10, 10],
     filename:   filename,
     image:      { type: 'jpeg', quality: 0.98 },
-    html2canvas:{ scale: 2, useCORS: true, letterRendering: true, backgroundColor: '#ffffff' },
-    jsPDF:      { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    html2canvas: {
+      scale:           2,
+      useCORS:         true,
+      letterRendering: true,
+      backgroundColor: '#ffffff',
+      scrollY:         0,
+      scrollX:         0,
+      windowWidth:     element.scrollWidth,
+      onclone: function(clonedDoc) {
+        const inv = clonedDoc.getElementById('invoice');
+        if (inv) {
+          inv.style.borderRadius = '0';
+          inv.style.boxShadow    = 'none';
+          inv.style.margin       = '0';
+          inv.style.width        = '100%';
+        }
+        clonedDoc.querySelectorAll('.screen-only').forEach(function(el) {
+          el.style.display = 'none';
+        });
+      }
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
   html2pdf().set(opt).from(element).save();
