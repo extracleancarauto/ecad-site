@@ -77,6 +77,22 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
   .invoice{box-shadow:none;border-radius:0;padding:32px}
   .wrap{max-width:100%}
 }
+
+/* ── LOGIN GATE ─────────────────────────────────────────── */
+#inv-login{position:fixed;inset:0;background:#0a0a0a;display:flex;align-items:center;justify-content:center;z-index:9999}
+#inv-login::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(76,175,130,.05) 0%,transparent 70%);pointer-events:none}
+.il-card{background:#111;border:1px solid rgba(184,200,214,.15);border-radius:12px;padding:40px 36px;width:100%;max-width:360px;position:relative;z-index:1}
+.il-brand{text-align:center;margin-bottom:32px}
+.il-name{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--silver-l);letter-spacing:.04em}
+.il-name em{font-style:italic;color:var(--silver)}
+.il-sub{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:var(--dim);margin-top:5px}
+.il-field{margin-bottom:14px}
+.il-label{font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--silver-d);display:block;margin-bottom:5px}
+.il-input{width:100%;background:#1a1a1a;border:1px solid rgba(255,255,255,.07);border-radius:5px;color:var(--text);font-family:'Sora',sans-serif;font-size:12px;padding:10px 13px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.il-input:focus{border-color:var(--silver-d)}
+.il-btn{width:100%;background:var(--silver);color:#000;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;padding:12px;border:none;border-radius:5px;cursor:pointer;margin-top:6px;transition:background .2s,transform .2s}
+.il-btn:hover{background:var(--silver-l);transform:translateY(-1px)}
+.il-err{font-size:11px;color:#e57373;text-align:center;margin-top:10px;min-height:16px}
 @media(max-width:520px){
   .form-grid{grid-template-columns:1fr}
   .inv-header{flex-direction:column;gap:12px}
@@ -90,6 +106,29 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
+
+<!-- ── LOGIN GATE ─────────────────────────────────────────────── -->
+<div id="inv-login">
+  <div class="il-card">
+    <div class="il-brand">
+      <div class="il-name">Extra <em>Clean</em></div>
+      <div class="il-sub">Invoice · Staff Access</div>
+    </div>
+    <div class="il-field">
+      <label class="il-label" for="il-user">Username</label>
+      <input class="il-input" id="il-user" type="text" placeholder="Username" autocomplete="username">
+    </div>
+    <div class="il-field">
+      <label class="il-label" for="il-pass">Password</label>
+      <input class="il-input" id="il-pass" type="password" placeholder="Password" autocomplete="current-password">
+    </div>
+    <button class="il-btn" onclick="invLogin()">Access Invoice</button>
+    <div class="il-err" id="il-err"></div>
+  </div>
+</div>
+
+<!-- ── MAIN CONTENT ───────────────────────────────────────────── -->
+<div id="inv-main" style="display:none">
 <div class="wrap">
 
   <!-- CONTROLS -->
@@ -204,9 +243,31 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
     </div>
   </div>
 
-</div>
+</div><!-- /inv-main -->
+</div><!-- /wrap -->
 <script>
-// Set today's date
+// ── LOGIN GATE ───────────────────────────────────────────────────
+const INV_USERS = { 'Hyperion': 'ecad2026', 'Axion': 'Ax#7291' };
+function invLogin() {
+  const user = document.getElementById('il-user').value.trim();
+  const pass = document.getElementById('il-pass').value;
+  const err  = document.getElementById('il-err');
+  if (INV_USERS[user] && INV_USERS[user] === pass) {
+    document.getElementById('inv-login').style.display = 'none';
+    document.getElementById('inv-main').style.display  = 'block';
+    initInvoice();
+  } else {
+    err.textContent = 'Invalid credentials.';
+    document.getElementById('il-pass').value = '';
+    document.getElementById('il-pass').focus();
+  }
+}
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('il-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') invLogin(); });
+  document.getElementById('il-user').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('il-pass').focus(); });
+});
+
+function initInvoice() {
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('inv-date').value = today;
 const next35 = new Date(); next35.setDate(next35.getDate()+35);
@@ -272,7 +333,7 @@ document.getElementById('svc-next').value = next35.toISOString().split('T')[0];
     '<div>'
     + '<div style="font-size:9px;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--copper);margin-bottom:4px">Pre-filled from Dashboard</div>'
     + '<div style="font-size:12px;color:var(--copper-l)"><strong>' + name + '</strong>'
-    + (date ? ' &nbsp;·&nbsp; ' + new Date(date + 'T00:00:00').toLocaleDateString('en-JM',{weekday:'short',month:'short',day:'numeric'}) : '')
+    + (date ? ' &nbsp;·&nbsp; ' + fmtDate(date, {weekday:'short',month:'short',day:'numeric'}) : '')
     + timeStr
     + '</div>'
     + '<div style="font-size:11px;color:var(--muted);margin-top:3px">Add the service amount, then generate &amp; print.</div>'
@@ -280,6 +341,7 @@ document.getElementById('svc-next').value = next35.toISOString().split('T')[0];
     + '<button class="btn print-btn" style="margin-top:0;width:auto;padding:10px 20px;flex-shrink:0" onclick="downloadPDF()">&#11015; Download PDF</button>';
   document.querySelector('.controls').insertBefore(dlBar, document.querySelector('.controls').firstChild);
 })();
+} // end initInvoice()
 
 function addAddonRow() {
   const row = document.createElement('div');
@@ -358,13 +420,20 @@ function downloadPDF() {
   html2pdf().set(opt).from(element).save();
 }
 
+// ── DATE FORMATTER (prevents UTC midnight timezone rollback) ──────
+function fmtDate(str, opts) {
+  if (!str) return '—';
+  const [y, m, d] = str.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-JM', opts);
+}
+
 function generateInvoice() {
   const num = document.getElementById('inv-num').value || '001';
   const date = document.getElementById('inv-date').value;
   const status = document.getElementById('svc-status').value;
 
   document.getElementById('out-num').textContent = '#' + num;
-  document.getElementById('out-date').textContent = date ? new Date(date).toLocaleDateString('en-JM',{year:'numeric',month:'long',day:'numeric'}) : '—';
+  document.getElementById('out-date').textContent = date ? fmtDate(date, {year:'numeric',month:'long',day:'numeric'}) : '—';
   document.getElementById('out-name').textContent = document.getElementById('cl-name').value || '—';
   document.getElementById('out-phone').textContent = document.getElementById('cl-phone').value || '—';
   document.getElementById('out-vehicle').textContent = document.getElementById('cl-vehicle').value || '—';
@@ -398,7 +467,7 @@ function generateInvoice() {
   const nextWrap = document.getElementById('out-next-wrap');
   if (nextDate) {
     nextWrap.style.display = 'block';
-    document.getElementById('out-next-date').textContent = new Date(nextDate).toLocaleDateString('en-JM',{year:'numeric',month:'long',day:'numeric'});
+    document.getElementById('out-next-date').textContent = fmtDate(nextDate, {year:'numeric',month:'long',day:'numeric'});
   } else { nextWrap.style.display = 'none'; }
 
   const notes = document.getElementById('svc-notes').value.trim();
