@@ -313,7 +313,53 @@ body::before {
   position: relative; z-index: 1;
 }
 
-/* ── VIEWS ──────────────────────────────────────────────────────── */
+/* ── COMMAND CENTRE ─────────────────────────────────────────────── */
+.cmd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media(max-width:900px){ .cmd-grid { grid-template-columns: 1fr; } }
+.cmd-col { display: flex; flex-direction: column; gap: 20px; }
+
+.cmd-card { background: var(--s2); border: 1px solid var(--bsoft); border-radius: 10px; padding: 22px 24px; }
+.cmd-card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
+.cmd-card-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--text); }
+.cmd-card-sub { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--silver-d); }
+
+/* Task items */
+.cmd-group-label { font-size: 8px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--copper-l); margin: 14px 0 8px; display: block; }
+.cmd-group-label:first-child { margin-top: 0; }
+.cmd-task { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.03); cursor: pointer; }
+.cmd-task:last-child { border-bottom: none; }
+.cmd-task input[type=checkbox] { margin-top: 2px; accent-color: var(--green); flex-shrink: 0; cursor: pointer; }
+.cmd-task-text { font-size: 12px; color: var(--muted); line-height: 1.45; transition: color .2s; }
+.cmd-task.done .cmd-task-text { color: var(--dim); text-decoration: line-through; }
+.cmd-task-badge { font-size: 8px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
+.badge-now  { background: rgba(207,91,91,.15);  color: var(--red);      border: 1px solid rgba(207,91,91,.25); }
+.badge-soon { background: rgba(201,120,60,.1);  color: var(--copper-l); border: 1px solid rgba(201,120,60,.22); }
+.badge-plan { background: rgba(184,200,214,.06);color: var(--silver-d); border: 1px solid var(--bsoft); }
+
+/* Roadmap items */
+.cmd-seq { display: flex; flex-direction: column; gap: 0; }
+.cmd-seq-item { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; position: relative; }
+.cmd-seq-item:not(:last-child)::before { content:''; position: absolute; left: 11px; top: 28px; width: 1px; height: calc(100% - 8px); background: var(--bsoft); }
+.cmd-seq-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+.seq-active  { background: rgba(76,175,130,.15); border: 1px solid rgba(76,175,130,.4); color: var(--green); }
+.seq-next    { background: rgba(201,120,60,.1);  border: 1px solid rgba(201,120,60,.3); color: var(--copper-l); }
+.seq-future  { background: var(--s3); border: 1px solid var(--bsoft); color: var(--dim); }
+.cmd-seq-body { flex: 1; }
+.cmd-seq-name { font-size: 12px; color: var(--silver-d); font-weight: 500; line-height: 1.3; }
+.cmd-seq-item.seq-active-item .cmd-seq-name { color: var(--silver-l); }
+.cmd-seq-note { font-size: 10px; color: var(--dim); margin-top: 2px; line-height: 1.4; }
+
+/* Skill stages */
+.cmd-stage { background: var(--s3); border: 1px solid var(--bsoft); border-radius: 7px; padding: 14px 16px; margin-bottom: 10px; }
+.cmd-stage:last-child { margin-bottom: 0; }
+.cmd-stage-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.cmd-stage-num  { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
+.stage-current  { background: rgba(76,175,130,.12); color: var(--green); border: 1px solid rgba(76,175,130,.3); }
+.stage-locked   { background: var(--s4); color: var(--dim); border: 1px solid var(--bsoft); }
+.cmd-stage-title{ font-size: 13px; color: var(--silver-d); font-weight: 500; }
+.cmd-stage.active-stage .cmd-stage-title { color: var(--silver-l); }
+.cmd-stage-items{ font-size: 11px; color: var(--dim); line-height: 1.8; }
+.cmd-stage.active-stage .cmd-stage-items { color: var(--muted); }
 .view { display: none; animation: fadeUp .35s ease forwards; }
 .view.active { display: block; }
 @keyframes fadeUp {
@@ -734,6 +780,16 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         </button>
       </div>
 
+      <div class="nav-section">
+        <span class="nav-sec-label">Command</span>
+        <button class="nav-btn" id="nb-command" onclick="goTo('command')">
+          <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M9 17H5a2 2 0 00-2 2v0a2 2 0 002 2h14a2 2 0 002-2v0a2 2 0 00-2-2h-4M12 3v14M9 6l3-3 3 3"/>
+          </svg>
+          Command Centre
+        </button>
+      </div>
+
     </aside>
 
     <!-- MAIN CONTENT -->
@@ -864,6 +920,250 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
           </div>
         </div>
       </div>
+
+      <!-- ── COMMAND CENTRE ──────────────────────────────────────── -->
+      <div class="view" id="v-command">
+        <div class="view-head">
+          <span class="view-eyebrow">Operations</span>
+          <h1 class="view-h1">Command <em>Centre</em></h1>
+        </div>
+
+        <div class="cmd-grid">
+
+          <!-- LEFT COLUMN ──────────────────────────────────────── -->
+          <div class="cmd-col">
+
+            <!-- Priority Tasks -->
+            <div class="cmd-card">
+              <div class="cmd-card-head">
+                <span class="cmd-card-title">Priority Actions</span>
+                <span class="cmd-card-sub">Tap to check off</span>
+              </div>
+
+              <span class="cmd-group-label">🔴 Immediate</span>
+
+              <label class="cmd-task" id="ct-subaru">
+                <input type="checkbox" onchange="saveTask('ct-subaru',this.checked)">
+                <span class="cmd-task-text">Close Subaru client on maintenance plan — specific date, in person</span>
+                <span class="cmd-task-badge badge-now">Now</span>
+              </label>
+              <label class="cmd-task" id="ct-post">
+                <input type="checkbox" onchange="saveTask('ct-post',this.checked)">
+                <span class="cmd-task-text">Post Subaru before/after content — exterior transformation is ready</span>
+                <span class="cmd-task-badge badge-now">Now</span>
+              </label>
+              <label class="cmd-task" id="ct-trn">
+                <input type="checkbox" onchange="saveTask('ct-trn',this.checked)">
+                <span class="cmd-task-text">Visit TAJ — obtain Business TRN (unlocks everything below)</span>
+                <span class="cmd-task-badge badge-now">Now</span>
+              </label>
+
+              <span class="cmd-group-label">🟠 This Month</span>
+
+              <label class="cmd-task" id="ct-tax">
+                <input type="checkbox" onchange="saveTask('ct-tax',this.checked)">
+                <span class="cmd-task-text">Get Tax Compliance Certificate from TAJ after Business TRN issued</span>
+                <span class="cmd-task-badge badge-soon">Soon</span>
+              </label>
+              <label class="cmd-task" id="ct-bank">
+                <input type="checkbox" onchange="saveTask('ct-bank',this.checked)">
+                <span class="cmd-task-text">Open business bank account — approach NCB or JN Bank first, not CIBC</span>
+                <span class="cmd-task-badge badge-soon">Soon</span>
+              </label>
+              <label class="cmd-task" id="ct-fleet">
+                <input type="checkbox" onchange="saveTask('ct-fleet',this.checked)">
+                <span class="cmd-task-text">Re-attempt fleet meeting through official procurement channels</span>
+                <span class="cmd-task-badge badge-soon">Soon</span>
+              </label>
+              <label class="cmd-task" id="ct-outreach">
+                <input type="checkbox" onchange="saveTask('ct-outreach',this.checked)">
+                <span class="cmd-task-text">10 direct personal outreaches — lead with work, not price</span>
+                <span class="cmd-task-badge badge-soon">Soon</span>
+              </label>
+              <label class="cmd-task" id="ct-headlight">
+                <input type="checkbox" onchange="saveTask('ct-headlight',this.checked)">
+                <span class="cmd-task-text">Source headlight restoration kit — practice sessions on the Serena</span>
+                <span class="cmd-task-badge badge-soon">Soon</span>
+              </label>
+
+              <span class="cmd-group-label">⚪ Planned</span>
+
+              <label class="cmd-task" id="ct-plates">
+                <input type="checkbox" onchange="saveTask('ct-plates',this.checked)">
+                <span class="cmd-task-text">Green plate conversion at TARA — legal requirement for commercial equipment transport</span>
+                <span class="cmd-task-badge badge-plan">Planned</span>
+              </label>
+              <label class="cmd-task" id="ct-insurance">
+                <input type="checkbox" onchange="saveTask('ct-insurance',this.checked)">
+                <span class="cmd-task-text">Update insurance to commercial classification after green plates secured</span>
+                <span class="cmd-task-badge badge-plan">Planned</span>
+              </label>
+              <label class="cmd-task" id="ct-tablet">
+                <input type="checkbox" onchange="saveTask('ct-tablet',this.checked)">
+                <span class="cmd-task-text">Acquire tablet — enables digital client signatures in the field</span>
+                <span class="cmd-task-badge badge-plan">Planned</span>
+              </label>
+              <label class="cmd-task" id="ct-polisher">
+                <input type="checkbox" onchange="saveTask('ct-polisher',this.checked)">
+                <span class="cmd-task-text">Source DA polisher — gateway skill for paint correction and ceramic prep</span>
+                <span class="cmd-task-badge badge-plan">Planned</span>
+              </label>
+            </div>
+
+            <!-- Infrastructure -->
+            <div class="cmd-card">
+              <div class="cmd-card-head">
+                <span class="cmd-card-title">Infrastructure</span>
+                <span class="cmd-card-sub">Legal &amp; Financial</span>
+              </div>
+              <div class="cmd-seq">
+                <div class="cmd-seq-item seq-active-item">
+                  <div class="cmd-seq-num seq-active">1</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Business TRN</div>
+                    <div class="cmd-seq-note">TAJ — free, required for all steps below</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-next">2</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Tax Compliance Certificate</div>
+                    <div class="cmd-seq-note">TAJ — issued after Business TRN</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-next">3</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Business Bank Account</div>
+                    <div class="cmd-seq-note">NCB or JN Bank — bring TRN + registration cert</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-future">4</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Green Plates</div>
+                    <div class="cmd-seq-note">TARA — legally required for commercial equipment transport</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-future">5</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Commercial Insurance Update</div>
+                    <div class="cmd-seq-note">Update policy to match green plate classification</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /left col -->
+
+          <!-- RIGHT COLUMN ─────────────────────────────────────── -->
+          <div class="cmd-col">
+
+            <!-- Equipment Roadmap -->
+            <div class="cmd-card">
+              <div class="cmd-card-head">
+                <span class="cmd-card-title">Equipment Sequence</span>
+                <span class="cmd-card-sub">Acquisition order</span>
+              </div>
+              <div class="cmd-seq">
+                <div class="cmd-seq-item seq-active-item">
+                  <div class="cmd-seq-num seq-active">1</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Tent / Canopy</div>
+                    <div class="cmd-seq-note">3×3m UV-resistant — sun is actively working against your chemistry</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-next">2</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Water Tank</div>
+                    <div class="cmd-seq-note">200–300L HDPE + 12V pump — full mobility unlock</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-next">3</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Karcher K4 + Foam Cannon</div>
+                    <div class="cmd-seq-note">130 bar — source K4-compatible cannon after purchase</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-future">4</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Power Source</div>
+                    <div class="cmd-seq-note">2000W inverter generator — runs K4, polisher, steamer simultaneously</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-future">5</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">Battery Drill + Vacuum</div>
+                    <div class="cmd-seq-note">Reduces power dependency — drill enables headlight restoration</div>
+                  </div>
+                </div>
+                <div class="cmd-seq-item">
+                  <div class="cmd-seq-num seq-future">6</div>
+                  <div class="cmd-seq-body">
+                    <div class="cmd-seq-name">DA Polisher</div>
+                    <div class="cmd-seq-note">15mm throw — gateway to paint correction and ceramic prep</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Skills Pathway -->
+            <div class="cmd-card">
+              <div class="cmd-card-head">
+                <span class="cmd-card-title">Skills Pathway</span>
+                <span class="cmd-card-sub">Sequential — cannot skip stages</span>
+              </div>
+
+              <div class="cmd-stage active-stage">
+                <div class="cmd-stage-head">
+                  <span class="cmd-stage-num stage-current">Stage 1 — Active</span>
+                  <span class="cmd-stage-title">Machine Polishing</span>
+                </div>
+                <div class="cmd-stage-items">
+                  Headlight restoration (drill method) · DA polisher fundamentals · Pressure, pad selection, heat management · Practice on the Serena
+                </div>
+              </div>
+
+              <div class="cmd-stage">
+                <div class="cmd-stage-head">
+                  <span class="cmd-stage-num stage-locked">Stage 2 — Locked</span>
+                  <span class="cmd-stage-title">Paint Correction</span>
+                </div>
+                <div class="cmd-stage-items">
+                  Single-stage correction · Compound and pad combinations · Swirl and scratch removal · Requires Stage 1 mastery
+                </div>
+              </div>
+
+              <div class="cmd-stage">
+                <div class="cmd-stage-head">
+                  <span class="cmd-stage-num stage-locked">Stage 3 — Locked</span>
+                  <span class="cmd-stage-title">Ceramic Coating Application</span>
+                </div>
+                <div class="cmd-stage-items">
+                  Professional coating application · Requires tent, correction skill, and 3 documented practice coatings · Year 2–3 target
+                </div>
+              </div>
+
+              <!-- Quick links -->
+              <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bsoft);">
+                <div class="cmd-card-sub" style="margin-bottom:10px">Quick Access</div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <a href="invoice.html"               class="btn sm ghost" style="font-size:10px">Invoice</a>
+                  <a href="availability.html"          class="btn sm ghost" style="font-size:10px">Availability</a>
+                  <a href="maintenance-enrollment.html" class="btn sm ghost" style="font-size:10px">Enrol Client</a>
+                  <a href="quote-calculator.html"      class="btn sm ghost" style="font-size:10px">Quote Calc</a>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- /right col -->
+        </div><!-- /cmd-grid -->
+      </div><!-- /v-command -->
 
     </main>
   </div><!-- /dash-body -->
@@ -1005,7 +1305,7 @@ function playChime() {
 }
 
 // ── NAVIGATION ───────────────────────────────────────────────────
-const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance'];
+const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'command'];
 
 function goTo(name) {
   VIEWS.forEach(v => {
@@ -1021,6 +1321,7 @@ function goTo(name) {
   if (name === 'clients')     loadClients();
   if (name === 'records')     loadRecords();
   if (name === 'maintenance') loadMaintenance();
+  if (name === 'command')     loadCommand();
 
   // Close sidebar on mobile
   if (window.innerWidth <= 820) closeSidebar();
@@ -1496,6 +1797,26 @@ function viewSignature(name, vehicle, plan, startDate, prefDay, encodedSig) {
 function bgCloseSig(e) { if (e.target.id === 'sig-modal-bg') document.getElementById('sig-modal-bg').classList.remove('open'); }
 
 let toastTimer;
+// ── COMMAND CENTRE ───────────────────────────────────────────────
+function loadCommand() {
+  const tasks = ['ct-subaru','ct-post','ct-trn','ct-tax','ct-bank',
+                 'ct-fleet','ct-outreach','ct-headlight','ct-plates',
+                 'ct-insurance','ct-tablet','ct-polisher'];
+  tasks.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cb   = el.querySelector('input[type=checkbox]');
+    const done = localStorage.getItem('ecad_task_' + id) === '1';
+    if (cb) cb.checked = done;
+    el.classList.toggle('done', done);
+  });
+}
+function saveTask(id, checked) {
+  localStorage.setItem('ecad_task_' + id, checked ? '1' : '0');
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('done', checked);
+}
+
 function toast(msg, type) {
   const el  = document.getElementById('toast');
   const txt = document.getElementById('toast-msg');
