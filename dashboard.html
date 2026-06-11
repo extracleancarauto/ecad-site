@@ -1944,6 +1944,7 @@ async function saveManualRecord() {
 
     const jobNotes = [
       vehicle ? 'Vehicle detail: ' + vehicle : null,
+      amount  ? 'Amount charged: JMD ' + parseFloat(amount).toLocaleString() : null,
       notes   || null
     ].filter(Boolean).join(' | ');
 
@@ -1952,7 +1953,6 @@ async function saveManualRecord() {
       service_date:   date,
       service_tier:   tier,
       job_notes:      jobNotes || null,
-      amount_charged: amount ? parseFloat(amount) : null,
       payment_status: status
     }]);
 
