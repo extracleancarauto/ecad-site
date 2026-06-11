@@ -6,7 +6,7 @@
 <meta name="description" content="Extra Clean Auto Detailing — Premium mobile car detailing in Jamaica. Professional on-site service. Not just a wash, a standard. Book at ecadja.com">
 <title>Extra Clean Auto Detailing — Jamaica</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script></script></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
   <link rel="apple-touch-icon" sizes="192x192" href="ecad-logo-192.png">
@@ -1279,11 +1279,6 @@ async function submitForm() {
   );
 
   await Promise.all(emailPromises);
-
-  if (false) { // close the if block that was opened
-  }
-
-  // WhatsApp removed — email notification handles owner alerts
 
   // Redirect customer to thank you page with booking summary
   var tyParams = new URLSearchParams({

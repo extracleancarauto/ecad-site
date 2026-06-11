@@ -196,19 +196,18 @@ async function submitIntake() {
   // Send emails and wait before redirecting
   var emailPromises = [];
 
-  if (email) {
-    emailPromises.push(
-      emailjs.send('service_zesixiz', 'template_gya3qb7', {
-        to_email:    email,
-        client_name: name,
-        service:     svc,
-        date:        date || 'To be confirmed',
-        time:        time || 'To be confirmed',
-        address:     addr,
-        phone:       phone
-      }).catch(function(e) { console.log('Customer email:', e); })
-    );
-  }
+  emailPromises.push(
+    emailjs.send('service_zesixiz', 'template_gya3qb7', {
+      to_email:    email,
+      client_name: name,
+      service:     svc,
+      date:        date || 'To be confirmed',
+      time:        time || 'To be confirmed',
+      address:     addr,
+      phone:       phone,
+      reply_to:    email
+    }).catch(function(e) { console.log('Customer email:', e); })
+  );
 
   emailPromises.push(
     emailjs.send('service_zesixiz', 'template_kr6ydp8', {
