@@ -1201,6 +1201,51 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
   </div>
 </div>
 
+<!-- EDIT SERVICE RECORD MODAL -->
+<div class="modal-bg" id="edit-record-modal-bg" onclick="bgCloseEditRecord(event)">
+  <div class="modal" style="max-width:480px">
+    <h2 class="modal-title">Edit Service Record</h2>
+    <input type="hidden" id="er-id">
+
+    <div class="mfield">
+      <label class="mlabel" for="er-tier">Service Tier</label>
+      <select class="minput" id="er-tier">
+        <option value="Tier 0 — Express Wash">Tier 0 — Express Wash</option>
+        <option value="Tier 1 — Full Clean">Tier 1 — Full Clean</option>
+        <option value="Tier 2 — Deep Clean">Tier 2 — Deep Clean</option>
+        <option value="Tier 3 — Showroom Detail">Tier 3 — Showroom Detail</option>
+        <option value="Cabin Revival — Refresh">Cabin Revival — Refresh</option>
+        <option value="Cabin Revival — Restore">Cabin Revival — Restore</option>
+      </select>
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="er-date">Service Date</label>
+      <input class="minput" id="er-date" type="date">
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="er-status">Payment Status</label>
+      <select class="minput" id="er-status">
+        <option value="Pending">Pending</option>
+        <option value="Paid">Paid</option>
+        <option value="Partial">Partial</option>
+        <option value="Waived">Waived</option>
+      </select>
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="er-notes">Job Notes</label>
+      <input class="minput" id="er-notes" type="text" placeholder="Notes">
+    </div>
+
+    <div class="mactions">
+      <button class="btn-cancel" onclick="closeEditRecord()">Cancel</button>
+      <button class="btn-save" onclick="saveEditRecord()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- MANUAL SERVICE RECORD MODAL -->
 <div class="modal-bg" id="record-modal-bg" onclick="bgCloseRecord(event)">
   <div class="modal" style="max-width:520px">
@@ -1700,6 +1745,7 @@ async function loadRecords() {
         `<span class="td-d" style="max-width:180px;white-space:normal;display:inline-block;">${x(r.job_notes || '—')}</span>`,
         `<div style="display:flex;gap:6px;flex-wrap:wrap;">
            <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',email:r.clients?.email||'',service:r.service_tier||'',date:r.service_date||'',address:r.clients?.service_address||'',vehicle:extractVehicle(r.job_notes),notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
+           <button class="btn-act btn-sig" onclick="openEditRecord('${r.id}','${x(r.service_tier||'')}','${r.service_date||''}','${x(r.payment_status||'')}','${x(r.job_notes||'')}')">Edit</button>
            ${(r.payment_status||'').toLowerCase() !== 'paid' && (r.payment_status||'').toLowerCase() !== 'completed'
              ? `<button class="btn-act btn-approve" onclick="markComplete('${r.id}')">✓ Complete</button>`
              : '<span class="badge b-approved" style="align-self:center;">Done</span>'}
@@ -1874,6 +1920,51 @@ function viewSignature(name, vehicle, plan, startDate, prefDay, encodedSig) {
 function bgCloseSig(e) { if (e.target.id === 'sig-modal-bg') document.getElementById('sig-modal-bg').classList.remove('open'); }
 
 let toastTimer;
+// ── EDIT SERVICE RECORD ──────────────────────────────────────────
+function openEditRecord(id, tier, date, status, notes) {
+  document.getElementById('er-id').value     = id;
+  document.getElementById('er-tier').value   = tier;
+  document.getElementById('er-date').value   = date;
+  document.getElementById('er-status').value = status;
+  document.getElementById('er-notes').value  = notes;
+  document.getElementById('edit-record-modal-bg').classList.add('open');
+}
+
+function closeEditRecord() {
+  document.getElementById('edit-record-modal-bg').classList.remove('open');
+}
+
+function bgCloseEditRecord(e) {
+  if (e.target === document.getElementById('edit-record-modal-bg')) closeEditRecord();
+}
+
+async function saveEditRecord() {
+  const id     = document.getElementById('er-id').value;
+  const tier   = document.getElementById('er-tier').value;
+  const date   = document.getElementById('er-date').value;
+  const status = document.getElementById('er-status').value;
+  const notes  = document.getElementById('er-notes').value.trim();
+
+  if (!id) { toast('No record selected', 'err'); return; }
+
+  try {
+    const { error } = await db.from('service_records').update({
+      service_tier:   tier,
+      service_date:   date,
+      payment_status: status,
+      job_notes:      notes || null
+    }).eq('id', id);
+
+    if (error) throw error;
+    toast('Record updated', 'ok');
+    closeEditRecord();
+    loadRecords();
+  } catch(e) {
+    console.error(e);
+    toast('Error updating record', 'err');
+  }
+}
+
 // ── MANUAL SERVICE RECORD ────────────────────────────────────────
 let manualClientId = null;
 
