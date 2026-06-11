@@ -896,7 +896,10 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         <div class="section-card">
           <div class="sc-head">
             <span class="sc-title">All Records</span>
-            <span class="sc-meta" id="records-meta">—</span>
+            <div style="display:flex;gap:10px;align-items:center">
+              <span class="sc-meta" id="records-meta">—</span>
+              <button class="btn-primary" onclick="openRecordModal()">+ Add Record</button>
+            </div>
           </div>
           <div class="tbl-scroll" id="records-wrap">
             <div class="loading">Loading</div>
@@ -1194,6 +1197,80 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
     <div class="mactions">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="btn-save" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANUAL SERVICE RECORD MODAL -->
+<div class="modal-bg" id="record-modal-bg" onclick="bgCloseRecord(event)">
+  <div class="modal" style="max-width:520px">
+    <h2 class="modal-title">Add Service Record</h2>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-phone">Client Phone <span style="color:var(--red)">*</span></label>
+      <div style="display:flex;gap:8px">
+        <input class="minput" id="r-phone" type="tel" placeholder="876 000 0000" style="flex:1">
+        <button class="btn-save" style="white-space:nowrap;padding:0 14px" onclick="lookupClient()">Look Up</button>
+      </div>
+      <span id="r-client-found" style="font-size:10px;color:var(--green);margin-top:4px;display:none"></span>
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-name">Client Name <span style="color:var(--red)">*</span></label>
+      <input class="minput" id="r-name" type="text" placeholder="Full name">
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-addr">Service Address</label>
+      <input class="minput" id="r-addr" type="text" placeholder="Parish or full address">
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-vehicle">Vehicle</label>
+      <input class="minput" id="r-vehicle" type="text" placeholder="e.g. Toyota Corolla 2018 — Silver">
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-tier">Service Tier <span style="color:var(--red)">*</span></label>
+      <select class="minput" id="r-tier">
+        <option value="">Select tier</option>
+        <option value="Tier 0 — Express Wash">Tier 0 — Express Wash</option>
+        <option value="Tier 1 — Full Clean">Tier 1 — Full Clean</option>
+        <option value="Tier 2 — Deep Clean">Tier 2 — Deep Clean</option>
+        <option value="Tier 3 — Showroom Detail">Tier 3 — Showroom Detail</option>
+        <option value="Cabin Revival — Refresh">Cabin Revival — Refresh</option>
+        <option value="Cabin Revival — Restore">Cabin Revival — Restore</option>
+      </select>
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-date">Service Date <span style="color:var(--red)">*</span></label>
+      <input class="minput" id="r-date" type="date">
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-amount">Amount Charged (JMD)</label>
+      <input class="minput" id="r-amount" type="number" placeholder="0">
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-status">Payment Status</label>
+      <select class="minput" id="r-status">
+        <option value="Pending">Pending</option>
+        <option value="Paid">Paid</option>
+        <option value="Partial">Partial</option>
+        <option value="Waived">Waived</option>
+      </select>
+    </div>
+
+    <div class="mfield">
+      <label class="mlabel" for="r-notes">Job Notes</label>
+      <input class="minput" id="r-notes" type="text" placeholder="Any relevant notes">
+    </div>
+
+    <div class="mactions">
+      <button class="btn-cancel" onclick="closeRecordModal()">Cancel</button>
+      <button class="btn-save" onclick="saveManualRecord()">Save Record</button>
     </div>
   </div>
 </div>
@@ -1797,6 +1874,97 @@ function viewSignature(name, vehicle, plan, startDate, prefDay, encodedSig) {
 function bgCloseSig(e) { if (e.target.id === 'sig-modal-bg') document.getElementById('sig-modal-bg').classList.remove('open'); }
 
 let toastTimer;
+// ── MANUAL SERVICE RECORD ────────────────────────────────────────
+let manualClientId = null;
+
+function openRecordModal() {
+  manualClientId = null;
+  ['r-phone','r-name','r-addr','r-vehicle','r-tier','r-amount','r-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('r-status').value = 'Pending';
+  document.getElementById('r-date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('r-client-found').style.display = 'none';
+  document.getElementById('record-modal-bg').classList.add('open');
+}
+
+function closeRecordModal() {
+  document.getElementById('record-modal-bg').classList.remove('open');
+}
+
+function bgCloseRecord(e) {
+  if (e.target === document.getElementById('record-modal-bg')) closeRecordModal();
+}
+
+async function lookupClient() {
+  const phone = document.getElementById('r-phone').value.trim();
+  if (!phone) return;
+  const { data } = await db.from('clients').select('id,full_name,service_address').eq('phone', phone).maybeSingle();
+  const found = document.getElementById('r-client-found');
+  if (data) {
+    manualClientId = data.id;
+    document.getElementById('r-name').value  = data.full_name || '';
+    document.getElementById('r-addr').value  = data.service_address || '';
+    found.textContent = '✓ Client found — ' + data.full_name;
+    found.style.display = 'block';
+  } else {
+    manualClientId = null;
+    found.textContent = 'No existing client — a new client record will be created on save';
+    found.style.color = 'var(--copper-l)';
+    found.style.display = 'block';
+  }
+}
+
+async function saveManualRecord() {
+  const phone   = document.getElementById('r-phone').value.trim();
+  const name    = document.getElementById('r-name').value.trim();
+  const addr    = document.getElementById('r-addr').value.trim();
+  const vehicle = document.getElementById('r-vehicle').value.trim();
+  const tier    = document.getElementById('r-tier').value;
+  const date    = document.getElementById('r-date').value;
+  const amount  = document.getElementById('r-amount').value;
+  const status  = document.getElementById('r-status').value;
+  const notes   = document.getElementById('r-notes').value.trim();
+
+  if (!name || !tier || !date) {
+    toast('Name, tier and date are required', 'err'); return;
+  }
+
+  try {
+    // Create client if not found
+    if (!manualClientId && name) {
+      const { data: nc } = await db.from('clients').insert([{
+        full_name: name, phone: phone || null,
+        service_address: addr || null,
+        referral_source: 'Manual Entry'
+      }]).select('id').single();
+      manualClientId = nc?.id;
+    }
+
+    const jobNotes = [
+      vehicle ? 'Vehicle detail: ' + vehicle : null,
+      notes   || null
+    ].filter(Boolean).join(' | ');
+
+    await db.from('service_records').insert([{
+      client_id:      manualClientId,
+      service_date:   date,
+      service_tier:   tier,
+      job_notes:      jobNotes || null,
+      amount_charged: amount ? parseFloat(amount) : null,
+      payment_status: status
+    }]);
+
+    toast('Record saved', 'ok');
+    closeRecordModal();
+    loadRecords();
+  } catch(e) {
+    console.error(e);
+    toast('Error saving record', 'err');
+  }
+}
+
 // ── COMMAND CENTRE ───────────────────────────────────────────────
 function loadCommand() {
   const tasks = ['ct-subaru','ct-post','ct-trn','ct-tax','ct-bank',
