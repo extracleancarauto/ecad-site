@@ -52,7 +52,209 @@ body {
   --topbar-h:  60px;
 }
 
-/* ── NOISE TEXTURE ──────────────────────────────────────────────── */
+/* ── TRAINING MODULE ────────────────────────────────────────────── */
+.trn-progress-bar-wrap {
+  background: var(--s3); border-radius: 8px; height: 6px;
+  margin-bottom: 28px; overflow: hidden;
+  border: 1px solid var(--bsoft);
+}
+.trn-progress-bar {
+  height: 100%; border-radius: 8px;
+  background: linear-gradient(90deg, var(--silver-d), var(--silver-l));
+  transition: width .6s ease;
+}
+.trn-module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px; margin-bottom: 30px;
+}
+.trn-card {
+  background: var(--s1);
+  border: 1px solid var(--bsoft);
+  border-radius: 10px; padding: 22px;
+  cursor: pointer; position: relative; overflow: hidden;
+  transition: border-color .25s, transform .25s;
+}
+.trn-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.trn-card.locked { opacity: .45; cursor: not-allowed; }
+.trn-card.locked:hover { transform: none; border-color: var(--bsoft); }
+.trn-card.completed::after {
+  content: '✓';
+  position: absolute; top: 14px; right: 14px;
+  font-size: 11px; font-weight: 700;
+  color: var(--green);
+  background: var(--green-d);
+  border: 1px solid rgba(76,175,130,.3);
+  border-radius: 50%; width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+}
+.trn-card-ico {
+  font-size: 26px; margin-bottom: 12px;
+}
+.trn-card-stage {
+  font-size: 8px; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 5px;
+}
+.trn-card-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px; font-weight: 400;
+  color: var(--silver-l); margin-bottom: 6px;
+}
+.trn-card-desc {
+  font-size: 11px; color: var(--muted); line-height: 1.55;
+}
+.trn-card-meta {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 14px;
+}
+.trn-pill {
+  font-size: 9px; font-weight: 600;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 3px; border: 1px solid transparent;
+}
+.trn-pill-q { background: var(--amber-d); color: var(--amber); border-color: rgba(212,168,67,.25); }
+.trn-pill-hand { background: var(--navy-l); color: var(--silver); border-color: var(--border); }
+
+/* Lesson overlay */
+.trn-overlay {
+  display: none; position: fixed; inset: 0; z-index: 700;
+  background: rgba(0,0,0,.88); backdrop-filter: blur(8px);
+  overflow-y: auto; padding: 40px 20px;
+}
+.trn-overlay.open { display: flex; align-items: flex-start; justify-content: center; }
+.trn-lesson-wrap {
+  width: 100%; max-width: 720px;
+  background: var(--s1); border: 1px solid var(--border);
+  border-radius: 14px; overflow: hidden;
+  position: relative;
+}
+.trn-lesson-head {
+  padding: 24px 28px 20px;
+  border-bottom: 1px solid var(--bsoft);
+  background: var(--s2);
+  display: flex; align-items: center; gap: 14px;
+}
+.trn-lesson-ico { font-size: 28px; }
+.trn-lesson-meta { flex: 1; }
+.trn-lesson-eyebrow {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--copper); margin-bottom: 4px;
+}
+.trn-lesson-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 26px; font-weight: 300; color: var(--silver-l);
+}
+.trn-lesson-close {
+  background: var(--bsoft); border: 1px solid var(--bsoft);
+  color: var(--muted); font-size: 18px;
+  width: 34px; height: 34px; border-radius: 6px;
+  cursor: pointer; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0;
+  transition: color .2s, border-color .2s;
+}
+.trn-lesson-close:hover { color: var(--red); border-color: rgba(207,91,91,.35); }
+.trn-lesson-body { padding: 28px; }
+.trn-section-lbl {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .22em; text-transform: uppercase;
+  color: var(--silver-d); margin: 22px 0 10px;
+}
+.trn-section-lbl:first-child { margin-top: 0; }
+.trn-point {
+  display: flex; gap: 12px; align-items: flex-start;
+  margin-bottom: 10px;
+}
+.trn-point-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--copper); flex-shrink: 0; margin-top: 6px;
+}
+.trn-point-text { font-size: 13px; color: var(--text); line-height: 1.6; }
+.trn-point-text strong { color: var(--silver-l); font-weight: 600; }
+.trn-callout {
+  background: var(--navy-l); border: 1px solid var(--border);
+  border-left: 3px solid var(--silver-d);
+  border-radius: 6px; padding: 14px 16px;
+  margin: 16px 0; font-size: 12px; color: var(--silver);
+  line-height: 1.6;
+}
+.trn-warn {
+  background: var(--amber-d); border: 1px solid rgba(212,168,67,.25);
+  border-left: 3px solid var(--amber);
+  border-radius: 6px; padding: 14px 16px;
+  margin: 16px 0; font-size: 12px; color: var(--amber);
+  line-height: 1.6;
+}
+
+/* Quiz */
+.trn-quiz-wrap { margin-top: 8px; }
+.trn-q {
+  background: var(--s2); border: 1px solid var(--bsoft);
+  border-radius: 8px; padding: 18px 20px; margin-bottom: 14px;
+}
+.trn-q-text {
+  font-size: 13px; color: var(--silver-l); margin-bottom: 12px;
+  font-weight: 500; line-height: 1.5;
+}
+.trn-opt {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px; margin-bottom: 6px; border-radius: 5px;
+  border: 1px solid var(--bsoft); cursor: pointer;
+  font-size: 12px; color: var(--muted);
+  transition: border-color .2s, background .2s, color .2s;
+  user-select: none;
+}
+.trn-opt:hover { border-color: var(--border); color: var(--text); background: var(--bsoft); }
+.trn-opt.selected { border-color: var(--silver-d); color: var(--silver-l); background: rgba(22,35,64,.5); }
+.trn-opt.correct { border-color: var(--green); color: var(--green); background: var(--green-d); }
+.trn-opt.wrong { border-color: var(--red); color: var(--red); background: var(--red-d); }
+.trn-opt-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 1.5px solid currentColor; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.trn-opt.selected .trn-opt-dot::after,
+.trn-opt.correct .trn-opt-dot::after,
+.trn-opt.wrong .trn-opt-dot::after {
+  content: ''; width: 6px; height: 6px;
+  border-radius: 50%; background: currentColor;
+}
+.trn-q-feedback {
+  font-size: 11px; margin-top: 8px; padding: 8px 10px;
+  border-radius: 4px; display: none; line-height: 1.5;
+}
+.trn-q-feedback.show { display: block; }
+.trn-q-feedback.ok { background: var(--green-d); color: var(--green); }
+.trn-q-feedback.err { background: var(--red-d); color: var(--red); }
+
+.trn-quiz-actions {
+  display: flex; gap: 10px; flex-wrap: wrap;
+  margin-top: 18px; padding-top: 18px;
+  border-top: 1px solid var(--bsoft);
+  align-items: center;
+}
+.trn-score-display {
+  margin-left: auto; font-size: 12px; color: var(--muted);
+}
+.trn-result {
+  text-align: center; padding: 28px 20px;
+  display: none;
+}
+.trn-result.show { display: block; }
+.trn-result-score {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 72px; font-weight: 300; color: var(--silver-l);
+  line-height: 1;
+}
+.trn-result-label {
+  font-size: 13px; color: var(--muted); margin: 8px 0 20px;
+}
+.trn-result-msg {
+  font-size: 14px; color: var(--text); line-height: 1.6;
+  max-width: 480px; margin: 0 auto 20px;
+}
+
 body::before {
   content: '';
   position: fixed; inset: 0; z-index: 0;
@@ -313,53 +515,7 @@ body::before {
   position: relative; z-index: 1;
 }
 
-/* ── COMMAND CENTRE ─────────────────────────────────────────────── */
-.cmd-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media(max-width:900px){ .cmd-grid { grid-template-columns: 1fr; } }
-.cmd-col { display: flex; flex-direction: column; gap: 20px; }
-
-.cmd-card { background: var(--s2); border: 1px solid var(--bsoft); border-radius: 10px; padding: 22px 24px; }
-.cmd-card-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 18px; }
-.cmd-card-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 400; color: var(--text); }
-.cmd-card-sub { font-size: 9px; letter-spacing: .18em; text-transform: uppercase; color: var(--silver-d); }
-
-/* Task items */
-.cmd-group-label { font-size: 8px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: var(--copper-l); margin: 14px 0 8px; display: block; }
-.cmd-group-label:first-child { margin-top: 0; }
-.cmd-task { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,.03); cursor: pointer; }
-.cmd-task:last-child { border-bottom: none; }
-.cmd-task input[type=checkbox] { margin-top: 2px; accent-color: var(--green); flex-shrink: 0; cursor: pointer; }
-.cmd-task-text { font-size: 12px; color: var(--muted); line-height: 1.45; transition: color .2s; }
-.cmd-task.done .cmd-task-text { color: var(--dim); text-decoration: line-through; }
-.cmd-task-badge { font-size: 8px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; flex-shrink: 0; margin-top: 2px; }
-.badge-now  { background: rgba(207,91,91,.15);  color: var(--red);      border: 1px solid rgba(207,91,91,.25); }
-.badge-soon { background: rgba(201,120,60,.1);  color: var(--copper-l); border: 1px solid rgba(201,120,60,.22); }
-.badge-plan { background: rgba(184,200,214,.06);color: var(--silver-d); border: 1px solid var(--bsoft); }
-
-/* Roadmap items */
-.cmd-seq { display: flex; flex-direction: column; gap: 0; }
-.cmd-seq-item { display: flex; gap: 14px; align-items: flex-start; padding: 10px 0; position: relative; }
-.cmd-seq-item:not(:last-child)::before { content:''; position: absolute; left: 11px; top: 28px; width: 1px; height: calc(100% - 8px); background: var(--bsoft); }
-.cmd-seq-num { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
-.seq-active  { background: rgba(76,175,130,.15); border: 1px solid rgba(76,175,130,.4); color: var(--green); }
-.seq-next    { background: rgba(201,120,60,.1);  border: 1px solid rgba(201,120,60,.3); color: var(--copper-l); }
-.seq-future  { background: var(--s3); border: 1px solid var(--bsoft); color: var(--dim); }
-.cmd-seq-body { flex: 1; }
-.cmd-seq-name { font-size: 12px; color: var(--silver-d); font-weight: 500; line-height: 1.3; }
-.cmd-seq-item.seq-active-item .cmd-seq-name { color: var(--silver-l); }
-.cmd-seq-note { font-size: 10px; color: var(--dim); margin-top: 2px; line-height: 1.4; }
-
-/* Skill stages */
-.cmd-stage { background: var(--s3); border: 1px solid var(--bsoft); border-radius: 7px; padding: 14px 16px; margin-bottom: 10px; }
-.cmd-stage:last-child { margin-bottom: 0; }
-.cmd-stage-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.cmd-stage-num  { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; padding: 2px 8px; border-radius: 3px; }
-.stage-current  { background: rgba(76,175,130,.12); color: var(--green); border: 1px solid rgba(76,175,130,.3); }
-.stage-locked   { background: var(--s4); color: var(--dim); border: 1px solid var(--bsoft); }
-.cmd-stage-title{ font-size: 13px; color: var(--silver-d); font-weight: 500; }
-.cmd-stage.active-stage .cmd-stage-title { color: var(--silver-l); }
-.cmd-stage-items{ font-size: 11px; color: var(--dim); line-height: 1.8; }
-.cmd-stage.active-stage .cmd-stage-items { color: var(--muted); }
+/* ── VIEWS ──────────────────────────────────────────────────────── */
 .view { display: none; animation: fadeUp .35s ease forwards; }
 .view.active { display: block; }
 @keyframes fadeUp {
@@ -781,12 +937,13 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
       </div>
 
       <div class="nav-section">
-        <span class="nav-sec-label">Command</span>
-        <button class="nav-btn" id="nb-command" onclick="goTo('command')">
+        <span class="nav-sec-label">Training</span>
+        <button class="nav-btn" id="nb-training" onclick="goTo('training')">
           <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M9 17H5a2 2 0 00-2 2v0a2 2 0 002 2h14a2 2 0 002-2v0a2 2 0 00-2-2h-4M12 3v14M9 6l3-3 3 3"/>
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
           </svg>
-          Command Centre
+          Skills Academy
         </button>
       </div>
 
@@ -896,10 +1053,7 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         <div class="section-card">
           <div class="sc-head">
             <span class="sc-title">All Records</span>
-            <div style="display:flex;gap:10px;align-items:center">
-              <span class="sc-meta" id="records-meta">—</span>
-              <button class="btn-primary" onclick="openRecordModal()">+ Add Record</button>
-            </div>
+            <span class="sc-meta" id="records-meta">—</span>
           </div>
           <div class="tbl-scroll" id="records-wrap">
             <div class="loading">Loading</div>
@@ -924,252 +1078,22 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         </div>
       </div>
 
-      <!-- ── COMMAND CENTRE ──────────────────────────────────────── -->
-      <div class="view" id="v-command">
+      <!-- ── TRAINING / SKILLS ACADEMY ──────────────────────── -->
+      <div class="view" id="v-training">
         <div class="view-head">
-          <span class="view-eyebrow">Operations</span>
-          <h1 class="view-h1">Command <em>Centre</em></h1>
+          <span class="view-eyebrow">Professional Development</span>
+          <h1 class="view-h1">Skills <em>Academy</em></h1>
         </div>
 
-        <div class="cmd-grid">
+        <div class="trn-progress-bar-wrap">
+          <div class="trn-progress-bar" id="trn-progress" style="width:0%"></div>
+        </div>
 
-          <!-- LEFT COLUMN ──────────────────────────────────────── -->
-          <div class="cmd-col">
-
-            <!-- Priority Tasks -->
-            <div class="cmd-card">
-              <div class="cmd-card-head">
-                <span class="cmd-card-title">Priority Actions</span>
-                <span class="cmd-card-sub">Tap to check off</span>
-              </div>
-
-              <span class="cmd-group-label">🔴 Immediate</span>
-
-              <label class="cmd-task" id="ct-subaru">
-                <input type="checkbox" onchange="saveTask('ct-subaru',this.checked)">
-                <span class="cmd-task-text">Close Subaru client on maintenance plan — specific date, in person</span>
-                <span class="cmd-task-badge badge-now">Now</span>
-              </label>
-              <label class="cmd-task" id="ct-post">
-                <input type="checkbox" onchange="saveTask('ct-post',this.checked)">
-                <span class="cmd-task-text">Post Subaru before/after content — exterior transformation is ready</span>
-                <span class="cmd-task-badge badge-now">Now</span>
-              </label>
-              <label class="cmd-task" id="ct-trn">
-                <input type="checkbox" onchange="saveTask('ct-trn',this.checked)">
-                <span class="cmd-task-text">Visit TAJ — obtain Business TRN (unlocks everything below)</span>
-                <span class="cmd-task-badge badge-now">Now</span>
-              </label>
-
-              <span class="cmd-group-label">🟠 This Month</span>
-
-              <label class="cmd-task" id="ct-tax">
-                <input type="checkbox" onchange="saveTask('ct-tax',this.checked)">
-                <span class="cmd-task-text">Get Tax Compliance Certificate from TAJ after Business TRN issued</span>
-                <span class="cmd-task-badge badge-soon">Soon</span>
-              </label>
-              <label class="cmd-task" id="ct-bank">
-                <input type="checkbox" onchange="saveTask('ct-bank',this.checked)">
-                <span class="cmd-task-text">Open business bank account at CIBC — bring TRN, registration cert and in-house financial statements</span>
-                <span class="cmd-task-badge badge-soon">Soon</span>
-              </label>
-              <label class="cmd-task" id="ct-fleet">
-                <input type="checkbox" onchange="saveTask('ct-fleet',this.checked)">
-                <span class="cmd-task-text">Re-attempt fleet meeting through official procurement channels</span>
-                <span class="cmd-task-badge badge-soon">Soon</span>
-              </label>
-              <label class="cmd-task" id="ct-outreach">
-                <input type="checkbox" onchange="saveTask('ct-outreach',this.checked)">
-                <span class="cmd-task-text">10 direct personal outreaches — lead with work, not price</span>
-                <span class="cmd-task-badge badge-soon">Soon</span>
-              </label>
-              <label class="cmd-task" id="ct-headlight">
-                <input type="checkbox" onchange="saveTask('ct-headlight',this.checked)">
-                <span class="cmd-task-text">Source headlight restoration kit — practice sessions on the Serena</span>
-                <span class="cmd-task-badge badge-soon">Soon</span>
-              </label>
-
-              <span class="cmd-group-label">⚪ Planned</span>
-
-              <label class="cmd-task" id="ct-plates">
-                <input type="checkbox" onchange="saveTask('ct-plates',this.checked)">
-                <span class="cmd-task-text">Green plate conversion at TARA — legal requirement for commercial equipment transport</span>
-                <span class="cmd-task-badge badge-plan">Planned</span>
-              </label>
-              <label class="cmd-task" id="ct-insurance">
-                <input type="checkbox" onchange="saveTask('ct-insurance',this.checked)">
-                <span class="cmd-task-text">Update insurance to commercial classification after green plates secured</span>
-                <span class="cmd-task-badge badge-plan">Planned</span>
-              </label>
-              <label class="cmd-task" id="ct-tablet">
-                <input type="checkbox" onchange="saveTask('ct-tablet',this.checked)">
-                <span class="cmd-task-text">Acquire tablet — enables digital client signatures in the field</span>
-                <span class="cmd-task-badge badge-plan">Planned</span>
-              </label>
-              <label class="cmd-task" id="ct-polisher">
-                <input type="checkbox" onchange="saveTask('ct-polisher',this.checked)">
-                <span class="cmd-task-text">Source DA polisher — gateway skill for paint correction and ceramic prep</span>
-                <span class="cmd-task-badge badge-plan">Planned</span>
-              </label>
-            </div>
-
-            <!-- Infrastructure -->
-            <div class="cmd-card">
-              <div class="cmd-card-head">
-                <span class="cmd-card-title">Infrastructure</span>
-                <span class="cmd-card-sub">Legal &amp; Financial</span>
-              </div>
-              <div class="cmd-seq">
-                <div class="cmd-seq-item seq-active-item">
-                  <div class="cmd-seq-num seq-active">1</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Business TRN</div>
-                    <div class="cmd-seq-note">TAJ — free, required for all steps below</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-next">2</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Tax Compliance Certificate</div>
-                    <div class="cmd-seq-note">TAJ — issued after Business TRN</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-next">3</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Business Bank Account</div>
-                    <div class="cmd-seq-note">CIBC — sole trader requirements, in-house financial statements acceptable under 18 months</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-future">4</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Green Plates</div>
-                    <div class="cmd-seq-note">TARA — legally required for commercial equipment transport</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-future">5</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Commercial Insurance Update</div>
-                    <div class="cmd-seq-note">Update policy to match green plate classification</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /left col -->
-
-          <!-- RIGHT COLUMN ─────────────────────────────────────── -->
-          <div class="cmd-col">
-
-            <!-- Equipment Roadmap -->
-            <div class="cmd-card">
-              <div class="cmd-card-head">
-                <span class="cmd-card-title">Equipment Sequence</span>
-                <span class="cmd-card-sub">Acquisition order</span>
-              </div>
-              <div class="cmd-seq">
-                <div class="cmd-seq-item seq-active-item">
-                  <div class="cmd-seq-num seq-active">1</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Tent / Canopy</div>
-                    <div class="cmd-seq-note">3×3m UV-resistant — sun is actively working against your chemistry</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-next">2</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Water Tank</div>
-                    <div class="cmd-seq-note">200–300L HDPE + 12V pump — full mobility unlock</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-next">3</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Karcher K4 + Foam Cannon</div>
-                    <div class="cmd-seq-note">130 bar — source K4-compatible cannon after purchase</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-future">4</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Power Source</div>
-                    <div class="cmd-seq-note">2000W inverter generator — runs K4, polisher, steamer simultaneously</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-future">5</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">Battery Drill + Vacuum</div>
-                    <div class="cmd-seq-note">Reduces power dependency — drill enables headlight restoration</div>
-                  </div>
-                </div>
-                <div class="cmd-seq-item">
-                  <div class="cmd-seq-num seq-future">6</div>
-                  <div class="cmd-seq-body">
-                    <div class="cmd-seq-name">DA Polisher</div>
-                    <div class="cmd-seq-note">15mm throw — gateway to paint correction and ceramic prep</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Skills Pathway -->
-            <div class="cmd-card">
-              <div class="cmd-card-head">
-                <span class="cmd-card-title">Skills Pathway</span>
-                <span class="cmd-card-sub">Sequential — cannot skip stages</span>
-              </div>
-
-              <div class="cmd-stage active-stage">
-                <div class="cmd-stage-head">
-                  <span class="cmd-stage-num stage-current">Stage 1 — Active</span>
-                  <span class="cmd-stage-title">Machine Polishing</span>
-                </div>
-                <div class="cmd-stage-items">
-                  Headlight restoration (drill method) · DA polisher fundamentals · Pressure, pad selection, heat management · Practice on the Serena
-                </div>
-              </div>
-
-              <div class="cmd-stage">
-                <div class="cmd-stage-head">
-                  <span class="cmd-stage-num stage-locked">Stage 2 — Locked</span>
-                  <span class="cmd-stage-title">Paint Correction</span>
-                </div>
-                <div class="cmd-stage-items">
-                  Single-stage correction · Compound and pad combinations · Swirl and scratch removal · Requires Stage 1 mastery
-                </div>
-              </div>
-
-              <div class="cmd-stage">
-                <div class="cmd-stage-head">
-                  <span class="cmd-stage-num stage-locked">Stage 3 — Locked</span>
-                  <span class="cmd-stage-title">Ceramic Coating Application</span>
-                </div>
-                <div class="cmd-stage-items">
-                  Professional coating application · Requires tent, correction skill, and 3 documented practice coatings · Year 2–3 target
-                </div>
-              </div>
-
-              <!-- Quick links -->
-              <div style="margin-top:18px;padding-top:16px;border-top:1px solid var(--bsoft);">
-                <div class="cmd-card-sub" style="margin-bottom:10px">Quick Access</div>
-                <div style="display:flex;flex-wrap:wrap;gap:8px">
-                  <a href="invoice.html"               class="btn sm ghost" style="font-size:10px">Invoice</a>
-                  <a href="availability.html"          class="btn sm ghost" style="font-size:10px">Availability</a>
-                  <a href="maintenance-enrollment.html" class="btn sm ghost" style="font-size:10px">Enrol Client</a>
-                  <a href="quote-calculator.html"      class="btn sm ghost" style="font-size:10px">Quote Calc</a>
-                </div>
-              </div>
-            </div>
-
-          </div><!-- /right col -->
-        </div><!-- /cmd-grid -->
-      </div><!-- /v-command -->
+        <div class="trn-module-grid" id="trn-module-grid"></div>
+      </div>
 
     </main>
-  </div><!-- /dash-body -->
+  </div>
 </div><!-- /dashboard -->
 
 <!-- ─────────────────────────────────────────────────────────── -->
@@ -1197,125 +1121,6 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
     <div class="mactions">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="btn-save" onclick="saveClient()">Save Client</button>
-    </div>
-  </div>
-</div>
-
-<!-- EDIT SERVICE RECORD MODAL -->
-<div class="modal-bg" id="edit-record-modal-bg" onclick="bgCloseEditRecord(event)">
-  <div class="modal" style="max-width:480px">
-    <h2 class="modal-title">Edit Service Record</h2>
-    <input type="hidden" id="er-id">
-
-    <div class="mfield">
-      <label class="mlabel" for="er-tier">Service Tier</label>
-      <select class="minput" id="er-tier">
-        <option value="Tier 0 — Express Wash">Tier 0 — Express Wash</option>
-        <option value="Tier 1 — Full Clean">Tier 1 — Full Clean</option>
-        <option value="Tier 2 — Deep Clean">Tier 2 — Deep Clean</option>
-        <option value="Tier 3 — Showroom Detail">Tier 3 — Showroom Detail</option>
-        <option value="Cabin Revival — Refresh">Cabin Revival — Refresh</option>
-        <option value="Cabin Revival — Restore">Cabin Revival — Restore</option>
-      </select>
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="er-date">Service Date</label>
-      <input class="minput" id="er-date" type="date">
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="er-status">Payment Status</label>
-      <select class="minput" id="er-status">
-        <option value="Pending">Pending</option>
-        <option value="Paid">Paid</option>
-        <option value="Partial">Partial</option>
-        <option value="Waived">Waived</option>
-      </select>
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="er-notes">Job Notes</label>
-      <input class="minput" id="er-notes" type="text" placeholder="Notes">
-    </div>
-
-    <div class="mactions">
-      <button class="btn-cancel" onclick="closeEditRecord()">Cancel</button>
-      <button class="btn-save" onclick="saveEditRecord()">Save Changes</button>
-    </div>
-  </div>
-</div>
-
-<!-- MANUAL SERVICE RECORD MODAL -->
-<div class="modal-bg" id="record-modal-bg" onclick="bgCloseRecord(event)">
-  <div class="modal" style="max-width:520px">
-    <h2 class="modal-title">Add Service Record</h2>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-phone">Client Phone <span style="color:var(--red)">*</span></label>
-      <div style="display:flex;gap:8px">
-        <input class="minput" id="r-phone" type="tel" placeholder="876 000 0000" style="flex:1">
-        <button class="btn-save" style="white-space:nowrap;padding:0 14px" onclick="lookupClient()">Look Up</button>
-      </div>
-      <span id="r-client-found" style="font-size:10px;color:var(--green);margin-top:4px;display:none"></span>
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-name">Client Name <span style="color:var(--red)">*</span></label>
-      <input class="minput" id="r-name" type="text" placeholder="Full name">
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-addr">Service Address</label>
-      <input class="minput" id="r-addr" type="text" placeholder="Parish or full address">
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-vehicle">Vehicle</label>
-      <input class="minput" id="r-vehicle" type="text" placeholder="e.g. Toyota Corolla 2018 — Silver">
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-tier">Service Tier <span style="color:var(--red)">*</span></label>
-      <select class="minput" id="r-tier">
-        <option value="">Select tier</option>
-        <option value="Tier 0 — Express Wash">Tier 0 — Express Wash</option>
-        <option value="Tier 1 — Full Clean">Tier 1 — Full Clean</option>
-        <option value="Tier 2 — Deep Clean">Tier 2 — Deep Clean</option>
-        <option value="Tier 3 — Showroom Detail">Tier 3 — Showroom Detail</option>
-        <option value="Cabin Revival — Refresh">Cabin Revival — Refresh</option>
-        <option value="Cabin Revival — Restore">Cabin Revival — Restore</option>
-      </select>
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-date">Service Date <span style="color:var(--red)">*</span></label>
-      <input class="minput" id="r-date" type="date">
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-amount">Amount Charged (JMD)</label>
-      <input class="minput" id="r-amount" type="number" placeholder="0">
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-status">Payment Status</label>
-      <select class="minput" id="r-status">
-        <option value="Pending">Pending</option>
-        <option value="Paid">Paid</option>
-        <option value="Partial">Partial</option>
-        <option value="Waived">Waived</option>
-      </select>
-    </div>
-
-    <div class="mfield">
-      <label class="mlabel" for="r-notes">Job Notes</label>
-      <input class="minput" id="r-notes" type="text" placeholder="Any relevant notes">
-    </div>
-
-    <div class="mactions">
-      <button class="btn-cancel" onclick="closeRecordModal()">Cancel</button>
-      <button class="btn-save" onclick="saveManualRecord()">Save Record</button>
     </div>
   </div>
 </div>
@@ -1427,7 +1232,7 @@ function playChime() {
 }
 
 // ── NAVIGATION ───────────────────────────────────────────────────
-const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'command'];
+const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance'];
 
 function goTo(name) {
   VIEWS.forEach(v => {
@@ -1443,7 +1248,6 @@ function goTo(name) {
   if (name === 'clients')     loadClients();
   if (name === 'records')     loadRecords();
   if (name === 'maintenance') loadMaintenance();
-  if (name === 'command')     loadCommand();
 
   // Close sidebar on mobile
   if (window.innerWidth <= 820) closeSidebar();
@@ -1523,7 +1327,7 @@ async function loadPending() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone, email, service_address)')
+      .select('*, clients(full_name, phone, service_address)')
       .eq('payment_status', 'Pending')
       .order('created_at', { ascending: false });
 
@@ -1545,11 +1349,9 @@ async function loadPending() {
         const inv = encodeURIComponent(JSON.stringify({
           name:    r.clients?.full_name        || '',
           phone:   r.clients?.phone            || '',
-          email:   r.clients?.email            || '',
           service: r.service_tier              || '',
           date:    r.service_date              || '',
           address: r.clients?.service_address  || '',
-          vehicle: extractVehicle(r.job_notes),
           notes:   r.job_notes                 || '',
           id:      r.id
         }));
@@ -1613,7 +1415,7 @@ async function loadBookings() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone, email, service_address)')
+      .select('*, clients(full_name, phone)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -1723,7 +1525,7 @@ async function loadRecords() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone, email, service_address)')
+      .select('*, clients(full_name, phone)')
       .order('service_date', { ascending: false });
 
     if (error) throw error;
@@ -1744,8 +1546,7 @@ async function loadRecords() {
         pBadge(r.payment_status),
         `<span class="td-d" style="max-width:180px;white-space:normal;display:inline-block;">${x(r.job_notes || '—')}</span>`,
         `<div style="display:flex;gap:6px;flex-wrap:wrap;">
-           <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',email:r.clients?.email||'',service:r.service_tier||'',date:r.service_date||'',address:r.clients?.service_address||'',vehicle:extractVehicle(r.job_notes),notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
-           <button class="btn-act btn-sig" onclick="openEditRecord('${r.id}','${x(r.service_tier||'')}','${r.service_date||''}','${x(r.payment_status||'')}','${x(r.job_notes||'')}')">Edit</button>
+           <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',service:r.service_tier||'',date:r.service_date||'',notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
            ${(r.payment_status||'').toLowerCase() !== 'paid' && (r.payment_status||'').toLowerCase() !== 'completed'
              ? `<button class="btn-act btn-approve" onclick="markComplete('${r.id}')">✓ Complete</button>`
              : '<span class="badge b-approved" style="align-self:center;">Done</span>'}
@@ -1805,23 +1606,15 @@ function countUp(id, target) {
 }
 
 // ── INVOICE REDIRECT ──────────────────────────────────────────────
-function extractVehicle(notes) {
-  if (!notes) return '';
-  const m = notes.match(/Vehicle detail:\s*([^|]+)/i);
-  return m ? m[1].trim() : '';
-}
-
 function goInvoice(el) {
   const info = JSON.parse(decodeURIComponent(el.dataset.inv));
   const invParams  = new URLSearchParams({
     name:    info.name    || '',
     phone:   info.phone   || '',
-    email:   info.email   || '',
     service: info.service || '',
     date:    info.date    || '',
     time:    info.time    || '',
     address: info.address || '',
-    vehicle: info.vehicle || '',
     notes:   info.notes   || '',
     id:      info.id      || ''
   });
@@ -1920,162 +1713,6 @@ function viewSignature(name, vehicle, plan, startDate, prefDay, encodedSig) {
 function bgCloseSig(e) { if (e.target.id === 'sig-modal-bg') document.getElementById('sig-modal-bg').classList.remove('open'); }
 
 let toastTimer;
-// ── EDIT SERVICE RECORD ──────────────────────────────────────────
-function openEditRecord(id, tier, date, status, notes) {
-  document.getElementById('er-id').value     = id;
-  document.getElementById('er-tier').value   = tier;
-  document.getElementById('er-date').value   = date;
-  document.getElementById('er-status').value = status;
-  document.getElementById('er-notes').value  = notes;
-  document.getElementById('edit-record-modal-bg').classList.add('open');
-}
-
-function closeEditRecord() {
-  document.getElementById('edit-record-modal-bg').classList.remove('open');
-}
-
-function bgCloseEditRecord(e) {
-  if (e.target === document.getElementById('edit-record-modal-bg')) closeEditRecord();
-}
-
-async function saveEditRecord() {
-  const id     = document.getElementById('er-id').value;
-  const tier   = document.getElementById('er-tier').value;
-  const date   = document.getElementById('er-date').value;
-  const status = document.getElementById('er-status').value;
-  const notes  = document.getElementById('er-notes').value.trim();
-
-  if (!id) { toast('No record selected', 'err'); return; }
-
-  try {
-    const { error } = await db.from('service_records').update({
-      service_tier:   tier,
-      service_date:   date,
-      payment_status: status,
-      job_notes:      notes || null
-    }).eq('id', id);
-
-    if (error) throw error;
-    toast('Record updated', 'ok');
-    closeEditRecord();
-    loadRecords();
-  } catch(e) {
-    console.error(e);
-    toast('Error updating record', 'err');
-  }
-}
-
-// ── MANUAL SERVICE RECORD ────────────────────────────────────────
-let manualClientId = null;
-
-function openRecordModal() {
-  manualClientId = null;
-  ['r-phone','r-name','r-addr','r-vehicle','r-tier','r-amount','r-notes'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.value = '';
-  });
-  document.getElementById('r-status').value = 'Pending';
-  document.getElementById('r-date').value = new Date().toISOString().split('T')[0];
-  document.getElementById('r-client-found').style.display = 'none';
-  document.getElementById('record-modal-bg').classList.add('open');
-}
-
-function closeRecordModal() {
-  document.getElementById('record-modal-bg').classList.remove('open');
-}
-
-function bgCloseRecord(e) {
-  if (e.target === document.getElementById('record-modal-bg')) closeRecordModal();
-}
-
-async function lookupClient() {
-  const phone = document.getElementById('r-phone').value.trim();
-  if (!phone) return;
-  const { data } = await db.from('clients').select('id,full_name,service_address').eq('phone', phone).maybeSingle();
-  const found = document.getElementById('r-client-found');
-  if (data) {
-    manualClientId = data.id;
-    document.getElementById('r-name').value  = data.full_name || '';
-    document.getElementById('r-addr').value  = data.service_address || '';
-    found.textContent = '✓ Client found — ' + data.full_name;
-    found.style.display = 'block';
-  } else {
-    manualClientId = null;
-    found.textContent = 'No existing client — a new client record will be created on save';
-    found.style.color = 'var(--copper-l)';
-    found.style.display = 'block';
-  }
-}
-
-async function saveManualRecord() {
-  const phone   = document.getElementById('r-phone').value.trim();
-  const name    = document.getElementById('r-name').value.trim();
-  const addr    = document.getElementById('r-addr').value.trim();
-  const vehicle = document.getElementById('r-vehicle').value.trim();
-  const tier    = document.getElementById('r-tier').value;
-  const date    = document.getElementById('r-date').value;
-  const amount  = document.getElementById('r-amount').value;
-  const status  = document.getElementById('r-status').value;
-  const notes   = document.getElementById('r-notes').value.trim();
-
-  if (!name || !tier || !date) {
-    toast('Name, tier and date are required', 'err'); return;
-  }
-
-  try {
-    // Create client if not found
-    if (!manualClientId && name) {
-      const { data: nc } = await db.from('clients').insert([{
-        full_name: name, phone: phone || null,
-        service_address: addr || null,
-        referral_source: 'Manual Entry'
-      }]).select('id').single();
-      manualClientId = nc?.id;
-    }
-
-    const jobNotes = [
-      vehicle ? 'Vehicle detail: ' + vehicle : null,
-      amount  ? 'Amount charged: JMD ' + parseFloat(amount).toLocaleString() : null,
-      notes   || null
-    ].filter(Boolean).join(' | ');
-
-    await db.from('service_records').insert([{
-      client_id:      manualClientId,
-      service_date:   date,
-      service_tier:   tier,
-      job_notes:      jobNotes || null,
-      payment_status: status
-    }]);
-
-    toast('Record saved', 'ok');
-    closeRecordModal();
-    loadRecords();
-  } catch(e) {
-    console.error(e);
-    toast('Error saving record', 'err');
-  }
-}
-
-// ── COMMAND CENTRE ───────────────────────────────────────────────
-function loadCommand() {
-  const tasks = ['ct-subaru','ct-post','ct-trn','ct-tax','ct-bank',
-                 'ct-fleet','ct-outreach','ct-headlight','ct-plates',
-                 'ct-insurance','ct-tablet','ct-polisher'];
-  tasks.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const cb   = el.querySelector('input[type=checkbox]');
-    const done = localStorage.getItem('ecad_task_' + id) === '1';
-    if (cb) cb.checked = done;
-    el.classList.toggle('done', done);
-  });
-}
-function saveTask(id, checked) {
-  localStorage.setItem('ecad_task_' + id, checked ? '1' : '0');
-  const el = document.getElementById(id);
-  if (el) el.classList.toggle('done', checked);
-}
-
 function toast(msg, type) {
   const el  = document.getElementById('toast');
   const txt = document.getElementById('toast-msg');
@@ -2085,6 +1722,303 @@ function toast(msg, type) {
   el.classList.add('show');
   toastTimer = setTimeout(() => el.classList.remove('show'), 3400);
 }
+</script>
+
+<!-- ── TRAINING LESSON OVERLAY ──────────────────────────────────── -->
+<div class="trn-overlay" id="trn-overlay">
+  <div class="trn-lesson-wrap" id="trn-lesson-wrap">
+    <div class="trn-lesson-head">
+      <div class="trn-lesson-ico" id="trn-l-ico"></div>
+      <div class="trn-lesson-meta">
+        <div class="trn-lesson-eyebrow" id="trn-l-stage"></div>
+        <div class="trn-lesson-title" id="trn-l-title"></div>
+      </div>
+      <button class="trn-lesson-close" onclick="closeLesson()">✕</button>
+    </div>
+    <div class="trn-lesson-body" id="trn-l-body"></div>
+  </div>
+</div>
+
+<script>
+// ── TRAINING DATA ──────────────────────────────────────────────────
+const TRN_MODULES = [
+  {
+    id: 'wash-prep',
+    stage: 'Foundation',
+    ico: '🪣',
+    title: 'Wash & Decontamination',
+    desc: 'The non-negotiable first step. Every job begins and ends here.',
+    pills: ['hands-on', 'quiz'],
+    content: `
+      <div class="trn-section-lbl">Why This Comes First</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Paint has embedded contaminants invisible to the naked eye — iron fallout, tar, industrial fallout. Applying any sealant or wax over these locks them in permanently and compromises adhesion.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Jamaica's coastal and urban environment accelerates contamination. Vehicles here accumulate fallout faster than temperate climates — that's both a challenge and a recurring revenue argument.</div></div>
+      <div class="trn-section-lbl">The Correct Sequence</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>1. Pre-rinse</strong> — flood the vehicle top to bottom to remove loose debris. Never touch a dry dirty car.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>2. Wheels first</strong> — wheels are the dirtiest part. Clean them first so brake dust doesn't contaminate already-washed panels. Use your Turtle Wax Wheel Prep and Cerakote Wheel Sealant system.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>3. Chemical decontamination</strong> — CarPro Acidic Soap handles mineral deposits, water spots, and industrial fallout. This is a dedicated step, not just a stronger wash.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>4. Two-bucket wash</strong> — one bucket clean suds, one rinse. Never drag a loaded mitt across paint without rinsing first.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>5. Clay bar / iron decon</strong> — run fingers across paint after washing. If it's not glass-smooth, it's not clean enough to seal.</div></div>
+      <div class="trn-callout">Jamaica's hard water is alkaline and mineral-heavy. Water spots form fast in our heat — especially on glass. Weave glass drying into your panel sequence, not as a final step.</div>
+      <div class="trn-section-lbl">Interior Headliner (ProBox Scenario)</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Assessment first</strong> — press lightly on the fabric. If it moves or sags, the adhesive is compromised — steam heat can worsen it. Flag this to the client before starting.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Test steamer in a hidden corner</strong> — rear cargo edge or above the B-pillar. Watch 10 seconds. No sagging, no discolouration — proceed.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Steam + extract simultaneously</strong> — nozzle 3–5cm from fabric, slow overlapping passes, follow immediately with extractor or clean microfibre. Don't soak.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Mildew odour</strong> — enzyme-based cleaner first, then steam. Run the ozone generator with windows closed 20–30 minutes after to neutralise odour at source.</div></div>
+      <div class="trn-warn">⚠ Never steam a headliner with visible delamination or bubbling. Document it, inform the client in writing, and limit your scope to protect your warranty.</div>
+    `,
+    quiz: [
+      { q: 'You arrive at a ProBox and notice the headliner fabric has a slight sag near the rear window. What do you do first?', opts: ['Steam it gently to see if it improves', 'Inform the client and document the pre-existing condition before touching it', 'Apply fabric adhesive before cleaning', 'Skip the headliner and clean everything else'], correct: 1, feedback: ['Steaming compromised adhesive causes further delamination — never start without assessment.', 'Correct. Documenting pre-existing damage protects your warranty and sets professional expectations.', 'Adhesive repair is outside detailing scope. Never start without client sign-off.', 'Avoidance without disclosure is a professional failure. Always communicate findings.'] },
+      { q: 'Why should wheels be cleaned before the painted body panels?', opts: ['Wheels take longer so you start there to save time', 'Wheel cleaner and brake dust can splash onto already-washed panels', 'It looks more professional to work bottom-up', 'The wheel chemicals work better when applied first'], correct: 1, feedback: ['Efficiency is a side benefit — not the core reason.', 'Correct. Cross-contamination invalidates prior work.', 'Professionalism is about results, not visual sequence.', 'Chemical dwell time is independent of panel wash sequence.'] },
+      { q: 'After a full wash with CarPro Acidic Soap, the hood still feels slightly rough. What does this tell you?', opts: ['The paint is scratched and needs polishing', 'There are still embedded contaminants — clay bar required before sealing', 'The soap left residue — rinse again', 'Normal orange peel texture for this vehicle'], correct: 1, feedback: ['Scratch roughness is directional; contamination is uniform.', 'Correct. Paint must be glass-smooth before any sealant. Clay removes what soap cannot.', 'Rinsing removes soap but not bonded iron fallout.', 'Orange peel is a clearcoat texture — it does not cause uniform surface roughness across all panels.'] }
+    ]
+  },
+  {
+    id: 'interior-detail',
+    stage: 'Core Skill',
+    ico: '🪑',
+    title: 'Interior Detailing',
+    desc: 'Where most jobs are won or lost. The cabin tells the story.',
+    pills: ['hands-on', 'quiz'],
+    content: `
+      <div class="trn-section-lbl">The Interior Hierarchy</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Work top to bottom, front to back.</strong> Gravity pulls debris downward. Clean floor mats after the headliner, not before.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Order:</strong> headliner → sun visors → pillars → dash → centre console → door cards → seats → carpet/mats.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Air before wiping</strong> — blow debris out of vents, seams, and seat tracks before any wet work. This prevents turning dust into mud.</div></div>
+      <div class="trn-section-lbl">Surface-Specific Approach</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Fabric seats & carpet</strong> — pre-treat heavy stains with enzyme cleaner or Koch Chemie Green Star, agitate with stiff brush, then extract. Multiple passes on heavy soiling. Don't soak — excess moisture risks mould in Jamaica's humidity.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Leather</strong> — pH-neutral cleaner on a soft brush. Never use alcohol-based products — they strip the conditioner coat and cause cracking. Follow with leather conditioner immediately.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Plastics & trim</strong> — Cerakote Ceramic Interior Detailer bonds to plastic and provides UV protection. Jamaica's UV index destroys untreated plastic. This is functional, not cosmetic.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Interior glass</strong> — dedicated glass cleaner, two-cloth method: one to clean, one to buff. Interior glass accumulates off-gassing residue from plastics.</div></div>
+      <div class="trn-callout">Your Cerakote Interior Detailer needs top-up every 2–3 months in Jamaica's climate. That's your maintenance plan recurring booking argument — built into the product itself.</div>
+      <div class="trn-section-lbl">Odour Elimination</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Source removal first.</strong> Masking odour without removing the source is not detailing. Extract the contamination first — ozone only works after.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Ozone treatment</strong> — windows fully closed, AC on recirculate, 20–30 minutes. Do not stay in the vehicle during treatment. Air out 10–15 minutes before client handover.</div></div>
+    `,
+    quiz: [
+      { q: 'You are doing a full interior detail. In what order should you clean: carpet, headliner, seats, dashboard?', opts: ['Carpet → Seats → Dashboard → Headliner', 'Headliner → Dashboard → Seats → Carpet', 'Dashboard → Headliner → Carpet → Seats', 'Seats → Dashboard → Headliner → Carpet'], correct: 1, feedback: ['Starting at the floor means debris from above falls on completed surfaces.', 'Correct. Top to bottom always. Gravity is part of your process.', 'Dashboard before headliner risks debris falling onto a finished dash.', 'Seats are mid-level — debris from headliner and pillars will land on them if cleaned first.'] },
+      { q: 'A client has strong smoke odour. You have completed the full interior detail. When do you run the ozone generator?', opts: ['Before any cleaning to neutralise odours first', 'Midway through after seats are done', 'After all cleaning is complete and contamination is removed', 'Skip ozone if the vehicle was professionally cleaned recently'], correct: 2, feedback: ['Ozone cannot neutralise odour trapped in saturated fabric — cleaning must come first.', 'Ozone mid-job is wasted — contamination still present in uncleaned surfaces.', 'Correct. Ozone treats what remains after cleaning. It cannot substitute for extraction.', "Ozone's value is independent of prior cleaning history — it treats what is present now."] },
+      { q: 'Why is Cerakote Ceramic Interior Detailer particularly valuable in Jamaica?', opts: ["It smells better than most interior products", "Jamaica's high UV index rapidly degrades untreated plastic — UV protection is a genuine functional need", "It's cheaper than equivalent products locally", "It works faster in high humidity"], correct: 1, feedback: ['Scent is irrelevant to value proposition.', 'Correct. UV degradation is accelerated in Jamaica — ceramic protection is functional, not cosmetic.', 'Cost comparison is not the value argument here.', 'Humidity affects drying time, not the core protective function.'] }
+    ]
+  },
+  {
+    id: 'paint-protection',
+    stage: 'Core Skill',
+    ico: '🛡️',
+    title: 'Paint Protection & Sealants',
+    desc: 'The Cerakote system, layering logic, and durability expectations.',
+    pills: ['hands-on', 'quiz'],
+    content: `
+      <div class="trn-section-lbl">Understanding Your Cerakote Paint Sealant</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>50-wash durability</strong> — not a weakness. At maintenance plan frequency, 50 washes maps to 4–6 months of service. Document application date and build reapplication into the plan.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Clean decontaminated surface required</strong> — sealant bonded over contamination = failed adhesion = short durability. Your decon step protects your warranty.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Application method</strong> — one panel at a time. Straight overlapping lines, not circular. Buff before the product hazes completely. In Jamaica's heat, always work in shade — direct sun dramatically reduces working time.</div></div>
+      <div class="trn-section-lbl">Panel Sequencing in Jamaican Heat</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Never apply sealant on hot panels.</strong> If you can't hold your palm against the surface for 5 seconds, it's too hot. Work in the morning or in shade.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Work small sections</strong> — in high heat, reduce panel size. A full bonnet in direct sun will haze before you can buff it out.</div></div>
+      <div class="trn-section-lbl">Tyre & Wheel System</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Sequence:</strong> Turtle Wax Wheel Prep → Cerakote Wheel Sealant → Cerakote Tyre Coat. Never reverse — contaminated wheels reject sealant.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Tyre dressing</strong> — thin even coats. Excess dressing slings onto painted panels at speed and is extremely difficult to remove.</div></div>
+      <div class="trn-callout">Your current kit covers a complete protection system. The gap is machine polishing — no DA polisher means paint correction is not in scope yet. Never attempt correction by hand with compounds on clearcoat.</div>
+      <div class="trn-warn">⚠ Do not list paint correction as a service until you have the DA polisher and completed deliberate practice sessions. Advertising ahead of capability destroys a premium reputation.</div>
+    `,
+    quiz: [
+      { q: 'A client asks why they need reapplication when the sealant "only lasts 50 washes." How do you respond?', opts: ['Apologise and offer a discount on the reapplication', 'Explain 50 washes represents 4–6 months of protection and schedule reapplication as part of the maintenance plan', 'Tell them all sealants have limits — nothing you can do', 'Upgrade them to ceramic coating instead'], correct: 1, feedback: ['Never pre-emptively discount. The 50-wash limit is a feature, not a flaw.', 'Correct. Reframe durability as a recurring service argument, not a product weakness.', 'Technically true but professionally weak — this abandons the close opportunity.', 'Ceramic coating is not yet in your service scope. Never offer what you cannot deliver.'] },
+      { q: "You're applying Cerakote on a hood in direct afternoon sun. The product hazes faster than you can buff. What do you do?", opts: ['Work faster to keep up', 'Add more product to extend working time', 'Stop, move to shade, restart that panel', 'Use a DA polisher to remove high spots'], correct: 2, feedback: ['Rushing causes uneven application and streak marks.', 'More product in high heat accelerates the problem.', 'Correct. Heat is the enemy of controlled application. Shade is not optional.', "A DA polisher would remove the sealant entirely — and you don't have one yet."] },
+      { q: 'In the tyre and wheel protection sequence, which step comes first?', opts: ['Cerakote Tyre Coat application', 'Cerakote Wheel Sealant application', 'Turtle Wax Wheel Prep / decontamination', 'Rinse with water only'], correct: 2, feedback: ['Tyre coat is the final step — never applied first.', 'Sealant cannot bond to contaminated wheels.', 'Correct. Decontamination always first. Prep enables adhesion.', 'Water alone does not remove brake dust bonded to the rim.'] }
+    ]
+  },
+  {
+    id: 'glass-headlights',
+    stage: 'Expanding',
+    ico: '🔦',
+    title: 'Glass & Headlight Restoration',
+    desc: 'Timing, sequencing, and technique before equipment fills the gap.',
+    pills: ['hands-on', 'quiz'],
+    content: `
+      <div class="trn-section-lbl">Glass — The Timing Problem</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Water spots on glass are a sequencing issue</strong> — not a product gap. In Jamaica's heat, water left on glass more than 60–90 seconds in direct sun begins to mineral-bond. Once bonded, acid treatment is required.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Weave glass into your panel sequence</strong> — dry and treat each window as you finish the adjacent panel. Never leave all glass to the end.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>CarPro Acidic Soap</strong> is your primary mineral deposit remover on glass — dedicated treatment step before the final glass clean. Rinse thoroughly.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Soft99 Glaco application</strong> — glass must be completely clean and dry. Cross-hatch pattern, haze, buff clear. Sell this as a safety feature — hydrophobic glass improves wet-weather visibility.</div></div>
+      <div class="trn-section-lbl">Headlight Restoration — Current Scope</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Process:</strong> wet sand 800–1000 grit (heavy oxidation) or 1500–2000 grit (moderate haze) → compound to remove sanding marks → Cerakote Headlight Restorer as UV sealant. Without UV coat, oxidation returns in weeks in Jamaica's sun.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Practice standard</strong> — practice on the Subaru headlights during the follow-up visit before listing this as a service. You need to feel the transition under your own hands first.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Know when to stop</strong> — internal yellowing or cracking beyond the surface layer won't respond to wet sanding. Flag to the client. Replacement is sometimes the honest answer.</div></div>
+      <div class="trn-callout">Headlight restoration before/after photos perform extremely well on Instagram. Once locked, this becomes a content asset, not just a service line.</div>
+      <div class="trn-warn">⚠ Do not list headlight restoration as a standalone service until the Cerakote Ceramic Headlight Coating is sourced. The restorer preps — the ceramic coat is what gives duration.</div>
+    `,
+    quiz: [
+      { q: "You finish washing the vehicle and start drying body panels. When do you address the glass?", opts: ['After all body panels are complete', "Glass is self-drying in Jamaica's heat — skip during drying", 'Weave each window into the sequence as you dry the adjacent panel', 'Use a leaf blower on glass at the end'], correct: 2, feedback: ["Leaving glass last means water spots are already forming during panel drying.", "Heat accelerates mineral bonding — it's the cause of the problem, not a solution.", "Correct. Glass drying must be integrated into the panel sequence.", "A blower helps with gaps but doesn't prevent mineral bonding on flat glass."] },
+      { q: "A client's headlights were heavily oxidised. You wet sand, compound, and apply Cerakote Headlight Restorer. Three weeks later the haze is back. What most likely went wrong?", opts: ['Wet sand grit was too coarse', "UV protective sealant coat was skipped or insufficient — Jamaica's UV causes rapid re-oxidation without it", 'Compounding stage was too aggressive', 'Headlights had internal damage making them impossible to restore'], correct: 1, feedback: ['Grit selection affects clarity, not durability. Re-oxidation is a UV issue.', "Correct. Without adequate UV sealant, polycarbonate re-oxidises rapidly in Jamaica's environment.", 'Over-compounding reduces material thickness but does not cause re-oxidation.', 'Internal damage causes cloudiness that wet sanding cannot improve — you would have seen this during the job.'] },
+      { q: 'How should you sell Soft99 Glaco glass coating to a client?', opts: ['As a cosmetic upgrade that makes the car look shiny', 'As a safety feature — hydrophobic glass sheds water faster and improves wet-weather visibility', 'As a necessity for every vehicle regardless of situation', 'As a free add-on to build goodwill'], correct: 1, feedback: ['Cosmetic framing invites price resistance.', 'Correct. Safety framing creates genuine perceived value. Clients pay for outcomes.', 'Forcing unnecessary services undermines trust.', 'Never give away billable services. Goodwill is built through results, not discounts.'] }
+    ]
+  },
+  {
+    id: 'client-sales',
+    stage: 'Business',
+    ico: '🤝',
+    title: 'Client Management & Closing',
+    desc: 'Assessment, pricing, the maintenance plan close, and handling objections.',
+    pills: ['quiz'],
+    content: `
+      <div class="trn-section-lbl">The Assessment — Your Most Important Tool</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Never quote blind.</strong> Every unknown job requires an assessment. It protects your time, pricing, and warranty. An assessment is a professional act — not a delay.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What to assess:</strong> paint condition, contamination level, interior soiling depth, pre-existing damage, headliner integrity, odour source, tyre and wheel condition. Photograph before you touch anything.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Pre-existing damage walk-around</strong> — walk the vehicle with the client present, point out every scratch and mark. Have them acknowledge it. This prevents the "that wasn't there before" conversation.</div></div>
+      <div class="trn-section-lbl">Pricing Discipline</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Hold your price.</strong> Pre-emptive discounting avoids rejection but doesn't prevent it — it just reduces revenue for the same outcome.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Fallback sequence:</strong> Full price → scope reduction (remove a service element, not a percentage) → minimum viable job that still represents ECAD quality. Never go below that floor.</div></div>
+      <div class="trn-section-lbl">The Maintenance Plan Close</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Close at the moment of result.</strong> Peak satisfaction = peak receptivity. "I offer a maintenance plan that keeps it at this standard consistently — want me to walk you through it?"</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Anchor a specific date immediately.</strong> Don't leave with "I'll be in touch." "Your next service would be around [date] — does that work?" A date is a commitment. Open availability is not.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>After the close question — stop talking.</strong> Silence is the client thinking, not rejection. The next person to speak loses negotiating ground.</div></div>
+      <div class="trn-callout">Your close gap right now is repetitions, not knowledge. Every completed job is a close opportunity — treat every single one as practice.</div>
+    `,
+    quiz: [
+      { q: 'You finish a Tier 2 job and the client is visibly impressed. When do you introduce the maintenance plan?', opts: ['During the initial booking before they have seen your work', 'When you are halfway through the job', 'Immediately after they see the completed result — peak satisfaction', 'In a follow-up WhatsApp message the next day'], correct: 2, feedback: ['Too early — they have no reference point for the result you deliver.', "Mid-job, the client hasn't seen the outcome yet.", 'Correct. Peak satisfaction is peak receptivity. This is the window.', 'By the next day the emotional response has faded — the close is significantly harder.'] },
+      { q: 'A client says your price is too high. What is your correct first response?', opts: ['Immediately offer a 15% discount to close the deal', 'Ask what budget they had in mind and adjust scope', 'Hold your price and ask what specifically concerns them about the cost', 'Explain your process in more detail to justify the price'], correct: 2, feedback: ['Pre-emptive discounting signals your original price was not real.', 'Asking for their budget hands them negotiating control before you know if the objection is genuine.', 'Correct. Find out if the objection is specific before adjusting anything. It may be reflexive, not genuine.', 'More explanation is useful but comes after you understand the nature of the objection.'] },
+      { q: 'You offer a maintenance plan date and the client says "let me think about it." What do you do?', opts: ['"No problem, let me know" and leave it open', 'Offer a discount if they commit today', '"When should I check back with you — would Thursday work?" — anchor a specific next step', 'Send a brochure and follow up next week'], correct: 2, feedback: ['Open-ended follow-ups rarely convert. Without a next step, deals go cold.', 'Discounting under non-specific hesitation trains clients to hesitate for a reward.', 'Correct. "Let me think" is an open door. A specific next step keeps the deal moving.', 'Passive follow-up after hesitation is how deals die quietly.'] }
+    ]
+  },
+  {
+    id: 'content-professionalism',
+    stage: 'Business',
+    ico: '📸',
+    title: 'Documentation & Content',
+    desc: 'Every job is a content asset. Capture it like one.',
+    pills: ['quiz'],
+    content: `
+      <div class="trn-section-lbl">Before You Touch the Vehicle</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Document all pre-existing damage</strong> — photograph every scratch, dent, and stain before starting. This is professional protection and before-content simultaneously.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Consistent angles</strong> — front 3/4, rear 3/4, driver side, passenger side, interior overview, close-up of worst area. Same angles before and after makes the transformation undeniable.</div></div>
+      <div class="trn-section-lbl">During the Job</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Process shots</strong> — extractor on a soiled seat, steamer on a headliner, wheel transformation mid-clean. These educate your audience about what is actually involved and justify the price before they ever ask.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Your tripod is for this.</strong> Set it up and capture hands-on work. Authentic process content consistently outperforms polished promotional content on social.</div></div>
+      <div class="trn-section-lbl">After</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Same angles as before</strong> — the side-by-side tells the story without a caption. Watermark with the ECAD logo before posting.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Ask for the review before you leave</strong> — not "feel free to leave a review" — "would you be willing to leave a quick Google review? I can send you the direct link right now." While they are standing in front of the result.</div></div>
+      <div class="trn-callout">Social content that teaches the difference between ECAD and an informal wash is your pre-emptive price objection handler. When a prospect already understands the difference before contacting you, the price conversation is already half-won.</div>
+    `,
+    quiz: [
+      { q: 'When is the best time to ask a satisfied client for a Google review?', opts: ['In a WhatsApp message the following day', 'While they are standing in front of the completed vehicle — link sent immediately', 'At the start of the job before any work', 'On your Instagram story tagging them'], correct: 1, feedback: ['Delayed requests lose momentum. The emotional response is strongest at the moment of reveal.', 'Correct. Peak satisfaction plus immediate friction removal equals highest conversion rate.', 'There is no result to reference yet — no emotional basis for a review.', 'Public tagging without consent is unprofessional. Always ask before tagging clients.'] },
+      { q: 'Why does process content outperform promotional content on social media for ECAD?', opts: ['It is easier and cheaper to produce', 'It educates the audience about what is involved, justifying the price before they ever ask', 'People prefer videos over photos', 'Promotional content is blocked by the Instagram algorithm'], correct: 1, feedback: ['Ease of production is a practical benefit — not the strategic reason.', 'Correct. Education pre-handles objections. When a prospect understands the process, price resistance drops significantly.', 'Format matters less than content. Process content works in both photo and video.', 'Algorithm preference varies — the real advantage is engagement driven by genuine curiosity.'] }
+    ]
+  }
+];
+
+// ── TRAINING ENGINE ────────────────────────────────────────────────
+const TRN_STORE_KEY = 'ecad_trn_completed';
+function getTrnCompleted() { try { return JSON.parse(localStorage.getItem(TRN_STORE_KEY) || '[]'); } catch { return []; } }
+function setTrnCompleted(ids) { try { localStorage.setItem(TRN_STORE_KEY, JSON.stringify(ids)); } catch {} }
+
+function renderTrainingModules() {
+  const completed = getTrnCompleted();
+  const grid = document.getElementById('trn-module-grid');
+  if (!grid) return;
+  const pct = Math.round((completed.length / TRN_MODULES.length) * 100);
+  const bar = document.getElementById('trn-progress');
+  if (bar) bar.style.width = pct + '%';
+  grid.innerHTML = TRN_MODULES.map((m, i) => `
+    <div class="trn-card ${completed.includes(m.id) ? 'completed' : ''}" onclick="openLesson(${i})">
+      <div class="trn-card-ico">${m.ico}</div>
+      <div class="trn-card-stage">${m.stage}</div>
+      <div class="trn-card-title">${m.title}</div>
+      <div class="trn-card-desc">${m.desc}</div>
+      <div class="trn-card-meta">
+        ${m.pills.map(p => p === 'quiz'
+          ? '<span class="trn-pill trn-pill-q">Includes Quiz</span>'
+          : '<span class="trn-pill trn-pill-hand">Hands-On</span>'
+        ).join('')}
+      </div>
+    </div>`).join('');
+}
+
+let currentModule = null, quizAnswers = {}, quizSubmitted = false;
+
+function openLesson(idx) {
+  const m = TRN_MODULES[idx];
+  currentModule = m; quizAnswers = {}; quizSubmitted = false;
+  document.getElementById('trn-l-ico').textContent = m.ico;
+  document.getElementById('trn-l-stage').textContent = m.stage;
+  document.getElementById('trn-l-title').textContent = m.title;
+  let body = m.content;
+  if (m.quiz && m.quiz.length) {
+    body += `
+      <div class="trn-section-lbl" style="margin-top:28px">Knowledge Check</div>
+      <div class="trn-quiz-wrap">
+        ${m.quiz.map((q, qi) => `
+          <div class="trn-q" id="trn-q-${qi}">
+            <div class="trn-q-text">${qi + 1}. ${q.q}</div>
+            ${q.opts.map((opt, oi) => `
+              <div class="trn-opt" id="trn-opt-${qi}-${oi}" onclick="selectOpt(${qi},${oi})">
+                <div class="trn-opt-dot"></div><span>${opt}</span>
+              </div>`).join('')}
+            <div class="trn-q-feedback" id="trn-fb-${qi}"></div>
+          </div>`).join('')}
+        <div class="trn-quiz-actions">
+          <button class="btn-primary" onclick="submitQuiz()">Submit Answers</button>
+          <span class="trn-score-display" id="trn-score-display"></span>
+        </div>
+        <div class="trn-result" id="trn-result">
+          <div class="trn-result-score" id="trn-result-score"></div>
+          <div class="trn-result-label" id="trn-result-label"></div>
+          <div class="trn-result-msg" id="trn-result-msg"></div>
+          <button class="btn-primary" style="margin-top:16px" onclick="completeCurrent()">Mark Module Complete</button>
+        </div>
+      </div>`;
+  } else {
+    body += `<div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--bsoft);"><button class="btn-primary" onclick="completeCurrent()">Mark Complete</button></div>`;
+  }
+  document.getElementById('trn-l-body').innerHTML = body;
+  document.getElementById('trn-overlay').classList.add('open');
+}
+
+function closeLesson() { document.getElementById('trn-overlay').classList.remove('open'); renderTrainingModules(); }
+function completeCurrent() { if (!currentModule) return; const c = getTrnCompleted(); if (!c.includes(currentModule.id)) c.push(currentModule.id); setTrnCompleted(c); toast('Module complete', 'ok'); closeLesson(); }
+
+function selectOpt(qi, oi) {
+  if (quizSubmitted) return;
+  quizAnswers[qi] = oi;
+  currentModule.quiz[qi].opts.forEach((_, i) => {
+    document.getElementById(`trn-opt-${qi}-${i}`).classList.toggle('selected', i === oi);
+  });
+}
+
+function submitQuiz() {
+  if (quizSubmitted) return;
+  const q = currentModule.quiz;
+  if (q.some((_, i) => quizAnswers[i] === undefined)) { toast('Answer all questions first', 'err'); return; }
+  quizSubmitted = true;
+  let correct = 0;
+  q.forEach((qItem, qi) => {
+    const chosen = quizAnswers[qi];
+    if (chosen === qItem.correct) correct++;
+    qItem.opts.forEach((_, oi) => {
+      const el = document.getElementById(`trn-opt-${qi}-${oi}`);
+      el.classList.remove('selected');
+      if (oi === qItem.correct) el.classList.add('correct');
+      else if (oi === chosen) el.classList.add('wrong');
+    });
+    const fb = document.getElementById(`trn-fb-${qi}`);
+    fb.textContent = qItem.feedback[chosen];
+    fb.className = `trn-q-feedback show ${chosen === qItem.correct ? 'ok' : 'err'}`;
+  });
+  const pct = Math.round((correct / q.length) * 100);
+  document.getElementById('trn-result-score').textContent = pct + '%';
+  document.getElementById('trn-result-label').textContent = pct === 100 ? 'Perfect — everything locked in.' : pct >= 67 ? `${correct} of ${q.length} correct — solid foundation.` : `${correct} of ${q.length} correct — revisit this module.`;
+  document.getElementById('trn-result-msg').textContent = pct === 100 ? 'You have a complete grasp of this module. Carry that standard into every job.' : pct >= 67 ? 'Review the highlighted answers before moving on. The gaps here show up on the job.' : 'Re-read the lesson with focus on the areas you missed. The why matters as much as the what.';
+  document.getElementById('trn-result').classList.add('show');
+  document.getElementById('trn-score-display').textContent = `${correct}/${q.length} correct`;
+}
+
+// Patch goTo to render training when visited
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    const orig = window.goTo;
+    window.goTo = function(id) { orig(id); if (id === 'training') renderTrainingModules(); };
+  }, 200);
+});
 </script>
 </body>
 </html>
