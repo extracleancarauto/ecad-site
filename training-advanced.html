@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ECAD — Advanced Training</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: #0a0a0a;
+  color: #f0ede6;
+  font-family: 'Sora', sans-serif;
+  font-weight: 300;
+  line-height: 1.65;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+:root {
+  --silver:   #b8c8d6;
+  --silver-l: #d4e2ec;
+  --silver-d: #586878;
+  --navy:     #162340;
+  --navy-l:   #1e2e50;
+  --black:    #0a0a0a;
+  --s1:       #111111;
+  --s2:       #181818;
+  --s3:       #1e1e1e;
+  --s4:       #232323;
+  --border:   rgba(184,200,214,0.22);
+  --bsoft:    rgba(255,255,255,0.06);
+  --text:     #f0ede6;
+  --muted:    #8a8378;
+  --dim:      #5a574f;
+  --green:    #4caf82;
+  --green-d:  rgba(76,175,130,0.14);
+  --red:      #cf5b5b;
+  --red-d:    rgba(207,91,91,0.13);
+  --amber:    #d4a843;
+  --amber-d:  rgba(212,168,67,0.14);
+  --copper:   #c9783c;
+  --copper-l: #e8a46a;
+}
+
+/* ── LAYOUT ─────────────────────────────────────────────────────── */
+.page-wrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 40px 24px 80px;
+}
+.page-header {
+  margin-bottom: 40px;
+  border-bottom: 1px solid var(--bsoft);
+  padding-bottom: 28px;
+}
+.page-header-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+.back-btn {
+  background: var(--s3);
+  border: 1px solid var(--bsoft);
+  color: var(--muted);
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  padding: 6px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.back-btn:hover { color: var(--silver); border-color: var(--border); }
+.page-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--silver-l);
+  letter-spacing: .04em;
+}
+.page-subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.overall-progress-wrap {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.overall-bar-bg {
+  flex: 1;
+  height: 5px;
+  background: var(--s3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.overall-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--silver-d), var(--silver-l));
+  border-radius: 4px;
+  transition: width .6s ease;
+}
+.overall-pct {
+  font-size: 12px;
+  color: var(--silver);
+  min-width: 42px;
+  text-align: right;
+}
+
+/* ── TRACK LABELS ───────────────────────────────────────────────── */
+.track-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 36px 0 14px;
+}
+.track-label:first-of-type { margin-top: 0; }
+
+/* ── MODULE GRID ────────────────────────────────────────────────── */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 14px;
+  margin-bottom: 6px;
+}
+.mod-card {
+  background: var(--s1);
+  border: 1px solid var(--bsoft);
+  border-radius: 10px;
+  padding: 22px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: border-color .25s, transform .25s;
+}
+.mod-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.mod-card.done { border-color: rgba(76,175,130,.3); }
+.mod-card.done::after {
+  content: '✓';
+  position: absolute;
+  top: 14px; right: 16px;
+  font-size: 13px;
+  color: var(--green);
+}
+.mod-card.locked { opacity: .42; cursor: not-allowed; }
+.mod-card.locked:hover { transform: none; border-color: var(--bsoft); }
+.mod-ico { font-size: 22px; margin-bottom: 10px; }
+.mod-stage {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--copper-l);
+  margin-bottom: 6px;
+}
+.mod-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--silver-l);
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+.mod-desc {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+.mod-pills { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 20px;
+  border: 1px solid var(--bsoft);
+  color: var(--dim);
+}
+.pill.quiz { border-color: rgba(212,168,67,.3); color: var(--amber); }
+.pill.practice { border-color: rgba(184,200,214,.2); color: var(--silver-d); }
+.pill.advanced { border-color: rgba(207,91,91,.3); color: var(--red); }
+
+/* ── OVERLAY ────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.72);
+  z-index: 200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 24px 16px 40px;
+  overflow-y: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s;
+}
+.overlay.open { opacity: 1; pointer-events: all; }
+.lesson-panel {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 760px;
+  padding: 36px 36px 40px;
+  position: relative;
+  margin-top: 20px;
+}
+.lesson-close {
+  position: absolute;
+  top: 18px; right: 20px;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  transition: color .2s;
+}
+.lesson-close:hover { color: var(--silver); }
+.lesson-stage {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--copper-l);
+  margin-bottom: 6px;
+}
+.lesson-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--silver-l);
+  margin-bottom: 22px;
+  line-height: 1.25;
+}
+.lesson-progress-wrap {
+  background: var(--s3);
+  border-radius: 6px;
+  height: 5px;
+  margin-bottom: 26px;
+  overflow: hidden;
+}
+.lesson-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--silver-d), var(--silver-l));
+  transition: width .5s ease;
+  border-radius: 6px;
+}
+
+/* ── LESSON CONTENT ─────────────────────────────────────────────── */
+.section-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--silver-d);
+  margin: 26px 0 12px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--bsoft);
+}
+.section-lbl:first-child { margin-top: 0; }
+.point {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 13px;
+  align-items: flex-start;
+}
+.point-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--silver-d);
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+.point-text { font-size: 13px; color: var(--text); line-height: 1.65; }
+.point-text strong { color: var(--silver-l); font-weight: 500; }
+.callout {
+  background: var(--navy);
+  border: 1px solid rgba(184,200,214,.18);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-size: 12.5px;
+  color: var(--silver);
+  margin: 18px 0;
+  line-height: 1.6;
+}
+.warn {
+  background: var(--red-d);
+  border: 1px solid rgba(207,91,91,.2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: #e08080;
+  margin: 14px 0;
+  line-height: 1.55;
+}
+.tip {
+  background: var(--amber-d);
+  border: 1px solid rgba(212,168,67,.2);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: 12px;
+  color: var(--amber);
+  margin: 14px 0;
+  line-height: 1.55;
+}
+
+/* ── PRACTICE QUESTIONS ─────────────────────────────────────────── */
+.pq-section {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--bsoft);
+}
+.pq-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin-bottom: 16px;
+}
+.pq-item {
+  background: var(--s3);
+  border: 1px solid var(--bsoft);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.pq-q {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 10px;
+  font-weight: 400;
+}
+.pq-reveal-btn {
+  background: none;
+  border: 1px solid var(--bsoft);
+  color: var(--silver-d);
+  font-family: 'Sora', sans-serif;
+  font-size: 11px;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.pq-reveal-btn:hover { color: var(--silver); border-color: var(--border); }
+.pq-answer {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--silver);
+  background: var(--s4);
+  border-radius: 6px;
+  padding: 10px 12px;
+  display: none;
+  line-height: 1.6;
+}
+.pq-answer.visible { display: block; }
+
+/* ── QUIZ ───────────────────────────────────────────────────────── */
+.quiz-section {
+  margin-top: 30px;
+  padding-top: 22px;
+  border-top: 1px solid var(--bsoft);
+}
+.quiz-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 18px;
+}
+.quiz-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--silver);
+}
+.quiz-pass-note {
+  font-size: 10px;
+  color: var(--muted);
+}
+.quiz-q-block { margin-bottom: 22px; }
+.quiz-q-text {
+  font-size: 13px;
+  color: var(--text);
+  margin-bottom: 10px;
+  font-weight: 400;
+  line-height: 1.6;
+}
+.quiz-opts { display: flex; flex-direction: column; gap: 7px; }
+.quiz-opt {
+  background: var(--s3);
+  border: 1px solid var(--bsoft);
+  border-radius: 7px;
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: border-color .2s, color .2s, background .2s;
+  line-height: 1.5;
+}
+.quiz-opt:hover { border-color: var(--border); color: var(--text); }
+.quiz-opt.selected { border-color: var(--silver-d); color: var(--silver-l); background: rgba(184,200,214,.07); }
+.quiz-opt.correct { border-color: var(--green); color: var(--green); background: var(--green-d); cursor: default; }
+.quiz-opt.wrong { border-color: var(--red); color: var(--red); background: var(--red-d); cursor: default; }
+.quiz-feedback {
+  font-size: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-top: 8px;
+  display: none;
+  line-height: 1.55;
+}
+.quiz-feedback.show { display: block; }
+.quiz-feedback.ok { background: var(--green-d); color: var(--green); border: 1px solid rgba(76,175,130,.2); }
+.quiz-feedback.err { background: var(--red-d); color: #e08080; border: 1px solid rgba(207,91,91,.2); }
+.quiz-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--navy-l), var(--navy));
+  border: 1px solid rgba(184,200,214,.25);
+  color: var(--silver-l);
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 10px 22px;
+  border-radius: 7px;
+  cursor: pointer;
+  letter-spacing: .04em;
+  transition: border-color .2s, opacity .2s;
+}
+.btn-primary:hover { border-color: var(--silver-d); }
+.btn-secondary {
+  background: var(--s3);
+  border: 1px solid var(--bsoft);
+  color: var(--muted);
+  font-family: 'Sora', sans-serif;
+  font-size: 12px;
+  padding: 10px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.btn-secondary:hover { color: var(--silver); border-color: var(--border); }
+.score-display { font-size: 12px; color: var(--muted); }
+
+.result-box {
+  margin-top: 20px;
+  background: var(--s3);
+  border: 1px solid var(--bsoft);
+  border-radius: 10px;
+  padding: 22px;
+  display: none;
+}
+.result-box.show { display: block; }
+.result-score {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 42px;
+  font-weight: 300;
+  color: var(--silver-l);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+.result-label {
+  font-size: 13px;
+  color: var(--silver);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+.result-msg { font-size: 12px; color: var(--muted); line-height: 1.6; }
+.result-pass .result-score { color: var(--green); }
+.result-fail .result-score { color: var(--red); }
+
+/* ── TOAST ──────────────────────────────────────────────────────── */
+.toast {
+  position: fixed;
+  bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--s3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 12px;
+  color: var(--silver);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity .3s, transform .3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.ok { border-color: rgba(76,175,130,.35); color: var(--green); }
+.toast.err { border-color: rgba(207,91,91,.35); color: var(--red); }
+
+@media (max-width: 600px) {
+  .lesson-panel { padding: 24px 18px 30px; }
+  .page-wrap { padding: 24px 16px 60px; }
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+  <!-- HEADER -->
+  <div class="page-header">
+    <div class="page-header-top">
+      <a class="back-btn" href="dashboard.html">← Dashboard</a>
+    </div>
+    <div class="page-title">Advanced Training Centre</div>
+    <div class="page-subtitle">Extra Clean Auto Detailing · Skills Development Programme</div>
+    <div class="overall-progress-wrap">
+      <div class="overall-bar-bg">
+        <div class="overall-bar-fill" id="overall-bar" style="width:0%"></div>
+      </div>
+      <div class="overall-pct" id="overall-pct">0%</div>
+    </div>
+  </div>
+
+  <div id="module-list"></div>
+</div>
+
+<!-- LESSON OVERLAY -->
+<div class="overlay" id="overlay">
+  <div class="lesson-panel" id="lesson-panel">
+    <button class="lesson-close" onclick="closeLesson()">×</button>
+    <div class="lesson-stage" id="l-stage"></div>
+    <div class="lesson-title" id="l-title"></div>
+    <div class="lesson-progress-wrap">
+      <div class="lesson-progress-bar" id="l-progress" style="width:0%"></div>
+    </div>
+    <div id="l-body"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── DATA ─────────────────────────────────────────────────────────
+const MODULES = [
+
+  // ══════════════════════════════════════════
+  // TRACK: CRAFT & TECHNIQUE
+  // ══════════════════════════════════════════
+  {
+    track: 'Craft & Technique',
+    id: 'paint-science',
+    stage: 'Advanced Craft',
+    ico: '🎨',
+    title: 'Paint Science & Correction Logic',
+    desc: 'Understanding clearcoat, oxidation, swirl marks, and when correction is — and is not — the answer.',
+    pills: ['advanced', 'practice', 'quiz'],
+    content: `
+      <div class="section-lbl">What You Are Actually Working On</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Modern vehicles have 4 layers:</strong> substrate (metal/plastic), electrocoat primer, base colour coat, and clearcoat. You are almost always working on the clearcoat. The colour coat beneath it is untouched in a correct detail.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Clearcoat thickness</strong> typically ranges 40–80 microns. Each polishing session removes 1–5 microns. This is not infinite. Knowing this prevents you from destroying a client's paint in the name of perfection.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Swirl marks</strong> are micro-scratches in the clearcoat surface that scatter light. They are caused by improper washing (dirty wash mitts, circular motion, dry wiping). Your wash technique either creates or prevents them.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Oxidation</strong> is UV-degraded clearcoat — the top layer has become chalky and lost its refractive ability. Mild oxidation responds to compound + polish. Severe oxidation means the clearcoat is failing. Flag it. You cannot restore what is gone.</div></div>
+      <div class="section-lbl">Correction Hierarchy</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Light polish only</strong> — removes light swirl marks and haze. Low cut, low heat. Starting point for newer or well-maintained paint.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Compound then polish</strong> — compound cuts deeper to remove heavy swirls, light scratches, oxidation. Polish removes the compounding micro-marring. Two-stage process.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Wet sand then compound then polish</strong> — for severe orange peel, heavy scratches, severe oxidation. This is specialist work. Do not offer this until you have 20+ hours of deliberate DA polisher practice.</div></div>
+      <div class="warn">⚠ A scratch that catches your fingernail has broken through the clearcoat into the colour coat. No amount of polishing will remove it. Managing client expectations at the assessment stage is the professional response — not a promise you cannot deliver.</div>
+      <div class="section-lbl">Jamaican Paint Considerations</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>UV intensity</strong> in Jamaica accelerates clearcoat degradation. Vehicles that are parked outdoors, unprotected, age faster than equivalent mileage vehicles in temperate climates. Expect more oxidation on older fleet vehicles.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Surface temperature</strong> — compounds and polishes behave differently on hot panels. Heat accelerates the abrasive cycle, meaning you remove more material faster. Always work cool, shaded panels. Early morning is preferred.</div></div>
+      <div class="callout">When a DA polisher enters your kit, your service scope expands significantly. Until then, your role in paint correction is accurate assessment and honest limitation — both of which are professional, billable skills.</div>
+    `,
+    practice: [
+      { q: 'A client asks you to "just buff out" a scratch on their bonnet. You run your fingernail across it and it catches. What do you tell them, and why?', a: 'You explain honestly that the scratch has broken through the clearcoat, meaning the colour coat is exposed. Polishing or buffing cannot restore what is missing — it would only risk damaging the surrounding clearcoat. The correct solution is touch-up paint or a body shop. Document this during the pre-job walk-around and have the client acknowledge it before you begin any work on the vehicle.' },
+      { q: 'Why does compound always need to be followed by polish on a two-stage correction?', a: 'Compound contains larger abrasive particles that cut into the clearcoat to remove defects — but they leave their own micro-scratches (marring) on the surface. Polish uses finer abrasives to remove those compound marks and restore optical clarity. Skipping the polish stage leaves the paint looking dull or hazy even though the original defect was corrected.' },
+      { q: 'A client\'s vehicle has been sitting outside unprotected for 3 years in Kingston. The bonnet feels rough and chalky. Before touching it, what do you assess and document?', a: 'Assess the severity of oxidation (mild chalky haze vs. severe breakdown), check whether the clearcoat is peeling or failing at edges, run a fingernail across the surface to gauge depth, photograph every panel in natural light before work begins, and note any areas where the clearcoat is cracking or lifting. Communicate clearly what correction is possible vs. what indicates structural paint failure.' }
+    ],
+    quiz: [
+      { q: 'A client has a 2015 Toyota Vitz with heavy swirl marks across all panels. You currently have a DA polisher. What is the correct correction sequence?', opts: ['Light polish only — swirls are not deep enough for compound', 'Compound all panels, then polish to remove compound marring', 'Wet sand first, then compound, then polish', 'Apply a sealant to fill in the swirls visually'], correct: 1, feedback: ['Light polish alone may not cut deep enough to fully remove heavy swirls.', 'Correct. Heavy swirls need compound to cut them out, followed by polish to restore gloss.', 'Wet sanding is reserved for severe orange peel or deep scratches — overkill for swirl marks.', 'Sealants fill swirls temporarily. This is not correction — and it is dishonest to present it as such.'] },
+      { q: 'You are polishing a black sedan bonnet at 11am in Kingston. The panel feels very warm. What should you do?', opts: ['Continue — the heat helps activate the polish chemistry', 'Work faster to minimise contact time', 'Stop. Cool the panel with water, move to shade, wait for the surface to cool before continuing', 'Switch to a coarser compound to finish faster'], correct: 2, feedback: ['Heat does not activate polish beneficially — it accelerates abrasion unpredictably and can cause product to dry and bind.', 'Speed on a hot panel increases heat from friction and removes the ability to monitor product behaviour.', 'Correct. A hot panel is an unsafe polishing surface. Cool, shaded conditions are non-negotiable for quality correction work.', 'Coarser compound on a hot panel dramatically increases the risk of clearcoat damage.'] },
+      { q: 'What does oxidation on a vehicle\'s paint actually mean?', opts: ['The metal beneath the paint has rusted through', 'UV radiation has degraded the clearcoat surface, making it chalky and unable to reflect light properly', 'The colour coat has faded due to washing too frequently', 'The vehicle has been waxed with an incompatible product'], correct: 1, feedback: ['Oxidation is a surface clearcoat issue, not rust — rust is metal corrosion beneath the paint system.', 'Correct. UV breaks down the polymer chains in the clearcoat. The result is a chalky, dull surface that has lost its refractive ability.', 'Over-washing does not cause oxidation — UV exposure and lack of protection do.', 'Product incompatibility causes bonding or application issues, not oxidation.'] },
+      { q: 'A scratch on a client\'s door catches your fingernail during the assessment. How do you handle this?', opts: ['Proceed with the detail and attempt to buff it out — the client expects results', 'Note it in the pre-job walk-around, photograph it, explain what it means, and be clear that polishing will not remove a clearcoat breach', 'Skip documenting it — if the client doesn\'t mention it, don\'t raise it', 'Charge extra for the attempt regardless of outcome'], correct: 1, feedback: ['Promising to correct a clearcoat breach through polishing sets up a dispute you will lose.', 'Correct. Documentation protects you legally. Honest communication protects your reputation. Both are mandatory.', 'Never skip documentation on pre-existing damage. This is how "that wasn\'t there before" arguments begin.', 'Charging for an attempt you know cannot deliver the expected result is dishonest and reputation-damaging.'] },
+      { q: 'At what clearcoat removal rate does repeated polishing become a long-term risk to paint integrity?', opts: ['There is no risk — clearcoat is designed to be polished indefinitely', 'Each polishing session removes material. Clearcoat (typically 40–80 microns) is finite — repeated correction without assessment accelerates failure', 'Risk only applies to budget vehicles with thin factory paint', 'Risk begins only after 10+ polishing sessions'], correct: 1, feedback: ['Clearcoat is absolutely finite. This is why paint depth gauges exist and why professional detailers track correction history.', 'Correct. Each session removes 1–5 microns. On thin or previously corrected paint, this is a real constraint that requires professional assessment before every correction job.', 'All factory clearcoats are finite. Premium vehicles often have thicker applications but they are not immune.', 'There is no session count threshold — the constraint is remaining material, not number of passes.'] }
+    ]
+  },
+
+  {
+    track: 'Craft & Technique',
+    id: 'wash-technique',
+    stage: 'Core Skill',
+    ico: '🪣',
+    title: 'Professional Wash Technique',
+    desc: 'Two-bucket method, dwell time, contact sequence, and the habits that separate pros from amateurs.',
+    pills: ['practice', 'quiz'],
+    content: `
+      <div class="section-lbl">The Two-Bucket Method — Why It Is Not Optional</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Bucket 1: wash solution.</strong> Bucket 2: rinse water with a grit guard at the bottom. Every pass of the mitt: rinse in Bucket 2, agitate against the grit guard, load with soap from Bucket 1. This sequence keeps abrasive particles from returning to the paint surface.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Without the two-bucket method</strong>, each rinse of your wash mitt reloads it with the contamination you just removed. You are then scrubbing that contamination back across the paint — creating the exact swirl marks your clients are paying you to avoid.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Mitt pressure.</strong> Let the mitt do the work. Firm pressure does not clean better — it forces abrasive particles deeper into the paint surface. Light, overlapping straight-line passes.</div></div>
+      <div class="section-lbl">Contact Sequence</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Wheels and arches first</strong> — these carry the heaviest contamination. Complete them before touching body panels. Use dedicated brushes and a separate mitt. Never use a wheel brush on paint.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Pre-rinse the vehicle</strong> — high pressure to remove loose contamination before any contact. Start from the roof down. This is not optional — contact washing a dry, dusty vehicle is how swirl marks are made.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Wash sequence: roof → glass → upper panels → lower panels → sills.</strong> Work top-down always. Lower panels carry the most contamination. If you wash them first and reuse the same path, you drag that contamination up.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Foam cannon pre-wash</strong> — where used, apply foam, allow 3–5 minutes dwell time (not in direct sun — foam dries into a residue problem), then rinse before contact washing. The foam softens and lubricates bonded contamination, reducing the force your mitt needs to apply.</div></div>
+      <div class="section-lbl">Drying Without Damage</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Waffle-weave microfibre only</strong> — this traps water in its structure rather than smearing it across the surface. Never use chamois leather on modern clearcoat — the dragging action at the molecular level creates marring.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Blower first</strong> — remove water from panel gaps, mirrors, badges, door jams. Water hiding in these areas migrates onto panels after drying and leaves water marks. Your blower is a professional tool, not just convenience.</div></div>
+      <div class="tip">💡 In Jamaica's heat, drying speed is your enemy. Work in the shade. A vehicle dried in direct afternoon sun will water-spot before your towel reaches the second panel. Time your wash completion so you are drying in shade or after the worst heat has passed.</div>
+      <div class="callout">Wash technique is where your reputation is built or damaged. A client does not see your product chemistry — they see swirl marks under sunlight two days after you left. Perfect wash technique is invisible. Imperfect wash technique is permanent.</div>
+    `,
+    practice: [
+      { q: 'Explain to a new assistant why you always wash the wheels before the body panels, using separate tools for each.', a: 'Wheels carry brake dust, road tar, and heavy grit — the most abrasive contamination on the vehicle. If you wash the body panels first and then move to the wheels, you risk splashing wheel contamination onto freshly cleaned paint. Using a dedicated wheel brush and mitt prevents cross-contamination: abrasive particles from the wheels never touch your paint wash mitt, which protects the clearcoat from the microscopic scratching that creates swirl marks.' },
+      { q: 'A client watches you work and says "why are you using two buckets? Seems like extra work." How do you explain it without being condescending?', a: 'You explain that the second bucket is the rinse bucket — every time you pull the mitt off the paint, you rinse it in the second bucket and scrub it against the grit guard at the bottom. That removes any grit or dirt the mitt picked up. If you rinsed the mitt back into the soap bucket, you\'d be reloading it with the same contamination you just removed, then scrubbing it back onto the paint. The two-bucket method is what keeps the wash from creating new scratches.' },
+      { q: 'You arrive at a client\'s home at 1pm. The vehicle is parked in direct sun and is very hot to the touch. What do you do before you begin washing?', a: 'Do not begin washing on a hot, sun-baked vehicle. Ask the client if the vehicle can be moved to shade — if not, wait for a cooler part of the day or reschedule. Washing a hot vehicle causes shampoo and foam to dry rapidly onto the surface before you can rinse it, leaving chemical residue. The heat also accelerates water evaporation during drying, causing water spotting on every panel. Schedule around the sun, not in spite of it.' }
+    ],
+    quiz: [
+      { q: 'You have rinsed your wash mitt in the wash bucket (not the rinse bucket) during a job. What is the most likely outcome if this continues?', opts: ['No impact — shampoo neutralises contamination', 'Contamination from the paint is reloaded onto the mitt and scrubbed back across the clearcoat, creating swirl marks', 'The wash just takes slightly longer', 'The shampoo dilutes and loses effectiveness'], correct: 1, feedback: ['Shampoo lubricates but does not neutralise abrasive particles — grit reloaded onto the mitt will scratch.', 'Correct. This is the exact mechanism by which swirl marks are created during washing. The two-bucket method exists entirely to prevent this.', 'The consequence is paint damage, not just time loss.', 'Dilution is a real concern but the primary risk here is abrasive recontamination.'] },
+      { q: 'In Jamaica\'s afternoon heat, you apply foam pre-wash and wait 10 minutes before rinsing. What problem does this create?', opts: ['No problem — longer dwell improves contamination removal', 'The foam dries onto the paint in the heat, creating a residue that requires additional work to remove', 'The foam becomes more effective as it concentrates', 'Wheels must be re-treated after long foam dwell times'], correct: 1, feedback: ['Dwell time guidelines assume normal conditions. Heat dramatically shortens the safe dwell window.', 'Correct. Dried foam leaves a concentrated chemical residue on the surface that must be rinsed and re-cleaned — adding work and risking surface chemistry issues.', 'Concentrated dried foam is a contaminant, not an improvement.', 'Wheel treatment is a separate process — foam drying is a panel-specific risk.'] },
+      { q: 'Why should a blower be used before drying towels on a freshly washed vehicle?', opts: ['To heat the panels for better towel absorption', 'To remove water from panel gaps and seams that would otherwise migrate onto dried panels and create water marks', 'Blowers are only for interiors — not exterior drying', 'To activate the sealant applied during washing'], correct: 1, feedback: ['Panel heat is a problem, not a goal, during the drying phase.', 'Correct. Door jams, badge edges, mirror housings, and panel gaps hold water that drips onto clean panels minutes after drying — creating marks on a vehicle you just finished.', 'A blower is a core exterior drying tool for any professional detailer.', 'No sealant is applied during the wash stage.'] },
+      { q: 'What does "straight-line overlapping passes" mean during contact washing, and why does it matter?', opts: ['Washing in parallel lines rather than circles, so any micro-scratches created align with light reflection and are less visible', 'Washing in a grid pattern to ensure full coverage', 'Applying more pressure in straight lines to clean better', 'A pattern only relevant during machine polishing'], correct: 0, feedback: ['Correct. Circular motion creates circular micro-scratches that scatter light in all directions — creating visible swirl halos. Straight-line scratches are far less visible because they align directionally.', 'Coverage is important but the direction rationale is specifically about scratch visibility.', 'Pressure is a separate concern — straight-line means direction, not force.', 'Straight-line technique applies to both hand washing and machine polishing.'] },
+      { q: 'A client\'s vehicle has heavy road tar on the lower panels. You begin contact washing and the wash mitt drags noticeably. What should you do?', opts: ['Apply more shampoo and push through — the soap will dissolve it', 'Stop contact washing that area. Apply a dedicated tar remover, allow it to dwell, and wipe off before continuing the wash', 'Use a stiffer brush to agitate the tar', 'Switch to a compound pad to cut through it'], correct: 1, feedback: ['Shampoo does not dissolve petroleum-based tar — forcing the mitt across it embeds abrasive tar particles into the clearcoat.', 'Correct. Tar requires a dedicated chemical solvent applied as a pre-treatment. Contact washing before chemical removal causes paint damage.', 'A stiff brush on painted lower panels is clearcoat damage waiting to happen.', 'Compound is a paint correction tool — not a decontamination solution.'] }
+    ]
+  },
+
+  // ══════════════════════════════════════════
+  // TRACK: BUSINESS OPERATIONS
+  // ══════════════════════════════════════════
+  {
+    track: 'Business Operations',
+    id: 'financial-literacy',
+    stage: 'Business',
+    ico: '📊',
+    title: 'Financial Literacy for ECAD',
+    desc: 'Revenue targets, job costing, cash flow discipline, and reading your own numbers honestly.',
+    pills: ['practice', 'quiz'],
+    content: `
+      <div class="section-lbl">Understanding Your Numbers</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Revenue is not profit.</strong> If you charge $8,500 for a full detail and spend $2,200 on chemicals, fuel, and your time (valued at cost), your gross margin on that job is $6,300. Fixed monthly costs — insurance, equipment payments, registration — come off the top of all your revenue before anything is truly yours.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Cost per job.</strong> Know this number for each service tier. Calculate: consumables (shampoo, dressings, microfibre wear), fuel, and your time at a fair hourly rate. If a job costs $1,800 to deliver and you charge $2,500, your margin is $700 — not $2,500. Pricing decisions require this clarity.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Break-even calculation.</strong> Add all fixed monthly costs. Divide by your average margin per job. That number is how many jobs you must complete monthly before you make any actual profit. Know this number. It changes every time your cost structure changes.</div></div>
+      <div class="section-lbl">Cash Flow vs Profit</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Cash flow is when money arrives.</strong> Profit is the mathematical difference between income and costs. A business can be profitable on paper and still run out of cash — if clients pay late, if you buy inventory before jobs are booked, if your loan payments fall due before revenue arrives. These are separate problems requiring separate discipline.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Float management.</strong> Keep a minimum cash reserve — ideally enough to cover one month of fixed costs — before drawing personal income. This protects the business from single-event disruption (one bad week, one equipment failure, one missed client).</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Separate accounts.</strong> Business income into a dedicated account — even if informal initially. Personal money and business money mixed together is the most common way small business owners lose track of their actual financial position.</div></div>
+      <div class="section-lbl">Loan and Debt Awareness</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Every loan has a real monthly cost</strong> that must be covered by revenue. Before taking on any new debt, calculate how many additional jobs per month the repayment requires. If the answer exceeds realistic new capacity, the loan is not ready for yet.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Good debt</strong> funds assets that generate more than the debt costs. A van that enables $80,000/month in additional revenue at a $15,000/month payment is good debt. Equipment sitting idle on borrowed money is not.</div></div>
+      <div class="callout">You already carry two existing loan obligations. Every financial decision you make right now must account for that base debt service. Growth is possible — but it must be structured, not assumed.</div>
+      <div class="tip">💡 Track every job in writing. Date, service, amount charged, amount collected, and chemical cost estimate. This is your business intelligence. Without it, you are running blind.</div>
+    `,
+    practice: [
+      { q: 'You complete 8 full detail jobs in a month at $9,000 each. Your variable costs average $2,200 per job. Your fixed monthly costs are $18,000. What is your actual net profit for the month?', a: 'Gross revenue: 8 × $9,000 = $72,000. Variable costs: 8 × $2,200 = $17,600. Gross profit: $72,000 − $17,600 = $54,400. Fixed costs: $18,000. Net profit: $54,400 − $18,000 = $36,400. This is what is available for loan repayment, reinvestment, and personal income — not $72,000.' },
+      { q: 'Why is it possible to have positive profit on paper but still be unable to pay a bill on time?', a: 'Because profit and cash flow are different. Profit is the mathematical result of income minus costs — it tells you what the business earned. Cash flow is about timing — when money physically arrives. If a client owes you $25,000 but pays 30 days late, that money is counted as profit for the month it was earned but is not in your account when bills are due. This is why cash flow discipline — deposits upfront, prompt invoicing, minimum reserves — matters even when a business is technically profitable.' },
+      { q: 'A supplier offers you a buy-now-pay-later deal on $40,000 of inventory. You have 4 jobs booked next month. Should you take it?', a: 'Only if the inventory directly enables those 4 jobs or additional jobs you cannot currently complete without it, and only if the repayment terms fit within your cash flow. Buying $40,000 of inventory on credit that generates $30,000 of revenue over the repayment period is a losing position. Calculate the jobs required to repay the debt, compare that to realistic capacity, and make the decision on numbers — not on the appeal of having a full stock.' }
+    ],
+    quiz: [
+      { q: 'You charge $12,000 for a job. Your variable costs were $3,400. What was your gross margin on that job?', opts: ['$12,000', '$8,600', '$3,400', 'Cannot determine without knowing fixed costs'], correct: 1, feedback: ['Revenue is not margin — costs must be subtracted.', 'Correct. $12,000 − $3,400 = $8,600 gross margin. Fixed cost allocation would further reduce this to net margin.', 'That is your cost, not your margin.', 'Gross margin only requires revenue and variable costs — fixed costs determine net margin, not gross.'] },
+      { q: 'Your fixed monthly costs total $22,000. Your average gross margin per job is $5,500. How many jobs must you complete before you begin generating actual profit?', opts: ['2 jobs', '4 jobs', '8 jobs', '10 jobs'], correct: 1, feedback: ['2 jobs × $5,500 = $11,000 — less than your fixed costs. Still losing.', 'Correct. 4 × $5,500 = $22,000 — exactly breaks even. Job 5 onward generates profit.', '8 jobs would generate $44,000 gross margin against $22,000 fixed costs — that is $22,000 of profit, not the break-even point.', 'That is well past break-even.'] },
+      { q: 'Why should business income and personal money be kept in separate accounts?', opts: ['It is a legal requirement in Jamaica for all businesses', 'Mixed accounts make it impossible to accurately track whether the business is profitable or losing, and blur the line between reinvestment and personal spending', 'Banks require it for mobile businesses', 'Separate accounts reduce loan interest rates'], correct: 1, feedback: ['Separation is best practice — formal legal requirements vary by business structure.', 'Correct. Without separation, you cannot read your own financial position. Profitable businesses have been run into the ground by owners who spent what looked like surplus but was actually operating capital.', 'There is no universal bank requirement for this — it is a financial discipline issue.', 'Account structure does not affect loan interest rates.'] },
+      { q: 'A bank offers you a $300,000 equipment loan at $28,000/month repayment. The equipment would enable you to offer ceramic coating at $35,000 per application. How many ceramic applications per month covers the loan payment alone?', opts: ['1 application', 'Less than 1 — you cannot cover it with this pricing', '2 applications', '5 applications'], correct: 0, feedback: ['Correct. 1 × $35,000 > $28,000 — one application per month covers the loan with $7,000 to spare. Whether this is viable depends on realistic booking frequency and variable costs.', 'One ceramic application at $35,000 exceeds the $28,000 payment.', 'Two would be preferred as a safety buffer, but one technically covers it.', 'Five would generate strong surplus — but the question asks for coverage, not optimal throughput.'] },
+      { q: 'Which of these correctly describes the difference between cash flow and profit?', opts: ['They are the same thing measured at different intervals', 'Profit is whether income exceeds costs mathematically; cash flow is whether money is physically available when obligations are due', 'Cash flow only matters for businesses with employees', 'Profit is for tax purposes; cash flow is for investment decisions'], correct: 1, feedback: ['They are distinct concepts that frequently diverge — particularly when payment timing is involved.', 'Correct. This is the essential distinction. A profitable business can be cash-negative; a cash-positive business can be losing money. Both require monitoring.', 'Cash flow is critical for any business with fixed payment obligations, regardless of size.', 'Both matter for taxes, investment, and operations — these are not cleanly separable domains.'] }
+    ]
+  },
+
+  {
+    track: 'Business Operations',
+    id: 'client-acquisition',
+    stage: 'Business',
+    ico: '🎯',
+    title: 'Client Acquisition & Retention Systems',
+    desc: 'How to find clients, convert them, keep them, and build a referral engine in the Jamaican market.',
+    pills: ['practice', 'quiz'],
+    content: `
+      <div class="section-lbl">The Jamaican Market Reality</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Word of mouth is the primary acquisition channel in Jamaica.</strong> Trust is community-earned. Your best next client is likely someone who knows your current or past client. Every job you do is an advertisement — the question is what kind.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>WhatsApp Business is your primary CRM</strong> at this stage. Quick replies, broadcast lists by segment, catalogue entries with prices and photos, and a professional business profile. A missed WhatsApp enquiry in Jamaica is a client lost — response time within 2 hours is a competitive standard.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Price sensitivity is real</strong> — but it is not your enemy. Clients who ask about price are evaluating perceived value against cost. Your job during a consultation is to shift the conversation from price to outcome. What does the vehicle look like now vs. what it will look like after? What is the protection value? What is the convenience of mobile service?</div></div>
+      <div class="section-lbl">Conversion — Turning Enquiries into Bookings</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Respond with a question, not a price.</strong> When someone asks "how much for a full detail?", respond: "I\'d love to help — what\'s the make, model, and condition of the vehicle? That lets me give you an accurate quote." This starts a conversation, moves toward assessment, and signals professionalism.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Social proof in responses.</strong> Keep 2–3 recent client results (with permission) accessible for sharing. "Let me show you a similar vehicle we completed last week" is more powerful than any price justification.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>The close.</strong> End every consultation with a specific next step: "I have availability Thursday morning and Saturday — which works better for you?" Never leave it open. An unscheduled lead is a lost lead.</div></div>
+      <div class="section-lbl">Retention — Why Clients Come Back</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Follow-up within 48 hours</strong> of every completed job. A simple WhatsApp: "How is the vehicle looking? Anything you\'d like us to note for next time?" This signals professionalism, invites feedback before it becomes a public review, and re-opens the maintenance conversation.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>The maintenance plan closes retention.</strong> A client on a maintenance plan is scheduled in advance, pays regularly, and is removed from the acquisition funnel entirely. Target: convert every full-detail client to a maintenance enquiry by the end of the job.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Referral activation.</strong> After a successful job, ask directly: "If you know anyone else looking for this level of care for their vehicle, I\'d really appreciate the referral." Direct asks outperform passive hope. Consider a small referral incentive — a complimentary tyre dressing on next visit, for example.</div></div>
+      <div class="callout">Acquisition costs money and time. Retention is nearly free. A business that retains 70% of its clients requires far fewer new leads to hit its revenue targets than one that retains 30%. Build retention systems before you exhaust your current network.</div>
+    `,
+    practice: [
+      { q: 'A client messages you: "How much for full detail?" Write a professional response that moves toward a conversion without immediately giving a price.', a: '"Thanks for reaching out! To give you an accurate quote, could you tell me the make, model, and approximate condition of the vehicle — and where it\'s located in Kingston/St. Andrew? Full details range based on vehicle size and how much work is involved, and I want to make sure I give you the right number rather than a rough guess. I\'ll come back to you quickly."' },
+      { q: 'You completed a full detail 3 days ago. The client has not messaged. Write a follow-up WhatsApp message.', a: '"Hi [Name], just checking in — hope the [vehicle] is still looking clean! 🙌 Let me know if there\'s anything you\'d like us to note for your next visit, or if you have any questions. If you\'re happy with the work, we\'d love a referral from you — and I\'m also happy to walk you through our monthly maintenance plan if that would be useful."' },
+      { q: 'A potential client says "I checked another detailer and he quoted $5,000 less than you." How do you respond?', a: 'You acknowledge the comparison without dismissing it: "I hear you — pricing varies quite a bit in this industry. The difference usually comes down to what\'s included: the products used, the process, and what you\'re left with at the end. I use professional-grade Cerakote products and a structured process that includes a pre-job walk-around, paint protection, and a follow-up. If you\'d like, I can walk you through exactly what we do differently. The question worth asking is not just the price today, but what the vehicle looks and feels like a month from now."' }
+    ],
+    quiz: [
+      { q: 'A potential client enquires on WhatsApp at 9pm. You see the message at 10pm. When should you respond?', opts: ['Immediately — respond at 10pm regardless of the hour', 'Early the next morning — first thing, before 8am', 'Within 2 hours during reasonable hours; if late evening, first thing next morning is professional', 'When it is convenient — clients understand detailers are busy'], correct: 2, feedback: ['Responding at 10pm can be appropriate in some contexts, but professional first impressions often favour reasonable-hours response.', 'Technically reasonable, but if "first thing next morning" means 10am, you may have already lost the enquiry.', 'Correct. Timely response signals professionalism. A thoughtful early-morning reply is often more effective than a rushed late-night one.', 'Convenience-based responses lose clients in a competitive market where alternatives are one message away.'] },
+      { q: 'Why is closing with a specific appointment option better than saying "let me know when you\'re available"?', opts: ['It reduces the number of messages needed', 'Specific options create a decision — the client acts. Open-ended availability creates a task they will postpone indefinitely', 'Clients prefer flexibility in scheduling', 'It is considered more polite in the Jamaican market'], correct: 1, feedback: ['Message count is not the goal — conversion is.', 'Correct. "Which works better, Thursday or Saturday?" is a binary decision. "Let me know when you\'re free" is a task with no deadline that competes with every other thing in the client\'s week.', 'Flexibility is valuable after conversion — before it, specificity drives action.', 'Directness and professionalism are valued — vagueness signals low confidence.'] },
+      { q: 'What is the primary strategic value of a maintenance plan from a business operations perspective?', opts: ['It generates more revenue per client per visit', 'It removes the client from the acquisition funnel — revenue is predictable and the relationship is secured', 'It reduces the amount of work required per visit', 'It improves your chemical purchasing power through volume'], correct: 1, feedback: ['Maintenance plan revenue per visit is typically lower than one-off full details — the value is in frequency and predictability.', 'Correct. A client on a plan is booked forward, predictable, and no longer a lead you must re-convert. This is the core operational value.', 'Vehicle condition compounds if not maintained — maintenance visits can be equally demanding.', 'Volume purchasing benefits exist but are secondary to the retention and revenue predictability argument.'] },
+      { q: 'A client refers a friend who books a job. When and how do you acknowledge the referral?', opts: ['After the referred client\'s job is complete and paid', 'Never — referrals should be expected, not rewarded', 'Immediately when the referred client books, with a thank-you to the referring client', 'Only if you plan to offer a formal referral incentive programme'], correct: 2, feedback: ['Acknowledging after payment delays the positive feedback loop that encourages future referrals.', 'Referrals are not automatic. They require effort and social capital from the referrer. Unacknowledged referrals stop.', 'Correct. Immediate acknowledgement closes the referral loop positively and signals that referring you is appreciated — reinforcing the behaviour.', 'Formal programmes help, but a simple, prompt, genuine thank-you is already more than most small businesses do.'] },
+      { q: 'You have 12 active clients who have each booked once. A competitor targets the same area and offers aggressive pricing. Which clients are most at risk of switching?', opts: ['All clients equally — price always wins', 'Clients who have never received a follow-up, have no ongoing relationship, and no plan — they have no switching cost', 'Clients who paid the most per job', 'Clients in areas with the most competitor presence'], correct: 1, feedback: ['Price is a factor, but relationship and switching cost are stronger retention forces.', 'Correct. A one-time transaction with no follow-up creates no loyalty. The client has no relationship to lose by switching. Retention systems — follow-ups, plans, referral acknowledgement — create switching costs that price alone cannot overcome.', 'Price paid does not predict loyalty — relationship depth does.', 'Geography affects accessibility, not the core loyalty dynamic.'] }
+    ]
+  },
+
+  // ══════════════════════════════════════════
+  // TRACK: LEADERSHIP & GROWTH
+  // ══════════════════════════════════════════
+  {
+    track: 'Leadership & Growth',
+    id: 'scaling-operations',
+    stage: 'Strategic',
+    ico: '🚀',
+    title: 'Scaling ECAD — From Solo to Fleet',
+    desc: 'The systems, decisions, and mindset required to move from one operator to a multi-vehicle operation.',
+    pills: ['practice', 'quiz'],
+    content: `
+      <div class="section-lbl">The Solo Ceiling</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Every solo operator hits a ceiling.</strong> Your hours are finite. Your body can only sustain full detail output for so many years at high volume. The business that depends entirely on you is not a business — it is a job with higher overhead. Recognising this early is not a sign of failure. It is the beginning of real entrepreneurship.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Systematise before you hire.</strong> A system can be taught. Tribal knowledge — the way you do things that only exist in your head — cannot be safely delegated. Every process you perform should eventually have a written standard. Your 20-step detailing protocol is an example. Build more of these.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Document while you do.</strong> You are at the ideal stage right now — low volume, building habit. Every time you complete a job, you have the opportunity to note what worked, what varied, and what a new operator would need to know. This documentation becomes your training programme.</div></div>
+      <div class="section-lbl">The Hiring Decision</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Do not hire to solve a capacity problem you have not yet had.</strong> Hire when you are consistently turning away work, when documented demand exceeds your output, or when a specific revenue target requires more output than solo operations can deliver. Premature hiring without revenue to support it is one of the most common ways small businesses fail.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>The first hire is an assistant, not a replacement.</strong> They assist your process, extend your output, learn the standard under direct supervision. Putting an untrained operator on a client vehicle alone before they are ready damages reputation faster than anything else.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Culture starts with the first hire.</strong> The standards you hold yourself to become the baseline. If you cut corners when tired, so will they. The standard you set in year one is the culture you inherit in year five.</div></div>
+      <div class="section-lbl">Fleet and Territory Expansion</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Each vehicle in a fleet is a revenue centre with its own cost structure.</strong> Equipment, operator wage, fuel, insurance, maintenance — know the monthly cost of each van before you add it. A second van that does not generate its own overhead plus profit margin is a liability disguised as growth.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Parish expansion sequencing</strong> — consolidate Kingston and St. Andrew to near-capacity before opening new territory. A half-full operation spread thin across parishes is worse than a focused, high-retention operation in two parishes.</div></div>
+      <div class="callout">Your 7–8 year vision of a 4–5 vehicle fleet is not a fantasy. It is a capital allocation and systems problem. The decisions you make in years 1–2 determine whether that fleet is built on solid ground or borrowed time.</div>
+      <div class="tip">💡 The business version of Thragg's discipline is this: build what outlasts your personal effort. A system that runs when you are off-shift is worth more than a hustle that stops when you sleep.</div>
+    `,
+    practice: [
+      { q: 'You are consistently completing 10 jobs per week and turning away 3–4 additional enquiries. What should happen before you hire a first assistant?', a: 'Before hiring, verify that: (1) the turned-away demand is consistent, not seasonal; (2) you have documented operational systems that can be taught — not just informal habits in your head; (3) the revenue from those additional 3–4 jobs per week would cover assistant wages plus the overhead of managing and training them; (4) you have a structured onboarding and quality-check process so the assistant does not deliver substandard results on client vehicles unsupervised.' },
+      { q: 'Why is the statement "I\'ll train them as I go" a risk rather than a strategy when hiring?', a: '"Training as you go" means the trainee is performing on live client vehicles before they have been assessed against a standard. Mistakes made during informal on-the-job training become client experience problems — paint damage, missed areas, incorrect product use. Formal training against documented standards (which you test before client exposure) separates a professional operation from an informal one. The reputational cost of one badly handled client vehicle can exceed months of training investment.' },
+      { q: 'What does it mean for a second vehicle in your fleet to "carry its own weight"? Calculate it.', a: 'A second vehicle carries its own weight when it generates enough monthly revenue to cover: (1) its own equipment and supply costs, (2) the operator\'s wages or commission, (3) fuel and vehicle running costs, (4) its proportional share of insurance and registration, (5) a margin contribution toward fixed overhead and profit. Example: if the van\'s allocated costs total $85,000/month, it must generate at minimum $85,000 in revenue before it contributes a single dollar to growth. Understanding this number before purchasing is how you avoid a second vehicle that drains the first one\'s profits.' }
+    ],
+    quiz: [
+      { q: 'You have strong demand but all your processes exist only in your head. What is the most important thing to do before hiring?', opts: ['Post a job vacancy and screen candidates', 'Document your key processes into teachable written standards before any hire', 'Buy a second vehicle to demonstrate serious capacity', 'Offer the first hire a trial job with no formal process'], correct: 1, feedback: ['Candidates cannot be effectively assessed or onboarded without documented standards to train them against.', 'Correct. Systematising before hiring ensures that the hire inherits a standard, not an improvisation. This is what makes scale possible.', 'Equipment without the operational foundation to support it is premature capital allocation.', 'A trial with no formal process produces inconsistent results and cannot be fairly evaluated.'] },
+      { q: 'You expand into a third parish while Kingston and St. Andrew are still at 60% capacity. What is the primary risk?', opts: ['Fuel costs increase significantly', 'You spread operational focus across more territory than existing revenue can efficiently support, while the core market remains underdeveloped', 'Parish regulations may differ', 'Marketing costs increase in the new area'], correct: 1, feedback: ['Fuel is a real cost but secondary to the operational fragmentation risk.', 'Correct. An unfocused expansion before the core market is saturated means you have high overhead across three parishes and weak density in each. Fill your foundation first.', 'Regulations matter but are not the primary strategic risk here.', 'Marketing costs are real but manageable — operational fragmentation at low capacity is a structural risk.'] },
+      { q: 'What is the difference between a business and a job in the context of ECAD as a solo operator?', opts: ['A business has employees; a solo operation is always a job', 'A business has documented systems and can generate revenue independently of one person\'s daily effort; a job stops when the owner does', 'A business is registered; a sole trader is a job', 'There is no meaningful distinction at the early stage'], correct: 1, feedback: ['Employees are one indicator but not the defining characteristic.', 'Correct. This distinction matters immediately — if ECAD only earns when Perry physically works, it is a high-overhead job. Systems, maintenance plans, and eventually staff create something that can earn beyond one person\'s direct effort.', 'Registration is a legal category, not an operational one.', 'The distinction matters most at the early stage when the foundation is being laid.'] },
+      { q: 'Your first hire is ready to take jobs independently. What must be in place before their first unsupervised client job?', opts: ['They must simply be trustworthy and willing to learn', 'Assessed competency against documented standards, understanding of the pre-job walk-around protocol, ability to handle client communication, and a quality-check process after the job', 'Completion of at least one supervised job', 'A signed employment contract'], correct: 1, feedback: ['Trust is necessary but insufficient. Undocumented trust does not protect the client or the business.', 'Correct. Competency must be assessed, not assumed. The walk-around protects the business from disputes. Client communication standards protect the brand. Post-job quality checks catch errors before clients do.', 'One supervised job may not cover all scenarios — assessment against standards is the correct threshold.', 'A contract is important legally but does not address operational readiness.'] },
+      { q: 'A vendor offers you a second vehicle on hire-purchase. Monthly payment is $45,000. Your current operation generates $180,000 net monthly. A second operator could realistically add $80,000 monthly. Should you take the deal?', opts: ['Yes — $80,000 new revenue against $45,000 payment is clearly profitable', 'Requires further analysis: operator wages, chemical costs, and fuel must be subtracted from the $80,000 before comparing to the $45,000 payment', 'No — never take on vehicle debt this early', 'Yes — the opportunity cost of not scaling is too high'], correct: 1, feedback: ['The $80,000 is revenue, not profit. Operator costs, fuel, and supplies reduce this significantly before the debt comparison is valid.', 'Correct. If operator wages are $40,000, fuel and chemicals $15,000, the net new margin is $25,000 — against a $45,000 payment. That is a losing position without additional volume. The analysis must include all costs.', 'Vehicle debt at the right time and cost structure is a legitimate growth tool. The question is the numbers, not a blanket rule.', 'Opportunity cost is real but does not override a cash-flow-negative decision.'] }
+    ]
+  },
+
+  {
+    track: 'Leadership & Growth',
+    id: 'professionalism',
+    stage: 'Foundations',
+    ico: '🎖️',
+    title: 'Professionalism as a Competitive Advantage',
+    desc: 'Appearance, communication, reliability, and the standard that makes ECAD memorable for the right reasons.',
+    pills: ['practice', 'quiz'],
+    content: `
+      <div class="section-lbl">What Professionalism Actually Means</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Professionalism is not formality.</strong> It is reliability and consistency — doing what you said you would do, when you said you would do it, at the standard the client was led to expect. In Jamaica's service landscape, simply arriving on time and looking prepared is already a differentiator.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Personal presentation.</strong> A clean, branded uniform communicates that this is a deliberate business. A wrinkled shirt and jeans communicates a casual side hustle. These are not neutral signals. Clients interpret your appearance as a preview of how you will treat their vehicle.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Vehicle and equipment presentation.</strong> Your work vehicle, visibly organised and clean, is a rolling advertisement. A cluttered vehicle with loose equipment signals that attention to detail is aspirational, not operational for you.</div></div>
+      <div class="section-lbl">Communication Standards</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Confirm every appointment 24 hours before.</strong> A brief WhatsApp the day before — "Confirming your detail tomorrow at 9am, [address]. Let me know if anything has changed." This dramatically reduces no-shows, demonstrates organisation, and gives you early warning of cancellations.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>If you are running late, communicate before you are late.</strong> Calling when you are already 30 minutes overdue is a complaint situation. A message 15 minutes before the scheduled time saying "running 20 minutes behind — apologise for the inconvenience" is a professional situation. Same information. Different framing. Radically different client experience.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>After the job.</strong> Walk the client around the finished vehicle. Point out what was done and why. Invite them to check areas of concern. This is not insecurity — it is confidence in your standard and an invitation for the client to own the quality of the result.</div></div>
+      <div class="section-lbl">Handling Problems</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Something will go wrong eventually.</strong> A water spot missed, a product reaction on an unexpected surface, a scratch claim. Your response in that moment will define your reputation more than ten perfect jobs. Never argue, never deflect, never go silent. Acknowledge, investigate, resolve.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>The pre-job walk-around is your protection.</strong> Documented pre-existing damage means you cannot be held responsible for what was already there. Your documentation process is not bureaucracy — it is professional self-protection and client respect.</div></div>
+      <div class="warn">⚠ One unresolved client complaint shared on social media or in a community WhatsApp group in Kingston can reach hundreds of potential clients within hours. Handle problems with urgency, not convenience.</div>
+      <div class="callout">Faith-rooted work ethic is not a soft principle. "Whatever you do, work at it with all your heart." (Col 3:23) The standard is not what the client can see from a distance — it is what you know you left on the vehicle when no one was watching.</div>
+    `,
+    practice: [
+      { q: 'You arrive at a job and realise you are missing one product that is needed for the service booked. The client is watching. What do you do?', a: 'You are honest immediately: "I want to let you know — I\'ve realised I don\'t have [product] with me today, which is needed for [specific part of service]. I have two options I can offer you: I can complete everything else now and return to finish that element at no additional cost, or we can reschedule the full job. What works best for you?" Never proceed quietly and hope the client doesn\'t notice the missing step. Honesty, even when uncomfortable, protects trust and reputation far more than covering up a gap.' },
+      { q: 'A client messages you saying they found a scratch that "wasn\'t there before." You documented the pre-job walk-around. How do you handle this?', a: 'You respond calmly and promptly: "Thank you for letting me know — I take this seriously. I did complete a full walk-around before starting and documented the vehicle\'s condition with photos. Let me compare those against what you\'re seeing. Could you send me a photo of the area you\'re concerned about, and I\'ll review my records and come back to you within [timeframe]?" You then compare your documentation honestly. If the scratch is pre-existing and documented, you can show the client the photo evidence professionally. If it is not in your documentation, you investigate and respond accordingly — never ignore or dismiss.' },
+      { q: 'You are booked at 10am and wake up feeling unwell. It is 8:30am. What is the professional response?', a: 'Message the client by 9am at the absolute latest: "Good morning [Name], I need to be upfront with you — I\'m unwell this morning and I don\'t want to arrive at your vehicle below the standard I\'ve committed to. I\'d like to reschedule for [specific alternative dates/times]. I sincerely apologise for the short notice and I will make sure this does not affect your booking — [offer: priority slot, small gesture]. Please let me know what works." Last-minute communication is still better than arriving and performing below standard, or worse, not showing up without warning.' }
+    ],
+    quiz: [
+      { q: 'What does confirming an appointment 24 hours in advance communicate to a client?', opts: ['That you lack confidence in your bookings', 'That you are organised, reliable, and that the appointment matters to you — it also reduces no-show risk', 'That you expect the client might cancel', 'It is unnecessary if the booking was made recently'], correct: 1, feedback: ['A confirmation communicates the opposite of insecurity — it signals a professional operation.', 'Correct. Confirmations reduce no-shows, signal reliability, and give clients a positive pre-job touchpoint. These are operational and relationship benefits.', 'A confirmation is standard professional practice — it does not imply distrust.', 'Regardless of booking recency, a 24-hour confirmation is best practice for professional service businesses.'] },
+      { q: 'You are 25 minutes behind schedule. When should you contact the client?', opts: ['When you arrive and can explain in person', 'When you are 10 minutes away from their location', 'Proactively, before the scheduled appointment time, as soon as you know you will be late', 'Only if they contact you first asking for your location'], correct: 2, feedback: ['Arriving late without warning and explaining after the fact is a complaint situation that damages confidence.', '10 minutes away may already be too late if the appointment was 25 minutes ago.', 'Correct. Proactive communication before the delay occurs transforms it from a failure into a professional situation. Same information — entirely different client experience.', 'Waiting for the client to chase you signals disorganisation and disrespect for their time.'] },
+      { q: 'After completing a full detail, the client comes outside and you walk them around the vehicle pointing out your work. Why is this important?', opts: ['To ensure they tip generously', 'To allow the client to identify any issues while you are present, and to demonstrate confidence in the quality of your work', 'To delay departure until payment is confirmed', 'It is unnecessary if the work was done correctly'], correct: 1, feedback: ['A professional walk-around is a quality and relationship standard — not a tip strategy.', 'Correct. A walk-around while you are present allows any concern to be raised immediately and resolved on the spot, rather than becoming a complaint later. It also demonstrates you stand behind your standard.', 'Payment should be confirmed as a standard step — but the walk-around has a different purpose.', 'Especially when work is done correctly, a walk-around allows the client to see and appreciate it — which drives referrals and retention.'] },
+      { q: 'A client complains about a result on social media before contacting you directly. How do you respond?', opts: ['Report the post — you have documentation to prove otherwise', 'Respond publicly with your documentation immediately to defend your position', 'Reach out to the client directly and privately first. Acknowledge their concern, investigate, and seek resolution before any public engagement', 'Ignore it — responding publicly draws more attention'], correct: 2, feedback: ['Reporting a legitimate complaint does not resolve it and escalates the situation.', 'Engaging publicly before speaking to the client risks escalation and makes the dispute visible to everyone in your market.', 'Correct. Private, direct resolution first is always the professional approach. A resolved complaint on social media where the client follows up positively is more valuable than a defensive public argument that you "win."', 'Ignoring public complaints allows the narrative to sit uncontested. A professional, calm public response — after private resolution — is appropriate.'] },
+      { q: 'A client points to a mark on their vehicle and says "you did that." You are certain it is pre-existing and it is not in your walk-around photos because it was on a panel you forgot to photograph. What is the honest professional response?', opts: ['Deny it firmly — if it is not in the photos it cannot be your fault', 'Acknowledge your documentation gap honestly, offer to review together what was and was not photographed, and handle the situation fairly rather than adversarially', 'Apologise and offer a free service to close the situation quickly', 'Refer the client to your service contract disclaimer'], correct: 1, feedback: ['Denying without full documentation to support the denial is a credibility risk.', 'Correct. A documentation gap is a gap in your protection. Honest acknowledgement, investigation, and fair resolution — even when it costs you — builds a reputation that is worth more than one dispute avoided through dishonesty.', 'An automatic apology and free service may be appropriate — but only after honest investigation, not as a way to make the conversation go away.', 'Contract disclaimers are legal protection — not relationship management tools. Leading with them in a dispute signals adversarial posture.'] }
+    ]
+  },
+
+  // ══════════════════════════════════════════
+  // TRACK: MARKETING & BRAND
+  // ══════════════════════════════════════════
+  {
+    track: 'Marketing & Brand',
+    id: 'social-media-content',
+    stage: 'Business',
+    ico: '📱',
+    title: 'Social Media Content Strategy',
+    desc: 'What to post, how often, and how to turn before/after content into a client acquisition engine.',
+    pills: ['practice', 'quiz'],
+    content: `
+      <div class="section-lbl">Why Most Small Business Social Media Fails</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Inconsistency kills accounts.</strong> An Instagram page that posts four times in one week and then disappears for three weeks signals a business that cannot be relied upon. The algorithm punishes it. Potential clients notice it. Consistency at a lower volume beats intensity followed by silence every time.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Price posts alone are not content.</strong> "Full detail $8,500 — call now" is not content. It asks for action without providing value or evidence. Content that educates, shows process, reveals results, or tells a story is what builds an audience. Selling comes second.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>The before/after is your most powerful single asset.</strong> A side-by-side comparison of a neglected vehicle restored to a clean standard is undeniable proof. It is more persuasive than any text. Your phone and a consistent filming habit are all you need to produce it.</div></div>
+      <div class="section-lbl">Content Pillars for ECAD</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Results content:</strong> Before/after photos and videos. The vehicle speaks for itself. Caption with vehicle type, service performed, location area (general). Keep it clean and professional.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Process content:</strong> Short clips of your technique — foam pre-wash, engine bay clean, interior extraction. These build credibility. Clients who see your process understand why you charge what you charge.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Educational content:</strong> "Why your car develops swirl marks even when washed regularly." "What oxidation on your bonnet means and how to stop it." This positions you as an authority, not just a service provider.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Social proof content:</strong> Client reactions (with permission), testimonial messages screenshotted (name visible or removed per preference), stats ("12 maintenance plan clients enrolled").</div></div>
+      <div class="section-lbl">Platform Priorities for Jamaica</div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Instagram</strong> — visual-first. Reels perform best. Before/after content and process clips. Stories for daily presence and behind-the-scenes. Hashtag strategy targeting Kingston/St. Andrew and Jamaican car community.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Facebook</strong> — older demographic, community groups. Local Kingston and St. Andrew buy/sell/service groups are high-value for service businesses. Post results content into relevant groups with permission.</div></div>
+      <div class="point"><div class="point-dot"></div><div class="point-text"><strong>WhatsApp Status</strong> — underutilised by most detailers. Daily status updates of current work reach your existing contact list for free. High conversion rate because it is people who already know you.</div></div>
+      <div class="callout">Minimum viable posting schedule: 3 posts per week on Instagram. Daily WhatsApp Status update when working. One Facebook group post per week. This is sustainable for a solo operator and sufficient to maintain visibility without burning out your creative capacity.</div>
+      <div class="tip">💡 Film everything. Before you touch the vehicle. During key steps. After. You do not need to post all of it immediately — a library of footage gives you content for slow weeks without having to manufacture anything from nothing.</div>
+    `,
+    practice: [
+      { q: 'Write a caption for an Instagram before/after post of a heavily oxidised silver Toyota Vitz that you fully restored.', a: '"Before → After. This Toyota Vitz came to us with heavy oxidation across all panels — that chalky, dull look you get from years in Jamaica\'s sun with no protection. Full exterior detail, chemical decontamination, Cerakote paint sealant applied to all panels. The paint was always there. It just needed the right hands. 📍 Kingston · Full Detail package available · DM to book #ExtraClean #JamaicaDetailing #CarDetailingJA #KingstonCars"' },
+      { q: 'You have not posted in 10 days. You have 3 before/after photos from jobs last week. Create a 3-post content plan for this week.', a: 'Post 1 (Monday): Best before/after from last week. Caption focused on the service result and the transformation. Post 2 (Wednesday): Process clip or photo from one of the jobs — foam pre-wash, engine bay, or interior extraction — with an educational caption explaining what that step achieves and why it matters. Post 3 (Friday): Educational content — "Why even freshly washed cars develop swirl marks" — with a subtle close: "Want a wash that protects the paint instead of damaging it? DM us to book." This covers results, process credibility, and education — three content pillars in three posts.' },
+      { q: 'A client sends you a voice note saying "yow the car look proper clean, yuh do a good work!" How do you turn this into social proof content?', a: 'Ask for permission: "Glad you\'re happy with it! Would you mind if I shared that feedback on my socials — I can keep your name private if you prefer?" If yes, screenshot the voice note notification (showing the message received but not necessarily the full name) or transcribe the key sentiment and post it: "\'The car look proper clean, yuh do a good work!\' — Recent client, Kingston. This is why we do what we do. 🙏 Book your detail: [link/DM]." Authentic client voice in Jamaican vernacular is more persuasive to the local market than any polished marketing copy.' }
+    ],
+    quiz: [
+      { q: 'Why is "Full detail — $8,500. Call to book." not effective standalone content?', opts: ['The price is too high to post publicly', 'It asks for action without providing evidence of quality or value — there is no reason for a new viewer to choose ECAD over any other option', 'Social media should not include pricing at all', 'It is too short to perform well in the algorithm'], correct: 1, feedback: ['Price transparency is not the issue — value justification is.', 'Correct. A price post with no context, proof, or value demonstration is an instruction without persuasion. Why should someone trust this business with their vehicle? That question must be answered first.', 'Pricing is appropriate to include — the problem is that pricing alone is not content.', 'Length is secondary to value delivery. A one-line post with a compelling before/after image outperforms a long post with nothing to show.'] },
+      { q: 'Which content type is most effective for convincing a price-sensitive potential client that ECAD is worth the investment?', opts: ['A promotional discount post', 'A detailed before/after of a visually dramatic vehicle transformation with an explanation of what was done and why', 'A post listing every product brand used', 'A text post explaining the years of experience behind the service'], correct: 1, feedback: ['Discounts reduce perceived value and attract clients who will always compare on price.', 'Correct. A dramatic, documented transformation answers the value question visually. The client can see what their money buys. No text can accomplish this as efficiently.', 'Product brand lists are credibility signals for industry peers — not persuasive for most clients.', 'Claimed experience without evidence is less persuasive than demonstrated results.'] },
+      { q: 'You post twice in one week, then nothing for two weeks, then four posts in two days. What is the likely impact on your Instagram account?', opts: ['No impact — total post count is what matters', 'Inconsistency reduces algorithmic reach and signals to potential clients that the business may not be reliably operational', 'The burst of four posts compensates for the quiet period', 'Follower growth is unaffected by posting rhythm'], correct: 1, feedback: ['Algorithmic platforms reward consistent engagement, not total post count.', 'Correct. Instagram\'s algorithm favours consistent accounts. More critically, a potential client who finds your page and sees an erratic posting history draws an inference about operational reliability.', 'Burst posting may spike short-term reach but does not compensate for the relationship damage of an unexplained absence.', 'Follower growth and engagement are directly correlated with posting consistency on all major platforms.'] },
+      { q: 'WhatsApp Status updates are listed as an underutilised channel. Why are they particularly effective for ECAD?', opts: ['They reach the widest possible audience including non-contacts', 'They reach your existing contact list — people who already have some relationship or trust with you — at no cost and with high visibility', 'Status updates are boosted by WhatsApp\'s algorithm to new users', 'They are better than Instagram for before/after content'], correct: 1, feedback: ['Status updates are only visible to contacts — they do not reach new audiences. That is not a weakness — it is a warm-audience strength.', 'Correct. Your contact list is your warmest possible audience. They know you. The conversion rate from a Status view to an enquiry is significantly higher than cold social media reach.', 'WhatsApp does not have a public discovery algorithm for Status content.', 'Instagram has broader discovery potential. Status excels at warm audience retention and re-engagement, not replacement.'] },
+      { q: 'A client whose vehicle you detailed shares your post with a comment: "Best detail in Kingston, I\'ll never go anywhere else." What do you do immediately?', opts: ['Like the comment and move on', 'Screenshot it, reply publicly thanking them warmly, save it as content for a social proof post, and message them privately to thank them and mention the maintenance plan', 'Ask them to post a Google review instead', 'Repost it without any additional action'], correct: 1, feedback: ['A like is the minimum. The opportunity here is far larger.', 'Correct. A warm public testimonial is multi-purpose: engagement signal for the algorithm, social proof for new visitors, and a re-engagement touchpoint with a happy client. Every layer of this should be activated.', 'A Google review is valuable — but prioritise building the relationship and leveraging the existing momentum first.', 'Reposting is good. The missed opportunity is the private relationship touchpoint and the maintenance plan conversation.'] }
+    ]
+  }
+
+];
+
+// ── STATE ─────────────────────────────────────────────────────────
+const STORAGE_KEY = 'ecad_adv_completed_v1';
+let currentModule = null;
+let quizAnswers = {};
+let quizSubmitted = false;
+const PASS_MARK = 0.80;
+
+function getCompleted() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch { return []; }
+}
+function setCompleted(arr) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch {}
+}
+function markDone(id) {
+  const c = getCompleted();
+  if (!c.includes(id)) { c.push(id); setCompleted(c); }
+}
+
+// ── RENDER MODULES ────────────────────────────────────────────────
+function render() {
+  const done = getCompleted();
+  const total = MODULES.length;
+  const completedCount = MODULES.filter(m => done.includes(m.id)).length;
+  const pct = Math.round((completedCount / total) * 100);
+
+  document.getElementById('overall-bar').style.width = pct + '%';
+  document.getElementById('overall-pct').textContent = pct + '%';
+
+  // Group by track
+  const tracks = {};
+  MODULES.forEach(m => {
+    if (!tracks[m.track]) tracks[m.track] = [];
+    tracks[m.track].push(m);
+  });
+
+  let html = '';
+  Object.entries(tracks).forEach(([track, mods]) => {
+    html += `<div class="track-label">${track}</div><div class="module-grid">`;
+    mods.forEach(m => {
+      const isDone = done.includes(m.id);
+      html += `
+        <div class="mod-card ${isDone ? 'done' : ''}" onclick="openLesson('${m.id}')">
+          <div class="mod-ico">${m.ico}</div>
+          <div class="mod-stage">${m.stage}</div>
+          <div class="mod-title">${m.title}</div>
+          <div class="mod-desc">${m.desc}</div>
+          <div class="mod-pills">
+            ${m.pills.map(p => `<span class="pill ${p}">${p}</span>`).join('')}
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  });
+  document.getElementById('module-list').innerHTML = html;
+}
+
+// ── OPEN LESSON ───────────────────────────────────────────────────
+function openLesson(id) {
+  currentModule = MODULES.find(m => m.id === id);
+  if (!currentModule) return;
+  quizAnswers = {};
+  quizSubmitted = false;
+
+  document.getElementById('l-stage').textContent = currentModule.stage;
+  document.getElementById('l-title').textContent = currentModule.title;
+
+  const done = getCompleted();
+  const idx = MODULES.indexOf(currentModule);
+  const pct = Math.round((idx / MODULES.length) * 100);
+  document.getElementById('l-progress').style.width = pct + '%';
+
+  let body = currentModule.content;
+
+  // Practice questions
+  if (currentModule.practice && currentModule.practice.length) {
+    body += `<div class="pq-section">
+      <div class="pq-section-title">Practice Questions — Reflect Before Revealing</div>`;
+    currentModule.practice.forEach((pq, i) => {
+      body += `
+        <div class="pq-item">
+          <div class="pq-q">${i + 1}. ${pq.q}</div>
+          <button class="pq-reveal-btn" onclick="revealAnswer(${i})">Reveal Answer</button>
+          <div class="pq-answer" id="pq-ans-${i}">${pq.a}</div>
+        </div>`;
+    });
+    body += `</div>`;
+  }
+
+  // Quiz
+  if (currentModule.quiz && currentModule.quiz.length) {
+    const passCount = Math.ceil(currentModule.quiz.length * PASS_MARK);
+    body += `<div class="quiz-section">
+      <div class="quiz-header">
+        <div class="quiz-title">Final Quiz</div>
+        <div class="quiz-pass-note">Pass mark: 80% (${passCount}/${currentModule.quiz.length} correct)</div>
+      </div>`;
+    currentModule.quiz.forEach((q, qi) => {
+      body += `<div class="quiz-q-block">
+        <div class="quiz-q-text">${qi + 1}. ${q.q}</div>
+        <div class="quiz-opts">
+          ${q.opts.map((opt, oi) => `
+            <div class="quiz-opt" id="qopt-${qi}-${oi}" onclick="selectOpt(${qi},${oi})">${opt}</div>
+          `).join('')}
+        </div>
+        <div class="quiz-feedback" id="qfb-${qi}"></div>
+      </div>`;
+    });
+    body += `
+      <div class="quiz-actions">
+        <button class="btn-primary" onclick="submitQuiz()">Submit Answers</button>
+        <button class="btn-secondary" onclick="resetQuiz()">Reset</button>
+        <span class="score-display" id="score-display"></span>
+      </div>
+      <div class="result-box" id="result-box">
+        <div class="result-score" id="result-score"></div>
+        <div class="result-label" id="result-label"></div>
+        <div class="result-msg" id="result-msg"></div>
+        <div style="display:flex;gap:10px;margin-top:18px;flex-wrap:wrap;">
+          <button class="btn-primary" id="complete-btn" onclick="completeModule()" style="display:none">Mark Complete</button>
+          <button class="btn-secondary" onclick="resetQuiz()">Retake Quiz</button>
+        </div>
+      </div>
+    </div>`;
+  } else {
+    body += `<div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--bsoft);">
+      <button class="btn-primary" onclick="completeModule()">Mark Complete</button>
+    </div>`;
+  }
+
+  document.getElementById('l-body').innerHTML = body;
+  document.getElementById('overlay').classList.add('open');
+  document.getElementById('lesson-panel').scrollTop = 0;
+}
+
+function closeLesson() {
+  document.getElementById('overlay').classList.remove('open');
+  render();
+}
+
+function revealAnswer(i) {
+  const el = document.getElementById(`pq-ans-${i}`);
+  el.classList.toggle('visible');
+  const btn = el.previousElementSibling;
+  btn.textContent = el.classList.contains('visible') ? 'Hide Answer' : 'Reveal Answer';
+}
+
+function selectOpt(qi, oi) {
+  if (quizSubmitted) return;
+  quizAnswers[qi] = oi;
+  const q = currentModule.quiz[qi];
+  q.opts.forEach((_, i) => {
+    document.getElementById(`qopt-${qi}-${i}`).classList.toggle('selected', i === oi);
+  });
+}
+
+function submitQuiz() {
+  if (quizSubmitted) return;
+  const q = currentModule.quiz;
+  const unanswered = q.some((_, i) => quizAnswers[i] === undefined);
+  if (unanswered) { showToast('Answer all questions first', 'err'); return; }
+
+  quizSubmitted = true;
+  let correct = 0;
+
+  q.forEach((qItem, qi) => {
+    const chosen = quizAnswers[qi];
+    if (chosen === qItem.correct) correct++;
+    qItem.opts.forEach((_, oi) => {
+      const el = document.getElementById(`qopt-${qi}-${oi}`);
+      el.classList.remove('selected');
+      if (oi === qItem.correct) el.classList.add('correct');
+      else if (oi === chosen) el.classList.add('wrong');
+    });
+    const fb = document.getElementById(`qfb-${qi}`);
+    fb.textContent = qItem.feedback[chosen];
+    fb.className = `quiz-feedback show ${chosen === qItem.correct ? 'ok' : 'err'}`;
+  });
+
+  const pct = correct / q.length;
+  const pctDisplay = Math.round(pct * 100) + '%';
+  const passed = pct >= PASS_MARK;
+
+  document.getElementById('score-display').textContent = `${correct}/${q.length} correct`;
+
+  const resultBox = document.getElementById('result-box');
+  resultBox.className = `result-box show ${passed ? 'result-pass' : 'result-fail'}`;
+  document.getElementById('result-score').textContent = pctDisplay;
+
+  if (passed) {
+    document.getElementById('result-label').textContent = pct === 1
+      ? 'Perfect — every answer locked in.'
+      : `${correct} of ${q.length} — passed. Standard met.`;
+    document.getElementById('result-msg').textContent = pct === 1
+      ? 'Flawless. This knowledge is yours to carry into every job.'
+      : 'You have met the standard. Review the flagged answers before your next job. The gaps you have now are smaller than the ones you had before.';
+    document.getElementById('complete-btn').style.display = 'inline-block';
+  } else {
+    document.getElementById('result-label').textContent = `${correct} of ${q.length} — ${pctDisplay}. Below the 80% pass mark.`;
+    document.getElementById('result-msg').textContent = 'Review the lesson sections connected to your wrong answers. The retake is available below. Passing this matters — 80% is not arbitrary. It reflects the standard that protects your clients and your reputation.';
+  }
+
+  resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function resetQuiz() {
+  quizAnswers = {};
+  quizSubmitted = false;
+  currentModule.quiz.forEach((q, qi) => {
+    q.opts.forEach((_, oi) => {
+      const el = document.getElementById(`qopt-${qi}-${oi}`);
+      el.className = 'quiz-opt';
+    });
+    document.getElementById(`qfb-${qi}`).className = 'quiz-feedback';
+  });
+  document.getElementById('score-display').textContent = '';
+  document.getElementById('result-box').className = 'result-box';
+}
+
+function completeModule() {
+  if (!currentModule) return;
+  markDone(currentModule.id);
+  showToast('Module complete ✓', 'ok');
+  setTimeout(closeLesson, 800);
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 2800);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
