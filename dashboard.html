@@ -52,30 +52,37 @@ body {
   --topbar-h:  60px;
 }
 
-/* ── TRAINING MODULE ────────────────────────────────────────────── */
-.trn-progress-bar-wrap {
-  background: var(--s3); border-radius: 8px; height: 6px;
-  margin-bottom: 28px; overflow: hidden;
-  border: 1px solid var(--bsoft);
-}
-.trn-progress-bar {
-  height: 100%; border-radius: 8px;
-  background: linear-gradient(90deg, var(--silver-d), var(--silver-l));
-  transition: width .6s ease;
-}
-.trn-module-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px; margin-bottom: 30px;
-}
-.trn-card {
-  background: var(--s1);
-  border: 1px solid var(--bsoft);
-  border-radius: 10px; padding: 22px;
-  cursor: pointer; position: relative; overflow: hidden;
-  transition: border-color .25s, transform .25s;
-}
-.trn-card:hover { border-color: var(--border); transform: translateY(-2px); }
+
+
+
+
+
+.trn-progress-bar-wrap { background: var(--s3); border-radius: 8px; height: 6px; margin-bottom: 28px; overflow: hidden; border: 1px solid var(--bsoft); }
+.trn-progress-bar { height: 100%; border-radius: 8px; background: linear-gradient(90deg, var(--silver-d), var(--silver-l)); transition: width .6s ease; }
+.trn-module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-bottom: 30px; }
+.trn-card { background: var(--s1); border: 1px solid var(--bsoft); border-radius: 10px; padding: 22px; cursor: pointer; position: relative; overflow: hidden; transition: border-color .25s, transform .25s; }
+/* ── ACADEMY STAGE ───────────────────────────────────────────────── */
+.acad-stage { margin-bottom: 36px; }
+.acad-stage-head { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--bsoft); }
+.acad-stage-num { font-family: 'Cormorant Garamond', serif; font-size: 38px; font-weight: 300; color: var(--silver-d); line-height: 1; flex-shrink: 0; width: 42px; }
+.acad-stage-info {}
+.acad-stage-label { font-size: 8px; font-weight: 700; letter-spacing: .24em; text-transform: uppercase; color: var(--copper); margin-bottom: 3px; }
+.acad-stage-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 400; color: var(--silver-l); }
+.acad-stage-progress { margin-left: auto; font-size: 11px; color: var(--dim); white-space: nowrap; }
+.acad-module-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.acad-card { background: var(--s1); border: 1px solid var(--bsoft); border-radius: 10px; padding: 20px 22px; cursor: pointer; position: relative; overflow: hidden; transition: border-color .25s, transform .25s; }
+.acad-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.acad-card.completed { border-color: rgba(76,175,130,.3); }
+.acad-card.completed::after { content: '✓'; position: absolute; top: 12px; right: 12px; font-size: 10px; font-weight: 700; color: var(--green); background: var(--green-d); border: 1px solid rgba(76,175,130,.3); border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+.acad-card.exam-card { border-color: rgba(212,168,67,.3); background: rgba(212,168,67,.04); }
+.acad-card.exam-card.locked { opacity: .4; cursor: not-allowed; }
+.acad-card.exam-card.locked:hover { transform: none; }
+.acad-card-ico { font-size: 22px; margin-bottom: 10px; }
+.acad-card-num { font-size: 8px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: var(--dim); margin-bottom: 4px; }
+.acad-card-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 400; color: var(--silver-l); margin-bottom: 6px; }
+.acad-card-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.acad-card-foot { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+
 .trn-card.locked { opacity: .45; cursor: not-allowed; }
 .trn-card.locked:hover { transform: none; border-color: var(--bsoft); }
 .trn-card.completed::after {
@@ -945,6 +952,13 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
           </svg>
           Skills Academy
         </button>
+        <button class="nav-btn" id="nb-academy" onclick="goTo('academy')">
+          <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+          Professional Academy
+        </button>
       </div>
 
     </aside>
@@ -1078,18 +1092,30 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         </div>
       </div>
 
-      <!-- ── TRAINING / SKILLS ACADEMY ──────────────────────── -->
+
       <div class="view" id="v-training">
         <div class="view-head">
           <span class="view-eyebrow">Professional Development</span>
           <h1 class="view-h1">Skills <em>Academy</em></h1>
         </div>
-
         <div class="trn-progress-bar-wrap">
           <div class="trn-progress-bar" id="trn-progress" style="width:0%"></div>
         </div>
-
         <div class="trn-module-grid" id="trn-module-grid"></div>
+      </div>
+
+      <!-- ── PROFESSIONAL ACADEMY ─────────────────────────────── -->
+      <div class="view" id="v-academy">
+        <div class="view-head">
+          <span class="view-eyebrow">Structured Curriculum</span>
+          <h1 class="view-h1">Professional <em>Academy</em></h1>
+        </div>
+
+        <div class="trn-progress-bar-wrap">
+          <div class="trn-progress-bar" id="acad-progress" style="width:0%"></div>
+        </div>
+
+        <div id="acad-stage-wrap"></div>
       </div>
 
     </main>
@@ -2006,18 +2032,495 @@ function submitQuiz() {
   });
   const pct = Math.round((correct / q.length) * 100);
   document.getElementById('trn-result-score').textContent = pct + '%';
+
   document.getElementById('trn-result-label').textContent = pct === 100 ? 'Perfect — everything locked in.' : pct >= 67 ? `${correct} of ${q.length} correct — solid foundation.` : `${correct} of ${q.length} correct — revisit this module.`;
   document.getElementById('trn-result-msg').textContent = pct === 100 ? 'You have a complete grasp of this module. Carry that standard into every job.' : pct >= 67 ? 'Review the highlighted answers before moving on. The gaps here show up on the job.' : 'Re-read the lesson with focus on the areas you missed. The why matters as much as the what.';
   document.getElementById('trn-result').classList.add('show');
   document.getElementById('trn-score-display').textContent = `${correct}/${q.length} correct`;
 }
 
-// Patch goTo to render training when visited
-document.addEventListener('DOMContentLoaded', () => {
-  setTimeout(() => {
-    const orig = window.goTo;
-    window.goTo = function(id) { orig(id); if (id === 'training') renderTrainingModules(); };
-  }, 200);
+// ── PROFESSIONAL ACADEMY DATA ──────────────────────────────────────
+const ACAD_STORE = 'ecad_acad_completed';
+const ACAD_EXAM_STORE = 'ecad_acad_exam';
+function getAcadCompleted() { try { return JSON.parse(localStorage.getItem(ACAD_STORE)||'[]'); } catch { return []; } }
+function setAcadCompleted(ids) { try { localStorage.setItem(ACAD_STORE, JSON.stringify(ids)); } catch {} }
+const ACAD_STAGES = [
+  {
+    num: '01', label: 'Stage 1', title: 'Chemistry & Surface Science',
+    modules: [
+      {
+        id: 'a-ph', ico: '⚗️', num: 'S1·M1', title: 'pH & Chemical Behaviour',
+        desc: 'What pH actually means for detailing and why the wrong product destroys your work.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">The pH Scale in Detailing</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>pH 1–6 = Acidic.</strong> Dissolves mineral deposits, water spots, iron fallout, brake dust. Your CarPro Acidic Soap lives here. Effective but aggressive on bare metal if left too long.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>pH 7 = Neutral.</strong> Safe on all surfaces. Ideal for maintenance washes, leather cleaning, and any coated surface.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>pH 8–14 = Alkaline.</strong> Cuts grease, traffic film, organic contamination. Koch Chemie Green Star sits here. Powerful — but strips wax, sealant, and ceramic coatings on repeated contact.</div></div>
+          <div class="trn-callout">Your decontamination phase deliberately alternates: alkaline to lift organic contamination → acidic to dissolve mineral and iron fallout → neutral rinse between stages. This is chemistry, not preference.</div>
+          <div class="trn-section-lbl">Why pH Matching Matters</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Clearcoat is pH-sensitive.</strong> Extended contact with strong acid etches the surface. Dwell time is a specification — never let acidic products dry on a surface.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Ceramic coatings are highly alkaline-sensitive.</strong> A single alkaline degreaser wash begins stripping the coating. Maintenance washing on ceramic vehicles must always be pH neutral or ceramic-safe.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Mixing products neutralises them.</strong> Acidic + alkaline = neutral. If you mix CarPro Acidic Soap with Koch Chemie Green Star in the same bucket, neither works. Keep your chemistry separate.</div></div>
+          <div class="trn-section-lbl">Jamaica-Specific Consideration</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Jamaica's tap water sits around pH 7.5–8.5 depending on the parish. Your rinse water is mildly alkaline. For show-quality work, a final rinse with filtered or distilled water eliminates this variable.</div></div>
+          <div class="trn-warn">⚠ Never assume a product is safe because it smells mild or looks clear. Check the pH specification on the label or SDS. This is professional standard — not caution.</div>`,
+        quiz: [
+          { q: 'A client has a ceramic-coated vehicle and wants a maintenance wash. Which product category is safe?', opts: ['Strong alkaline degreaser — fastest contamination removal', 'pH neutral or ceramic-safe wash product only', 'Acidic soap — removes mineral deposits without alkaline stripping', 'Any product at low dilution is safe on ceramic'], correct: 1, feedback: ['Alkaline chemistry strips ceramic coatings on repeated contact — never for maintenance washing.', 'Correct. pH neutral is the only safe choice for regular washing of ceramic-coated vehicles.', 'Acidic decon is a periodic step, not a maintenance wash chemistry.', 'Dilution reduces concentration but does not change pH chemistry.'] },
+          { q: 'You mix CarPro Acidic Soap and Koch Chemie Green Star in the same wash bucket. What happens?', opts: ['They create a more powerful decontamination solution', 'They neutralise each other — neither product works effectively', 'The alkaline dominates and the acidic becomes inert', 'Nothing — both are designed for paint and are compatible'], correct: 1, feedback: ['Acid and alkaline do not stack — they cancel each other chemically.', 'Correct. Acid + alkaline = neutralisation. You get an expensive bucket of pH 7 water.', 'Partial neutralisation occurs proportionally — both lose effectiveness.', 'Product compatibility is determined by chemistry, not intended surface.'] },
+          { q: 'You apply CarPro Acidic Soap to a spotted panel on a hot Jamaican afternoon in direct sun. What is the critical risk?', opts: ['The product will not activate in heat', 'The product will dry before you can rinse, potentially etching the clearcoat', 'The product becomes alkaline at high temperature', 'Heat increases effectiveness — no risk'], correct: 1, feedback: ['Heat accelerates chemical reactions — products become more aggressive, not inactive.', 'Correct. Uncontrolled drying concentrates the acid. Dwell time must be controlled.', 'Chemical pH does not shift with ambient temperature at these levels.', 'Increased effectiveness without controlled dwell time is increased risk.'] }
+        ]
+      },
+      {
+        id: 'a-contamination', ico: '🔬', num: 'S1·M2', title: 'Contamination Types & Identification',
+        desc: 'Know what you are looking at before you decide how to remove it.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">The Four Contamination Categories</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>1. Mineral / Inorganic</strong> — water spots, calcium deposits, hard water scale. Evaporated water leaves dissolved minerals behind. Requires acidic chemistry. Cannot be removed by washing alone. Jamaica's hard water makes this the most common contamination type.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>2. Iron / Metallic</strong> — brake dust, rail dust, industrial fallout. Embeds into paint and oxidises, creating micro rust spots. Identified by clay bar test. Removed with iron fallout remover or acidic decon.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>3. Organic</strong> — bird droppings, tree sap, insect splatter, mould. Highly acidic by nature — bird droppings etch clearcoat within hours in Jamaica's heat. Never rub dry organic contamination — it abrades as you move it.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>4. Petroleum / Chemical</strong> — tar, road film, grease, fuel residue. Requires tar remover or solvent-based product. Does not respond to water-based chemistry.</div></div>
+          <div class="trn-section-lbl">Identification Techniques</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Clay bar test</strong> — glide clay across a lubricated washed panel. Resistance = surface contamination. Smooth = clean. Standard pre-sealant check.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Raking light inspection</strong> — hold a light at a low angle across the panel. Contamination, scratches, and texture become visible that are invisible in ambient light.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Touch test after washing</strong> — clean hands across paint. Glass-smooth = clean. Any texture or drag = residual contamination requiring decon.</div></div>
+          <div class="trn-callout">In Jamaica, vehicles regularly present with multiple contamination types simultaneously. Your decontamination protocol must address all four categories before sealing anything.</div>`,
+        quiz: [
+          { q: 'A white SUV has small orange-brown dots embedded in the paint across the lower panels. They do not wash off. What are they?', opts: ['Dried mud — pressure washing will remove them', 'Iron fallout embedded in the clearcoat — requires iron remover or acidic decon', 'Paint transfer from another vehicle — requires compounding', 'Fuel residue — requires tar remover'], correct: 1, feedback: ['Mud washes off. These dots are sub-surface — they have bonded to or entered the clearcoat.', 'Correct. Orange-brown embedded dots are the classic presentation of iron fallout oxidising within the clearcoat.', 'Paint transfer presents as a colour-matched smear, not embedded dots.', 'Fuel residue is oily and transparent — it does not create coloured embedded dots.'] },
+          { q: 'Bird droppings land on a freshly sealed bonnet. It is midday at approximately 33°C. How quickly must you address this?', opts: ['Within the same working day', 'Within the hour — heat accelerates acid etching dramatically', 'The sealant protects the paint — address at end of job', 'Only when cool — heat makes removal easier'], correct: 1, feedback: ['In Jamaica\'s heat, bird droppings can begin etching clearcoat within 30–60 minutes.', 'Correct. Bird droppings are highly acidic. Heat is a catalyst — etching accelerates significantly above 30°C.', 'Sealant provides a sacrificial layer but is not immune to prolonged acidic contact.', 'Heat softens the dropping but acid damage occurs continuously.'] },
+          { q: 'After a full wash, the clay bar glides across the roof with no resistance. What does this confirm?', opts: ['The paint is scratch-free and ready for polishing', 'The surface is free of bonded contamination — ready for sealant', 'The clay bar is worn and needs replacement', 'The paint has already been ceramic coated'], correct: 1, feedback: ['Clay tests surface contamination, not surface imperfections.', 'Correct. No clay resistance = no bonded contamination. Safe to proceed to sealant.', 'A worn clay bar still drags on contaminated surfaces — smooth means clean.', 'Ceramic coating is smooth but clay does not diagnose what product is present.'] }
+        ]
+      },
+      {
+        id: 'a-products', ico: '🧴', num: 'S1·M3', title: 'Your Product Arsenal — Surface Chemistry',
+        desc: 'Not what the label says — what is happening at the surface level.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">Cerakote Rapid Ceramic Paint Sealant</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What it does:</strong> forms an SiO2-based hydrophobic layer that bonds to clearcoat. Water beads and sheets off, carrying surface contamination with it. 50-wash durability = approximately 4–6 months of regular use in Jamaica's climate.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What it cannot do:</strong> fill scratches, correct defects, or bond over contamination. Applied over undecontaminated paint = locked-in contamination and reduced durability.</div></div>
+          <div class="trn-section-lbl">CarPro Acidic Soap (Descale)</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What it does:</strong> acidic formula dissolves calcium carbonate and silica-based mineral deposits through chemical reaction — not abrasion. The acid converts mineral deposits to water-soluble salts that rinse away.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Critical rule:</strong> controlled dwell time only. In direct Jamaican sun, the working window shortens dramatically. Apply in shade and rinse before product dries.</div></div>
+          <div class="trn-section-lbl">Koch Chemie Green Star</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What it does:</strong> alkaline APC that saponifies (breaks down) greases and oils into water-soluble compounds. Dilution-ratio dependent — always check the guide for the surface being treated.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Watch:</strong> repeated undiluted use on rubber seals and plastic trim causes drying and cracking. Use correct dilution and rinse thoroughly.</div></div>
+          <div class="trn-section-lbl">Cerakote Ceramic Interior Detailer</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What it does:</strong> deposits a thin SiO2 ceramic layer on plastic, vinyl, and fabric surfaces. On plastics, it restores and seals against UV degradation. On fabric, it reduces surface adhesion so future contamination sits on top rather than bonding into fibres.</div></div>
+          <div class="trn-section-lbl">Soft99 Glaco Roll On</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What it does:</strong> fluoropolymer-based hydrophobic coating for glass. Above approximately 50km/h, water beads and is thrown clear without wipers. A genuine safety upgrade in Jamaica's rain conditions.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Requirement:</strong> glass must be chemically clean. Any contamination prevents uniform bonding and creates streaking when wet.</div></div>
+          <div class="trn-callout">Knowing what each product does at the surface level separates a technician from someone who follows instructions. When something goes wrong, product science tells you why — and prevents you from making it worse.</div>`,
+        quiz: [
+          { q: 'You apply Cerakote Paint Sealant correctly but the client reports water is not beading after two weeks. What is the most likely cause?', opts: ['Counterfeit product', 'Residual contamination at application — sealant bonded partially or not at all', 'Two weeks is normal degradation for this product', 'Client washing too frequently'], correct: 1, feedback: ['Counterfeit is unlikely if sourced correctly. Surface prep failure is the most common cause of early sealant failure.', 'Correct. Sealant cannot bond properly to contaminated paint. The result is premature failure or non-uniform protection.', 'Cerakote is rated 50 washes. Two weeks indicates application failure, not product degradation.', 'Frequent pH-neutral washing should not degrade a properly applied sealant this quickly.'] },
+          { q: 'A client asks you to use Koch Chemie Green Star as their regular maintenance wash on a coated vehicle. You should:', opts: ['Agree — it is labelled all-purpose', 'Decline — alkaline cleaners strip ceramic and sealant on repeated contact', 'Dilute to 1:100 — at that dilution it becomes pH neutral', 'Use it once — a single application causes no damage'], correct: 1, feedback: ['All-purpose means versatile application — not chemically safe on all protected surfaces.', 'Correct. Repeated alkaline washing is the fastest way to degrade protection. Maintenance washing must be pH neutral.', 'Dilution reduces concentration but does not change pH chemistry.', 'A single application causes measurable degradation that compounds with each subsequent wash.'] },
+          { q: 'Soft99 Glaco is applied to a windscreen but streaks heavily in rain. What went wrong?', opts: ['Applied too thinly', 'Silicone or mineral contamination prevented uniform bonding', 'Product expired before application', 'Jamaican rain is too acidic for the product'], correct: 1, feedback: ['Thin application reduces durability — it does not cause streaking.', 'Correct. Any contamination prevents fluoropolymer bonding uniformly — streaking is the signature of uneven adhesion.', 'Expiry affects durability, not bonding pattern.', 'Rain chemistry does not prevent Glaco bonding — it affects durability over time, not initial adhesion.'] }
+        ]
+      }
+    ]
+  },
+  {
+    num: '02', label: 'Stage 2', title: 'Technique Mastery',
+    modules: [
+      {
+        id: 'a-handtech', ico: '🤲', num: 'S2·M1', title: 'Hand Application Technique',
+        desc: 'Pressure, motion, panel reading, and avoiding the mistakes that damage paint.',
+        pills: ['hands-on','quiz'],
+        content: `
+          <div class="trn-section-lbl">Pressure — The Most Misunderstood Variable</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Less pressure is almost always correct.</strong> On paint, your hand weight is sufficient. Pressing harder into a wash mitt does not clean better — it drags trapped particles across clearcoat, creating marring.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>The exception is textured surfaces</strong> — carpet fibres, fabric upholstery. Here, directed pressure with an appropriate brush is how agitation works. A stiff detailing brush on leather is damage, not cleaning.</div></div>
+          <div class="trn-section-lbl">Motion Patterns</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Exterior paint — straight lines only.</strong> Straight overlapping passes, front to rear (following airflow direction). Circular motions create swirl marks that catch light from every angle. This is how the informal wash market destroys paint.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Interior surfaces — vary by material.</strong> Fabric: circular agitation with a brush. Leather: straight, gentle wipe to avoid stretching. Plastics: any direction with soft cloth.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Glass — two-cloth method.</strong> Cloth 1 applies and cleans. Cloth 2 follows immediately to buff before residue dries. In Jamaica's heat, glass dries within seconds in direct sun — always work glass in shade.</div></div>
+          <div class="trn-section-lbl">Panel Reading</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Before applying anything, read the panel.</strong> Check paint condition under a raking light. A 3-minute pre-job assessment prevents 30 minutes of damage control.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Paint thickness awareness.</strong> Edges, creases, and panel corners have thinner clearcoat. Reduce pressure even further in these areas. Machine polishing on edges without experience removes clearcoat entirely.</div></div>
+          <div class="trn-section-lbl">Working in Jamaica's Climate</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Heat management is part of technique.</strong> Products flash faster. Sealants haze before you can buff. Your technique adapts: smaller working sections, shade positioning, morning start times for protection application.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Humidity and drying.</strong> Interior extraction jobs need complete drying before handover. In the wet season, extraction jobs may need additional blower passes to confirm surfaces are dry.</div></div>
+          <div class="trn-callout">Technique does not compensate for product choice, and product choice does not compensate for technique. Both must be correct simultaneously.</div>`,
+        quiz: [
+          { q: 'You press harder with the mitt to remove a stubborn stain. Why is this incorrect?', opts: ['It uses more product', 'Increased pressure drags trapped particles across clearcoat, creating marring and scratches', 'It wears the mitt faster', 'It is fine — modern clearcoats handle pressure'], correct: 1, feedback: ['Product consumption is secondary.', 'Correct. Pressure does not clean better — it increases the risk of abrasive contact with trapped contamination.', 'Tool longevity is not the safety concern.', 'Modern clearcoats are typically 40–80 microns thick — less than a human hair.'] },
+          { q: 'You apply sealant using circular motions. Six months later the client sees swirl marks under direct sunlight. What caused this?', opts: ['The sealant caused swirl marks', 'Circular application created marring in the clearcoat that the sealant made more visible', 'Paint too thin for sealant', 'Swirl marks only come from machine polishing errors'], correct: 1, feedback: ['Sealant does not create swirl marks — it amplifies existing ones.', 'Correct. Circular motions create circular micro-scratches. Sealant clarity makes them more visible, not less.', 'Panel thickness does not cause swirl marks.', 'Hand application creates swirl marks as easily as machine — the motion pattern is the cause.'] },
+          { q: 'It is 2 PM in direct sun and you need to apply Soft99 Glaco to the windscreen. What is correct procedure?', opts: ['Apply quickly and buff before it dries', 'Move the vehicle to shade before starting', 'Apply in sections and buff each immediately', 'Wait until the glass cools, then apply in direct sun'], correct: 1, feedback: ['Speed is not a substitute for controlled conditions.', 'Correct. Glass in direct afternoon sun can exceed 70°C surface temperature. No coating applies or bonds correctly under these conditions.', 'Section-by-section helps but does not solve the fundamental heat problem.', 'Glass cools quickly back to ambient in direct sun — position, not surface temperature, is the issue.'] }
+        ]
+      },
+      {
+        id: 'a-steam', ico: '💨', num: 'S2·M2', title: 'Steam & Extraction Mastery',
+        desc: 'The commercial steamer and extractor are your most powerful interior tools. Control them.',
+        pills: ['hands-on','quiz'],
+        content: `
+          <div class="trn-section-lbl">How Steam Cleans</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Steam is superheated water vapour — typically 120–160°C at the nozzle.</strong> It penetrates fabric fibres, liquefies oils and waxes, loosens bonded contamination, and kills bacteria and mould spores on contact. It is the most chemically neutral deep cleaning method available.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Steam deposits very low moisture.</strong> This is the difference between a 2-hour dry time and an overnight one. For Jamaica's humidity, this matters — over-wetting fabric in a humid environment creates the mould problem you were hired to solve.</div></div>
+          <div class="trn-section-lbl">Nozzle Distance & Speed</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>3–5 cm distance on fabric.</strong> Closer concentrates heat for heavy staining. Farther reduces effectiveness. Move at the pace the surface requires.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Follow immediately with extraction.</strong> Steam loosens contamination — the extractor removes it. Steam without extraction redistributes contamination on absorbent surfaces.</div></div>
+          <div class="trn-section-lbl">Surface-Specific Steam Rules</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Fabric headliner</strong> — lowest safe setting, 5–8 cm distance, test patch first. Headliner backing adhesive is heat-sensitive. Once delaminated, it is a trim repair, not a detail problem.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Leather</strong> — low setting, moderate distance. Opens pores for cleaning but excessive heat dries and cracks leather. Follow with conditioner immediately.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Vents and crevices</strong> — narrow nozzle, aim front-to-back so loosened contamination exits toward you, not deeper into the duct.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Never steam electronics or speaker grilles directly.</strong> Steam is water — moisture intrusion causes immediate or delayed failure.</div></div>
+          <div class="trn-section-lbl">Extractor Operation</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Pre-treat → agitate → extract.</strong> Multiple dry passes after wet extraction pull residual moisture out — this is the step most operators skip that causes slow dry times.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Check the waste tank.</strong> A full tank reduces suction. On heavily soiled jobs, check and empty halfway through.</div></div>
+          <div class="trn-warn">⚠ Never return a vehicle with damp interior surfaces. In Jamaica's humidity, damp fabric develops mildew within 24–48 hours. Confirm dry before handover — press firmly on each extracted surface and check your hand.</div>`,
+        quiz: [
+          { q: 'You are steaming a soiled fabric seat. After each pass it looks cleaner but smells musty. What step are you skipping?', opts: ['Need more steam pressure', 'Not extracting after steaming — contamination is being redistributed, not removed', 'Seat needs to be removed from vehicle', 'Mould requires enzyme treatment, not steam'], correct: 1, feedback: ['More pressure increases heat — it does not remove loosened contamination from fabric.', 'Correct. Steam loosens and kills mould. Extraction removes it. Without extraction, you are moving the problem.', 'Removal helps access but is not required with correct steam and extraction technique.', 'Enzyme treatment is correct pre-treatment for heavy mould — but extraction after steaming is still required.'] },
+          { q: 'After extracting front seats, how do you confirm they are dry enough for handover?', opts: ['Surface feels dry to light touch', 'Press firmly into the fabric — hand comes away dry means extraction is sufficient', 'Wait 30 minutes then visually check', 'Run a final steam pass — this dries the fabric'], correct: 1, feedback: ['Surface dryness is misleading — moisture deeper in the foam may still be present.', 'Correct. Firm pressure tests full depth. Surface-dry with wet backing still causes mildew in Jamaica\'s humidity.', 'Visual inspection does not reveal sub-surface moisture.', 'Steam deposits moisture — it does not remove it.'] },
+          { q: 'What is the correct nozzle direction when steam-cleaning dashboard vents?', opts: ['Aim steam as deep as possible into the ductwork', 'Narrow nozzle, aimed front-to-back so loosened contamination exits toward you', 'Steam the surrounding trim to let moisture enter passively', 'Vents should never be steam-cleaned'], correct: 1, feedback: ['Steam aimed deep into ductwork risks moisture contact with electronics.', 'Correct. Front-to-back ensures loosened contamination exits the vent rather than being pushed deeper.', 'Passive moisture entry does not produce directional cleaning.', 'Vents are safely steam-cleaned with proper narrow-nozzle technique.'] }
+        ]
+      },
+      {
+        id: 'a-workflow', ico: '⏱️', num: 'S2·M3', title: 'Job Sequencing & Time Management',
+        desc: 'Solo operation means every inefficiency doubles. Build the sequence into muscle memory.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">The Master Sequence — Every Job</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>1. Arrival & setup</strong> — vehicle assessment and photo documentation before any equipment leaves the vehicle. All tools laid out before starting. Mid-job trips to the vehicle break your flow and extend time.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>2. Pre-rinse & wheels</strong> — flood the vehicle, then complete the full wheel and tyre process before touching the body.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>3. Chemical decontamination</strong> — acidic soap application. While dwell time is active, begin interior air-blowing. Two processes simultaneously.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>4. Two-bucket wash & rinse</strong> — body panels, top to bottom.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>5. Drying</strong> — panel by panel, weaving glass into the sequence as you go.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>6. Interior — top to bottom</strong> — headliner, dash, seats, carpet, mats. Steam and extract zone by zone, not all steam then all extraction.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>7. Protection application</strong> — exterior sealant, tyre coat, wheel sealant, interior ceramic detailer, glass coat. Always last.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>8. Final inspection & documentation</strong> — walk the vehicle under raking light. Photograph finished result at the same angles as before.</div></div>
+          <div class="trn-section-lbl">Time Estimation</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Tier 1 exterior:</strong> 1.5–2.5 hours depending on vehicle size and contamination.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Tier 2 full detail:</strong> 4–6 hours for a standard sedan, 6–8 hours for an SUV or van. A heavily neglected vehicle adds 1–2 hours minimum.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Never quote a time without an assessment.</strong> "About 4 hours" on a vehicle you have not seen is a promise you cannot keep.</div></div>
+          <div class="trn-callout">As a solo operator on a firefighter schedule, your operational windows are fixed. A job that runs 2 hours over estimate does not just affect that client — it affects the next booking and your recovery time.</div>
+          <div class="trn-warn">⚠ One Tier 2 job per day maximum on a full detail day. Two Tier 2 jobs in a day is only possible once your process is fully systemised and equipment setup is under 10 minutes.</div>`,
+        quiz: [
+          { q: 'You find yourself retrieving tools from your vehicle 3 times mid-job. What is the systemic fix?', opts: ['Park closer to the client\'s vehicle', 'Build a pre-job equipment layout step into the sequence — all tools out before starting', 'Purchase a tool belt', 'It is unavoidable as a solo operator'], correct: 1, feedback: ['Proximity helps but does not eliminate the problem.', 'Correct. Repeated mid-job retrieval means setup was skipped or incomplete. The fix is procedural.', 'A tool belt helps for small items but does not replace systematic pre-job layout.', 'Solo operators with strong process management eliminate mid-job retrieval entirely.'] },
+          { q: 'A Toyota Fortuner is booked as Tier 2, client described "a bit of interior staining." You arrive and find all seats, carpet, and headliner are heavily soiled. Your estimate was 5 hours. How do you handle this?', opts: ['Complete what you can in 5 hours and leave the rest', 'Proceed as quoted — renegotiating is unprofessional', 'Stop, document the actual condition, and have an honest pricing conversation before continuing', 'Rush to complete everything within the quoted time'], correct: 2, feedback: ['Partial completion of a Tier 2 is not a Tier 2 — it is a failed job.', 'Professional obligations run both directions. The client provided incomplete information — renegotiation is appropriate.', 'Correct. Honesty before continuing is both the professional and ethical standard.', 'Rushing compromises quality — a client who paid full price for a rushed job is not satisfied.'] },
+          { q: 'Why must protection products always be applied last in the job sequence?', opts: ['They need maximum time to cure before handover', 'Any cleaning activity after protection application removes or degrades the protection layer', 'Protection products are most effective on warm surfaces from prior work', 'Client preference — they want to see the cleaned vehicle before discussing protection'], correct: 1, feedback: ['Curing time is a factor but not the primary sequencing reason.', 'Correct. All chemical cleaning activity degrades or removes freshly applied protection. Protection is always final.', 'Cool surfaces in shade are preferred in Jamaica\'s climate — heat is the enemy, not the asset.', 'Client communication happens before the job. Sequencing is a technical decision.'] }
+        ]
+      }
+    ]
+  },
+  {
+    num: '03', label: 'Stage 3', title: 'Job Management',
+    modules: [
+      {
+        id: 'a-site', ico: '📍', num: 'S3·M1', title: 'Mobile Site Setup & Client Communication',
+        desc: 'Your setup is your professionalism before you touch the car.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">Site Selection</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Shade is not optional — it is operational.</strong> Direct sun increases product flash time, reduces sealant working time, accelerates water spotting, and physically exhausts you. Negotiate shade access during booking confirmation, not on arrival.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Water and power access.</strong> Confirm both before confirming the booking. A client who says "we'll figure it out when you get here" is a job risk.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Drainage.</strong> Detailing produces large volumes of contaminated water. Understand drainage before you start. In gated communities, ask about protocol upfront.</div></div>
+          <div class="trn-section-lbl">Equipment Layout</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Everything out before you start.</strong> Group by phase: decontamination products together, interior products together, protection products together.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Clean and dirty towels separated.</strong> Two towel systems — one for cleaning, one for buffing protection. Mixed towels transfer contamination into sealant.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Waste management.</strong> Bring a designated bag for soiled towels. Remove all waste when you leave.</div></div>
+          <div class="trn-section-lbl">Client Communication On-Site</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Pre-job walk-around with client present.</strong> Point out all pre-existing damage before touching the vehicle. Photograph everything and have the client verbally acknowledge.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Mid-job discoveries.</strong> If you uncover a condition requiring scope change, stop, photograph, inform the client, and agree before continuing.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Handover standard.</strong> Final walk-around with client. Point out what was done, what improved, and any limitations. Confirm the next service date at handover — not later.</div></div>
+          <div class="trn-callout">Your Serena is your mobile workshop. After every job: restock towels, check product levels, clean your equipment. A disorganised vehicle creates disorganised jobs.</div>`,
+        quiz: [
+          { q: 'You arrive and the only available space is in direct afternoon sun. The client says "just park anywhere." What do you do?', opts: ['Proceed — you have worked in sun before', 'Begin the wash in sun but apply protection in a garage if available', 'Ask the client to create shade or negotiate garage access before starting', 'Complete the detail quickly before heat peaks'], correct: 2, feedback: ['Direct sun compromises every stage — not just protection.', 'Washing in direct sun creates water spots during panel drying — the problem starts at stage one.', 'Correct. Shade is an operational requirement. Raise it before the job starts.', 'Speed does not resolve the chemistry problems direct sun creates.'] },
+          { q: 'Midway through a full interior detail you discover a deep fuel stain not visible during assessment. What is the correct next step?', opts: ['Attempt removal with your strongest product and see what happens', 'Continue and inform the client at handover that a stain remains', 'Stop, photograph, inform the client, and agree on scope before continuing', 'Include it — fuel stain removal is part of full interior detail'], correct: 2, feedback: ['Attempting unknown stain removal without client knowledge risks damage you did not quote for.', 'Informing at handover removes the client\'s ability to make an informed decision.', 'Correct. Scope discoveries mid-job require a client conversation before you proceed.', 'Specialised stain removal is a separate scope item from standard interior cleaning.'] },
+          { q: 'You complete a Tier 2 on a maintenance plan client and say "I\'ll be in touch about the next service" at handover. What went wrong?', opts: ['Nothing — maintaining contact is professional', 'You missed the close. Handover is the moment to confirm a specific next date, not an open follow-up', 'The client should initiate based on the agreement', 'Send a WhatsApp reminder in a few weeks instead'], correct: 1, feedback: ['"I\'ll be in touch" is open-ended and rarely converts to a confirmed booking.', 'Correct. Peak satisfaction at handover is peak receptivity. A specific date confirmed then is a booking — an open follow-up is a hope.', 'Recurring revenue requires proactive scheduling — the client should never have to initiate.', 'WhatsApp reminders have value but cannot replicate the closing power of face-to-face confirmation at peak satisfaction.'] }
+        ]
+      }
+    ]
+  },
+  {
+    num: '04', label: 'Stage 4', title: 'Advanced Services',
+    modules: [
+      {
+        id: 'a-headlights', ico: '🔦', num: 'S4·M1', title: 'Headlight Restoration — Deep Dive',
+        desc: 'The full wet sanding to UV seal process, grit selection, and failure points.',
+        pills: ['hands-on','quiz'],
+        content: `
+          <div class="trn-section-lbl">Understanding Polycarbonate Degradation</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Modern headlight lenses are polycarbonate plastic.</strong> The manufacturer applies a thin UV-protective clear coat. This coat is what degrades — not the lens material itself. When it fails, UV radiation breaks down the exposed polycarbonate, causing yellowing and hazing.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Jamaica's UV index accelerates this dramatically.</strong> A headlight lasting 7–10 years in Europe may degrade significantly in 3–5 years here. High-demand service in this market.</div></div>
+          <div class="trn-section-lbl">Grit Selection</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>800–1000 grit:</strong> severe oxidation, heavy yellowing, surface pitting. Aggressive cut. Leaves marks that must be refined progressively before compounding.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>1500 grit:</strong> moderate haze and yellowing. Middle ground — cuts enough without excessive material removal.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>2000–2500 grit:</strong> light haze, early degradation, or refinement after coarser grit.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Always wet sand.</strong> Dry sanding generates heat that melts and smears polycarbonate. Keep the surface and paper continuously wet throughout.</div></div>
+          <div class="trn-section-lbl">The Full Process</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>1. Mask the surrounding paint.</strong> Tape off before any sanding. Wet sanding grit on clearcoat creates scratches. 3 minutes of masking prevents a paint correction job.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>2. Wet sand with initial grit.</strong> Straight overlapping passes, surface kept wet. Wipe clear and inspect under raking light periodically. Hazy surface becomes uniformly dull when the degraded layer is removed.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>3. Step up through grits.</strong> Each finer grit removes the previous grit's scratch marks. Skipping steps leaves visible sanding marks in the final finish.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>4. Compound.</strong> Removes final sanding marks and restores optical clarity. Inspect under raking light — the lens should be clear, not just smooth.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>5. UV sealant — non-negotiable.</strong> Without UV protection, Jamaica's UV re-degrades the exposed polycarbonate within 4–8 weeks. The UV coat makes the restoration durable.</div></div>
+          <div class="trn-warn">⚠ If wet sanding reveals crazing (a network of fine internal cracks), the degradation is sub-surface and cannot be sanded out. Document, inform the client, and recommend replacement. You cannot restore structural lens damage.</div>`,
+        quiz: [
+          { q: 'A client\'s headlights are severely yellowed and pitted. Which wet sanding grit progression is correct?', opts: ['2000 → compound → UV seal', '1500 → 2000 → compound → UV seal', '800 → 1500 → 2000 → compound → UV seal', '800 → compound → UV seal'], correct: 2, feedback: ['2000 grit alone is insufficient for severe oxidation.', 'Starting at 1500 is for moderate hazing, not severe pitting and yellowing.', 'Correct. Severe degradation requires an aggressive starting grit with progressive refinement before compounding.', 'Jumping from 800 directly to compound leaves sanding marks in the final finish.'] },
+          { q: 'After completing a wet sand, you see a network of fine internal cracks in the lens material under raking light. What does this indicate?', opts: ['Your sanding created the cracks', 'The compound was too aggressive', 'Sub-surface crazing — structural degradation. This lens requires replacement', 'Normal sanding marks that disappear under UV sealant'], correct: 2, feedback: ['Wet sanding removes surface material — it does not create structural crazing.', 'Compound removes sanding marks — it does not create internal cracking.', 'Correct. Crazing is structural polycarbonate degradation revealed by sanding. No surface process can restore it.', 'Sanding marks are directional and uniform — crazing is a random internal network of fractures.'] },
+          { q: 'Why is masking the surrounding paint before headlight wet sanding non-negotiable?', opts: ['Keeps the lens clean during the process', 'Wet sanding grit on clearcoat creates scratches requiring paint correction', 'Prevents water running onto the panel', 'Insurance requirement'], correct: 1, feedback: ['Cleanliness is secondary — paint protection is the primary reason.', 'Correct. Sanding paper on clearcoat creates scratches. Masking is 3 minutes that prevents a paint correction job.', 'Water management is handled by technique — masking serves paint protection.', 'Masking is a professional standard regardless of insurance.'] }
+        ]
+      },
+      {
+        id: 'a-glass-coat', ico: '🪟', num: 'S4·M2', title: 'Glass Coating — Full Process',
+        desc: 'Surface prep, Soft99 Glaco application, and what makes glass coating last.',
+        pills: ['hands-on','quiz'],
+        content: `
+          <div class="trn-section-lbl">Why Glass Coating Fails</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>The number one cause is surface preparation failure.</strong> Fluoropolymers bond to chemically clean glass only. Any contamination — silicone from prior products, mineral deposits, wiper rubber transfer — creates a barrier. The coating appears to apply but does not bond and fails within days.</div></div>
+          <div class="trn-section-lbl">Glass Preparation Protocol</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Step 1 — Acidic decontamination.</strong> CarPro Acidic Soap dissolves mineral water spots and silica deposits regular glass cleaner cannot remove.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Step 2 — IPA wipe-down.</strong> Isopropyl alcohol (70%+) removes silicone, wax, and oil residue. Apply with lint-free cloth, buff with a second clean cloth.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Step 3 — Raking light inspection.</strong> Water spots, oily residue, and silicone all show as distinct patterns. Do not proceed until the glass reads clean.</div></div>
+          <div class="trn-section-lbl">Soft99 Glaco Application</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Glass must be cool, clean, and dry.</strong> Move to shade 15–20 minutes before application to allow surface temperature below 40°C.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Cross-hatch pattern</strong> — horizontal passes first, then vertical. One window panel at a time.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Allow to haze fully.</strong> Do not buff before hazing — premature buffing removes product before adhesion. In Jamaica's climate in shade: approximately 3–5 minutes.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Buff with clean dry microfibre.</strong> Straight passes, firm pressure, until streak-free. Inspect from multiple angles including from inside the vehicle.</div></div>
+          <div class="trn-callout">Glaco requires approximately 12 hours of cure before water contact for full durability. Inform clients not to wash the vehicle or park in heavy rain overnight after application. Client communication — not product weakness.</div>`,
+        quiz: [
+          { q: 'You apply Soft99 Glaco to a clean-looking windscreen. Within a week the client reports severe streaking in rain. The coating is only adhered in patches. What failed?', opts: ['Applied too thinly', 'Silicone or mineral contamination prevented uniform bonding', 'Insufficient cure time', 'Jamaican rain is too heavy for Glaco'], correct: 1, feedback: ['Thin application affects durability — not bonding uniformity.', 'Correct. Patchy adhesion is the visual signature of contamination preventing uniform fluoropolymer bonding.', 'Insufficient cure reduces durability — it does not create patchy adhesion.', 'Glaco is designed for rain environments — heavy rain is its operating condition.'] },
+          { q: 'What is the correct glass coating preparation order?', opts: ['IPA wipe → acidic decon → raking light → Glaco', 'Acidic decon → IPA wipe → raking light → Glaco', 'Regular glass cleaner → Glaco', 'Raking light → acidic decon → Glaco'], correct: 1, feedback: ['IPA before acid decon does not remove mineral deposits first.', 'Correct. Acid removes mineral deposits, IPA removes oil/silicone, inspection confirms readiness, then coat.', 'Regular glass cleaner does not remove mineral deposits or silicone — insufficient for coating prep.', 'Inspecting before decon tells you what is there — it does not prepare the surface.'] },
+          { q: 'A client asks if they can wash the car the next morning after glass coating. Your response:', opts: ['Yes — Glaco bonds instantly on application', 'Allow at least 12 hours of cure before water contact for full durability', 'No — never wash the windscreen again to preserve the coating', 'Washing is fine immediately but avoid wipers for 24 hours'], correct: 1, feedback: ['Glaco bonds progressively — full cure requires time.', 'Correct. 12-hour cure window before water contact. Client communication protects your result.', 'Glaco is designed to be washed over — it is a permanent hydrophobic coating.', 'The full glass surface needs 12 hours — not just the wiper contact area.'] }
+        ]
+      },
+      {
+        id: 'a-ozone', ico: '🌀', num: 'S4·M3', title: 'Ozone Treatment & Odour Diagnosis',
+        desc: 'What ozone actually does, what it cannot do, and the full treatment protocol.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">The Science of Ozone (O3)</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Ozone is O3 — three oxygen atoms.</strong> The third atom is unstable and bonds to odour-causing molecules, oxidising and chemically destroying the compounds that produce the smell. This is not masking — it is molecular-level destruction of the odour source.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Ozone does not discriminate.</strong> It attacks all organic compounds — bacteria, mould, tobacco, pet dander. It also degrades rubber seals and plastics with extended exposure. Treatment time is controlled for this reason.</div></div>
+          <div class="trn-section-lbl">Odour Diagnosis First</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Identify the source category.</strong> Tobacco: embedded in fabric, headliner, HVAC. Pet: carpet and seat foam. Mildew: under carpet or door sills from a water leak. Food: localised to seat crevices or boot.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Source removal is non-negotiable before ozone.</strong> Ozone cannot oxidise odour faster than a wet contaminated seat produces it. Extract contamination first.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Mildew specifically.</strong> If the smell persists and you cannot find wet fabric, investigate: lift the boot liner, check under floor mats, feel door sills. Active moisture source = recurring odour regardless of treatment.</div></div>
+          <div class="trn-section-lbl">Treatment Protocol</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>1.</strong> Complete all physical cleaning and extraction. Surfaces must be dry.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>2.</strong> Place the Medvoe generator on the front passenger seat. Run HVAC on recirculate — distributes ozone through the ventilation system.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>3.</strong> Close all windows and doors. Run 20–30 minutes standard. Heavy tobacco or pet: 45–60 minutes.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>4.</strong> Do not enter during treatment. Ozone at therapeutic concentrations is harmful to lungs. Step away completely.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>5.</strong> Open all doors and windows. Air for minimum 15 minutes. Do not hand over until the ozone smell is gone.</div></div>
+          <div class="trn-warn">⚠ Ozone at high concentrations degrades rubber seals and plastics over repeated long treatments. For maintenance plan clients, keep to the minimum effective time — 20–30 minutes is the working standard, not a floor to exceed.</div>`,
+        quiz: [
+          { q: 'A client requests ozone for persistent mildew smell. You complete full extraction and run the generator. Two weeks later the smell returns. Most likely cause?', opts: ['Generator too small', 'Active moisture source not identified and eliminated — ozone treats air, not ongoing contamination', 'Treatment duration was too short', 'Mildew always returns and requires monthly treatment'], correct: 1, feedback: ['Generator output is a factor — but returning odour indicates a source, not insufficient ozone.', 'Correct. Returning mildew smell almost always indicates an active moisture source not addressed.', 'Duration affects depth of treatment — but if the source is active, no duration is sufficient.', 'Mildew does not return after proper source elimination and ozone treatment — recurrence indicates an unresolved source.'] },
+          { q: 'The ozone treatment is complete after 30 minutes. What is the correct next step before handover?', opts: ['Present immediately — the fresh smell confirms treatment worked', 'Open all doors and windows, air for at least 15 minutes until ozone smell dissipates', 'Run HVAC on fresh air for 5 minutes', 'The client should air it themselves'], correct: 1, feedback: ['Handing over a vehicle with therapeutic ozone concentration is harmful to the client.', 'Correct. 15 minutes minimum open airing. Ozone converts to O2 in open air — the sharp smell indicates it is still present.', '5 minutes of HVAC airing is insufficient to clear therapeutic ozone concentrations.', 'Airing out is your professional responsibility — not the client\'s.'] },
+          { q: 'Where should the ozone generator be placed and why?', opts: ['Boot — out of the way, treats the rear first', 'Front passenger seat with HVAC on recirculate — distributes ozone through ventilation system', 'Dashboard for fastest cabin treatment', 'Outside the vehicle aimed through an open window'], correct: 1, feedback: ['Boot treats cargo space — major odour sources are in the cabin.', 'Correct. HVAC recirculation distributes ozone through the ducts where embedded odours accumulate — the hardest area to treat physically.', 'Dashboard without recirculation does not treat the ventilation system.', 'Outside placement does not achieve therapeutic concentration inside the cabin.'] }
+        ]
+      },
+      {
+        id: 'a-ceramic', ico: '💎', num: 'S4·M4', title: 'Ceramic Coating — Theory & Application',
+        desc: 'What ceramic coatings are, the preparation standard required, and the full application process.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">What Ceramic Coating Is — And Is Not</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>A ceramic coating is a liquid polymer — primarily SiO2 or TiO2 — that chemically bonds to clearcoat and cures into a hard, semi-permanent protective layer.</strong> It is not wax, not sealant, and not paint protection film. It becomes part of the vehicle's surface chemistry.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What it does:</strong> creates a 9H-hardness hydrophobic layer that is chemically resistant, UV resistant, and anti-contaminant. Contamination sits on the ceramic rather than bonding to paint.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>What it does not do:</strong> make the vehicle scratch-proof, eliminate washing needs, or last forever without maintenance. Marketing claims of "self-healing" apply only to minor surface swirls at elevated temperature.</div></div>
+          <div class="trn-section-lbl">The Preparation Standard</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Ceramic coating locks in everything beneath it.</strong> Any swirl mark, water spot, scratch, or contamination present at application is sealed permanently. Paint correction must be completed before any ceramic application. This is the primary reason ceramic is a Stage 1 equipment prerequisite.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Sequence:</strong> full decontamination (wash, chemical decon, clay bar) → paint correction (DA polisher, compound, polish) → IPA panel wipe → ceramic application. Skipping any step produces an inferior result the client lives with for years.</div></div>
+          <div class="trn-section-lbl">Application Process</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Environment requirements.</strong> Enclosed space, no direct sun, 15–25°C ambient ideal. Morning in shade is closest achievable in Jamaica. Dust-free — a particle landing in wet ceramic bonds in permanently.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Work in sections of 40x40cm maximum.</strong> Apply with a suede applicator on a foam block. Cross-hatch pattern (horizontal then vertical) for uniform coverage.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Watch for the high spot flash.</strong> Rainbow-like sheen or slight tackiness as solvent evaporates — this is the buffing window. Buff immediately with a clean low-pile microfibre. Missing this window means cured high spots requiring mechanical removal.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Levelling technique.</strong> First wipe: firm pressure to remove the bulk. Second wipe: fresh panel, light pressure to level and reveal clarity. Inspect under raking light after each panel.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Cure times and client instructions.</strong> Initial cure: 24 hours — no water contact. Full cure: 7–14 days — no alkaline washing, no automatic car washes. Client must understand this before the job starts, not at handover.</div></div>
+          <div class="trn-section-lbl">Jamaica-Specific Considerations</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Flash time is dramatically shorter in Jamaica's heat.</strong> A coating giving 3–4 minutes working time at 20°C may give 60–90 seconds at 30°C. Know your product's flash behaviour at operating temperature.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Enclosed space is not optional.</strong> Outdoor application in Jamaica's dust, wind, and heat produces inferior results even for experienced applicators. If you cannot access an enclosed garage, do not offer ceramic for that job.</div></div>
+          <div class="trn-callout">Ceramic coating is the highest-value single service in professional detailing. It is also the highest-risk if preparation is skipped. Your reputation is built or broken on ceramic work quality — exactly why it is a Year 2–3 target after DA polisher mastery is confirmed.</div>
+          <div class="trn-warn">⚠ Do not offer ceramic coating as a service until: (1) you own and have mastered a DA polisher, (2) you have confirmed access to a suitable enclosed application environment, and (3) you have practiced on a test panel. Preparation protects the premium you will charge.</div>`,
+        quiz: [
+          { q: 'A client wants ceramic coating. During assessment you see moderate swirl marks across all panels. What must happen first?', opts: ['Apply the coating — it hides swirl marks', 'Decline — coating cannot be applied to swirled paint', 'Complete paint correction with a DA polisher, then apply ceramic coating', 'Apply sealant first to fill swirls, then coat over it'], correct: 2, feedback: ['Ceramic coating amplifies defects — it does not hide them. Swirl marks sealed under ceramic are permanent.', 'Swirl marks are correctable — the job requires a paint correction stage, not a decline.', 'Correct. Coating locks in everything beneath it. Defect-free paint is the non-negotiable prerequisite.', 'Sealant under ceramic creates an incompatible base — the coating cannot bond to wax or sealant.'] },
+          { q: 'You apply ceramic coating and the panel you just worked has a cloudy, uneven appearance under raking light. What most likely caused this?', opts: ['Too much product applied', 'You missed the buffing window — coating partially cured before levelling', 'IPA wipe was insufficient — oil residue present', 'Ambient temperature too low for proper curing'], correct: 1, feedback: ['Excess product produces high spots and rainbow sheen — not uniform cloudiness.', 'Correct. Partial cure before buffing produces an uneven surface — the classic cloudy panel failure.', 'IPA residue causes adhesion issues — not post-application cloudiness during the same session.', 'Low temperature slows curing — giving more working time, not less.'] },
+          { q: 'What is the minimum initial cure time before water contact after ceramic coating?', opts: ['1 hour', '6 hours', '24 hours', '7 days'], correct: 2, feedback: ['1 hour produces only surface-level cure — water contact causes streaking and coating failure.', '6 hours is insufficient — the coating is still in active cure.', 'Correct. 24 hours is the standard initial cure before any water contact. Full cure is 7–14 days.', '7 days is the full cure period — water can contact the surface after 24 hours but chemical washing should be avoided for the full 7–14 day period.'] }
+        ]
+      }
+    ]
+  }
+];
+const FINAL_EXAM = [
+  { q: 'What is the primary reason ceramic coating preparation requires paint correction before application?', opts: ['Paint correction removes old wax so the coating bonds better', 'Ceramic coating seals in all surface defects permanently — correction must occur before coating', 'Paint correction thickens the clearcoat to support the ceramic layer', 'Correction removes contamination that washing cannot'], correct: 1, feedback: ['Old wax is removed by IPA wipe — paint correction addresses surface defects.', 'Correct. The irreversibility of ceramic coating is why preparation is uncompromising.', 'Paint correction removes material — it does not add thickness.', 'Decontamination handles contamination — correction handles defects. Both are required.'] },
+  { q: 'You are washing a ceramic-coated maintenance plan vehicle. Which wash chemistry is correct?', opts: ['Koch Chemie Green Star at 1:20 dilution', 'CarPro Acidic Soap — removes mineral deposits without stripping', 'pH neutral or ceramic-safe wash product only', 'Any shampoo at low dilution is fine'], correct: 2, feedback: ['Alkaline chemistry degrades ceramic coatings regardless of dilution.', 'Acidic decon is for periodic sessions — not regular maintenance washing.', 'Correct. pH neutral is the only safe regular washing chemistry for ceramic-coated vehicles.', 'Dilution does not change fundamental pH chemistry.'] },
+  { q: 'A heavily soiled fabric seat smells strongly of tobacco. In what order do you treat it?', opts: ['Ozone → steam → extract', 'Steam → extract → ozone', 'Extract → steam → ozone', 'Ozone → extract → steam'], correct: 1, feedback: ['Ozone cannot treat odour trapped in saturated unextracted contamination.', 'Correct. Steam loosens contamination. Extraction removes it. Ozone eliminates residual molecular odour.', 'Extraction without pre-treatment on heavy soiling is less effective — steam first breaks down contamination.', 'Ozone first does not remove physical contamination.'] },
+  { q: 'You finish wet sanding headlights at 800 grit and the lens is uniformly dull. What is the correct next step?', opts: ['Apply compound directly', 'Step up to 1500 grit, then 2000, before compounding', 'Apply UV sealant — the degraded layer is removed', 'Buff with microfibre to check clarity'], correct: 1, feedback: ['Jumping from 800 to compound leaves visible sanding marks in the final finish.', 'Correct. Progressive grit refinement removes each prior grit\'s scratch marks before compounding.', 'UV sealant is the final step — after compounding restores optical clarity.', 'Buffing an 800-grit surface shows scratch marks — it does not restore clarity.'] },
+  { q: 'What does pH 8–14 indicate and what surfaces must it avoid?', opts: ['Acidic — avoid mineral deposits and glass', 'Alkaline — avoid ceramic coatings, wax, and sealant on protected vehicles', 'Neutral — safe on all surfaces', 'Solvent — avoid plastics'], correct: 1, feedback: ['pH 8–14 is alkaline, not acidic.', 'Correct. Alkaline chemistry strips all forms of paint protection.', 'Neutral is pH 7 — the 8–14 range is alkaline.', 'Solvents are a separate chemical category from pH classification.'] },
+  { q: 'A client has water spots on the windscreen after your exterior wash. You wiped the windscreen last after all body panels. What caused this?', opts: ['Wash soap left mineral residue', 'The windscreen was left to air-dry in direct sun during panel work — mineral bonding occurred before you wiped it', 'Water pressure too high during rinsing', "Jamaica's water is too hard for standard washing to prevent spots"], correct: 1, feedback: ['Wash soap does not cause post-rinse water spots — mineral-rich water does.', 'Correct. Glass left in direct Jamaican sun bonds minerals within 60–90 seconds. Weaving glass into the drying sequence prevents this.', 'Rinse pressure affects coverage, not mineral bonding.', 'Hard water is the cause — but timing of glass drying is the controllable variable.'] },
+  { q: 'You arrive and no shade is available anywhere on the property. What is your decision?', opts: ['Proceed — adapt your technique', 'Begin washing in sun, apply protection inside garage if available', 'Have a direct conversation with the client about rescheduling or creating shade before starting', 'Complete in under 3 hours before heat peaks'], correct: 2, feedback: ['Direct sun compromises every stage — adaptation is not sufficient.', 'Washing in direct sun creates water spots during drying — the problem begins at stage one.', 'Correct. Shade is an operational requirement. The professional approach is a direct conversation before starting.', 'Speed does not resolve the chemistry problems direct sun creates.'] },
+  { q: 'A maintenance plan client\'s ceramic coating stops beading after 6 months. You have been washing their vehicle monthly with Koch Chemie Green Star. What is the cause?', opts: ['Six months is normal ceramic durability', 'The ceramic was incorrectly applied originally', 'Repeated alkaline washing stripped the coating progressively over six months', 'Jamaica\'s humidity degraded the coating'], correct: 2, feedback: ['Professional ceramic coatings are rated 2–5 years with correct maintenance.', 'Application failure presents within weeks, not months.', 'Correct. Alkaline chemistry is the primary maintenance cause of ceramic degradation. This is a product selection error.', 'Humidity affects curing time — it does not degrade properly cured ceramic coatings.'] },
+  { q: 'You notice slight discolouration on the carpet edge near the tail light in a vehicle with mildew odour. What is this telling you?', opts: ['Previous staining — no active issue', 'Historical water leak — likely resolved', 'Potentially active water ingress — investigate before proceeding with ozone', 'Normal condensation pattern in Jamaica\'s climate'], correct: 2, feedback: ['Discolouration at a specific structural point is not consistent with general staining.', 'Active and historical leaks look similar on initial inspection — investigation is required.', 'Correct. Discolouration at a tail light joint is a known water ingress indicator. If the leak is active, ozone will not resolve the odour permanently.', 'Condensation patterns are distributed — they do not concentrate at specific structural joints.'] },
+  { q: 'A client wants a full interior detail quote without an in-person assessment. They describe it as "just a little dirty." What is your response?', opts: ['Quote Tier 2 and adjust on the day', 'Quote Tier 1 — it is likely minor', 'Explain that an assessment is required before any quote, and schedule one', 'Ask follow-up questions over WhatsApp until you have enough information'], correct: 2, feedback: ['Quoting Tier 2 blind risks both overquoting and underquoting.', '"A little dirty" has been the description on some of the most heavily soiled vehicles encountered. Never quote on a client\'s self-assessment.', 'Correct. An assessment is professional standard that protects your pricing, time, and warranty.', 'WhatsApp descriptions are still self-assessments. Photography from a non-professional is unreliable. Assess in person.'] },
+  { q: 'When is the maintenance plan close most effective and why?', opts: ['During booking confirmation — they are already engaged', 'Midway through the job when they can see progress', 'Immediately after the client sees the completed result — peak satisfaction equals peak receptivity', 'In a follow-up message 2 days after the job'], correct: 2, feedback: ['Booking confirmation close has no emotional anchor — they have not experienced your standard yet.', 'Mid-job close has no peak satisfaction to leverage.', 'Correct. Peak satisfaction is the highest point of receptivity. This window is measured in minutes — use it.', '2 days later the emotional response has faded and the client has moved on mentally.'] },
+  { q: 'What is the correct buffing window indicator when applying ceramic coating?', opts: ['Product becomes completely transparent — indicating full cure', 'A rainbow-like sheen or slight tackiness appears as the solvent evaporates — buff immediately', 'Product is visibly wet — maximum working time remains', 'Panel feels warm from the curing reaction'], correct: 1, feedback: ['Complete transparency indicates the product is past the optimal buffing window.', 'Correct. The rainbow sheen is the solvent evaporation indicator — buff immediately at this point.', 'Visibly wet product has not begun solvent evaporation — buffing now removes too much.', 'Ceramic coating curing does not produce significant heat — temperature is not the indicator.'] },
+  { q: 'Your extractor\'s suction feels weaker midway through a heavily soiled job. What do you check first?', opts: ['Motor overheating — stop and let it cool', 'Check and empty the waste tank — a full tank reduces suction significantly', 'Increase water pressure to compensate', 'Filter needs replacement — job cannot continue'], correct: 1, feedback: ['Overheating is possible but reduced suction mid-job is most commonly a full waste tank.', 'Correct. Waste tank capacity is the first check. It is the most common cause of reduced suction on heavily soiled jobs.', 'Water pressure and suction are separate systems.', 'A clogged filter reduces performance — but a full tank is more immediately diagnosable and resolvable mid-job.'] },
+  { q: 'Soft99 Glaco is applied correctly but streaks at a low sun angle from the driver\'s perspective. Most likely cause?', opts: ['Applied too thickly in some areas', 'Residual compounding product from adjacent correction work contaminated the glass surface before application', 'Glass has internal delamination', 'Normal appearance at low sun angle'], correct: 1, feedback: ['Thick application causes haze and poor clarity — not angle-specific streaking.', 'Correct. Compound residue from adjacent paint correction work is a common glass contamination source. IPA wipe before coating catches this.', 'Internal delamination presents as a fogged or bubbled internal layer — not surface streaking.', 'Angle-specific streaking is non-uniform bonding — a surface preparation failure.'] },
+  { q: 'You discover ceramic coating high spots on two panels the morning after application. How do you address them?', opts: ['Apply Glaco over them to blend', 'Light machine polishing with cutting compound on the affected panels, then recoat those sections', 'Use IPA to dissolve and remove the cured high spots', 'High spots are permanent once cured — client must accept them'], correct: 1, feedback: ['Glaco is a glass product — it cannot blend cured ceramic high spots.', 'Correct. Cured ceramic requires mechanical removal via machine polishing — which is why the DA polisher is a prerequisite for ceramic services.', 'IPA dissolves uncured ceramic — cured ceramic requires abrasion to remove.', 'High spots are correctable — but they require a DA polisher. This reinforces why equipment prerequisites matter.'] }
+];
+
+const ACAD_EXAM_PASS = 80;
+let acadCurrentModule = null, acadQuizAnswers = {}, acadQuizSubmitted = false;
+let examAnswers = {}, examSubmitted = false;
+
+function getAllAcadModuleIds() { return ACAD_STAGES.flatMap(s => s.modules.map(m => m.id)); }
+function isExamUnlocked() { const done = getAcadCompleted(); return getAllAcadModuleIds().every(id => done.includes(id)); }
+
+function renderAcademy() {
+  const done = getAcadCompleted();
+  const allIds = getAllAcadModuleIds();
+  const pct = Math.round((done.length / allIds.length) * 100);
+  const bar = document.getElementById('acad-progress');
+  if (bar) bar.style.width = pct + '%';
+  const wrap = document.getElementById('acad-stage-wrap');
+  if (!wrap) return;
+  let html = '';
+  ACAD_STAGES.forEach((stage, si) => {
+    const doneInStage = stage.modules.filter(m => done.includes(m.id)).length;
+    html += `<div class="acad-stage">
+      <div class="acad-stage-head">
+        <div class="acad-stage-num">${stage.num}</div>
+        <div class="acad-stage-info"><div class="acad-stage-label">${stage.label}</div><div class="acad-stage-title">${stage.title}</div></div>
+        <div class="acad-stage-progress">${doneInStage}/${stage.modules.length} complete</div>
+      </div>
+      <div class="acad-module-grid">
+        ${stage.modules.map((m, mi) => `<div class="acad-card ${done.includes(m.id)?'completed':''}" onclick="openAcadLesson(${si},${mi})">
+          <div class="acad-card-ico">${m.ico}</div>
+          <div class="acad-card-num">${m.num}</div>
+          <div class="acad-card-title">${m.title}</div>
+          <div class="acad-card-desc">${m.desc}</div>
+          <div class="acad-card-foot">${m.pills.map(p=>p==='quiz'?'<span class="trn-pill trn-pill-q">Quiz</span>':'<span class="trn-pill trn-pill-hand">Hands-On</span>').join('')}</div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  });
+  const examLocked = !isExamUnlocked();
+  const examDone = !!localStorage.getItem(ACAD_EXAM_STORE);
+  html += `<div class="acad-stage">
+    <div class="acad-stage-head">
+      <div class="acad-stage-num" style="color:var(--amber)">⚑</div>
+      <div class="acad-stage-info"><div class="acad-stage-label" style="color:var(--amber)">Final Assessment</div><div class="acad-stage-title">Professional Certification Exam</div></div>
+      ${examLocked?'<div class="acad-stage-progress">Complete all modules to unlock</div>':''}
+    </div>
+    <div class="acad-module-grid">
+      <div class="acad-card exam-card ${examLocked?'locked':''} ${examDone?'completed':''}" onclick="${examLocked?"toast('Complete all modules first','err')":'openFinalExam()'}">
+        <div class="acad-card-ico">📋</div>
+        <div class="acad-card-num">15 Questions · Pass Mark 80%</div>
+        <div class="acad-card-title">Final Exam</div>
+        <div class="acad-card-desc">${examLocked?'Complete all Stage 1–4 modules to unlock.':examDone?'Exam completed. Retake anytime.':'All modules complete. You are ready.'}</div>
+        <div class="acad-card-foot"><span class="trn-pill" style="background:var(--amber-d);color:var(--amber);border-color:rgba(212,168,67,.25)">Final Exam</span></div>
+      </div>
+    </div>
+  </div>`;
+  wrap.innerHTML = html;
+}
+
+function openAcadLesson(si, mi) {
+  const m = ACAD_STAGES[si].modules[mi];
+  acadCurrentModule = m; acadQuizAnswers = {}; acadQuizSubmitted = false;
+  document.getElementById('trn-l-ico').textContent = m.ico;
+  document.getElementById('trn-l-stage').textContent = m.num + ' — ' + ACAD_STAGES[si].title;
+  document.getElementById('trn-l-title').textContent = m.title;
+  let body = m.content;
+  if (m.quiz && m.quiz.length) {
+    body += `<div class="trn-section-lbl" style="margin-top:28px">Knowledge Check</div><div class="trn-quiz-wrap">
+      ${m.quiz.map((q,qi)=>`<div class="trn-q" id="aq-${qi}"><div class="trn-q-text">${qi+1}. ${q.q}</div>${q.opts.map((o,oi)=>`<div class="trn-opt" id="aopt-${qi}-${oi}" onclick="acadSelectOpt(${qi},${oi})"><div class="trn-opt-dot"></div><span>${o}</span></div>`).join('')}<div class="trn-q-feedback" id="afb-${qi}"></div></div>`).join('')}
+      <div class="trn-quiz-actions"><button class="btn-primary" onclick="acadSubmitQuiz()">Submit Answers</button><span class="trn-score-display" id="atrn-score"></span></div>
+      <div class="trn-result" id="atrn-result"><div class="trn-result-score" id="atrn-rscore"></div><div class="trn-result-label" id="atrn-rlabel"></div><div class="trn-result-msg" id="atrn-rmsg"></div><button class="btn-primary" style="margin-top:16px" onclick="completeAcadCurrent()">Mark Module Complete</button></div>
+    </div>`;
+  } else {
+    body += `<div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--bsoft);"><button class="btn-primary" onclick="completeAcadCurrent()">Mark Complete</button></div>`;
+  }
+  document.getElementById('trn-l-body').innerHTML = body;
+  document.getElementById('trn-overlay').classList.add('open');
+}
+
+function completeAcadCurrent() {
+  if (!acadCurrentModule) return;
+  const c = getAcadCompleted(); if (!c.includes(acadCurrentModule.id)) c.push(acadCurrentModule.id);
+  setAcadCompleted(c); toast('Module complete','ok'); closeLesson(); renderAcademy();
+}
+
+function acadSelectOpt(qi,oi) {
+  if (acadQuizSubmitted) return; acadQuizAnswers[qi]=oi;
+  acadCurrentModule.quiz[qi].opts.forEach((_,i)=>document.getElementById(`aopt-${qi}-${i}`).classList.toggle('selected',i===oi));
+}
+
+function acadSubmitQuiz() {
+  if (acadQuizSubmitted) return;
+  const q=acadCurrentModule.quiz;
+  if (q.some((_,i)=>acadQuizAnswers[i]===undefined)){toast('Answer all questions first','err');return;}
+  acadQuizSubmitted=true; let correct=0;
+  q.forEach((qItem,qi)=>{
+    const chosen=acadQuizAnswers[qi]; if(chosen===qItem.correct)correct++;
+    qItem.opts.forEach((_,oi)=>{const el=document.getElementById(`aopt-${qi}-${oi}`);el.classList.remove('selected');if(oi===qItem.correct)el.classList.add('correct');else if(oi===chosen)el.classList.add('wrong');});
+    const fb=document.getElementById(`afb-${qi}`);fb.textContent=qItem.feedback[chosen];fb.className=`trn-q-feedback show ${chosen===qItem.correct?'ok':'err'}`;
+  });
+  const pct=Math.round((correct/q.length)*100);
+  document.getElementById('atrn-rscore').textContent=pct+'%';
+  document.getElementById('atrn-rlabel').textContent=pct===100?'Perfect.':pct>=67?`${correct}/${q.length} correct — solid.`:`${correct}/${q.length} — revisit this module.`;
+  document.getElementById('atrn-rmsg').textContent=pct===100?'Full understanding confirmed. Mark complete and move forward.':pct>=67?'Review highlighted answers before progressing.':'Re-read the lesson. The gaps here show up on the job.';
+  document.getElementById('atrn-result').classList.add('show');
+  document.getElementById('atrn-score').textContent=`${correct}/${q.length} correct`;
+}
+
+function openFinalExam() {
+  examAnswers={}; examSubmitted=false;
+  document.getElementById('trn-l-ico').textContent='📋';
+  document.getElementById('trn-l-stage').textContent='Final Assessment';
+  document.getElementById('trn-l-title').textContent='Professional Certification Exam';
+  let body=`<div class="trn-callout" style="margin-bottom:20px">15 questions drawn from all four stages. Pass mark: 80% (12/15 correct). Retake as many times as needed — the goal is genuine mastery.</div><div class="trn-quiz-wrap">
+    ${FINAL_EXAM.map((q,qi)=>`<div class="trn-q" id="eq-${qi}"><div class="trn-q-text">${qi+1}. ${q.q}</div>${q.opts.map((o,oi)=>`<div class="trn-opt" id="eopt-${qi}-${oi}" onclick="examSelect(${qi},${oi})"><div class="trn-opt-dot"></div><span>${o}</span></div>`).join('')}<div class="trn-q-feedback" id="efb-${qi}"></div></div>`).join('')}
+    <div class="trn-quiz-actions"><button class="btn-primary" onclick="submitFinalExam()">Submit Exam</button><span class="trn-score-display" id="escore-disp"></span></div>
+    <div class="trn-result" id="exam-result">
+      <div class="trn-result-score" id="exam-rscore"></div><div class="trn-result-label" id="exam-rlabel"></div><div class="trn-result-msg" id="exam-rmsg"></div>
+      <div style="margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn-primary" onclick="passExam()">Record Result & Close</button>
+        <button class="btn-ghost" onclick="openFinalExam()">Retake Exam</button>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('trn-l-body').innerHTML=body;
+  document.getElementById('trn-overlay').classList.add('open');
+}
+
+function examSelect(qi,oi){
+  if(examSubmitted)return; examAnswers[qi]=oi;
+  FINAL_EXAM[qi].opts.forEach((_,i)=>document.getElementById(`eopt-${qi}-${i}`).classList.toggle('selected',i===oi));
+}
+
+function submitFinalExam(){
+  if(examSubmitted)return;
+  if(FINAL_EXAM.some((_,i)=>examAnswers[i]===undefined)){toast('Answer all 15 questions first','err');return;}
+  examSubmitted=true; let correct=0;
+  FINAL_EXAM.forEach((qItem,qi)=>{
+    const chosen=examAnswers[qi]; if(chosen===qItem.correct)correct++;
+    qItem.opts.forEach((_,oi)=>{const el=document.getElementById(`eopt-${qi}-${oi}`);el.classList.remove('selected');if(oi===qItem.correct)el.classList.add('correct');else if(oi===chosen)el.classList.add('wrong');});
+    const fb=document.getElementById(`efb-${qi}`);fb.textContent=qItem.feedback[chosen];fb.className=`trn-q-feedback show ${chosen===qItem.correct?'ok':'err'}`;
+  });
+  const pct=Math.round((correct/FINAL_EXAM.length)*100);
+  const passed=pct>=ACAD_EXAM_PASS;
+  const scoreEl=document.getElementById('exam-rscore');
+  scoreEl.textContent=pct+'%'; scoreEl.style.color=passed?'var(--green)':'var(--red)';
+  document.getElementById('exam-rlabel').textContent=passed?`${correct}/15 — Passed.`:`${correct}/15 — Not yet. Review and retake.`;
+  document.getElementById('exam-rmsg').textContent=passed?'You have demonstrated professional-level understanding across all four stages. This is the standard every client receives.':'Review the highlighted answers carefully. The questions you missed identify the specific areas requiring attention.';
+  document.getElementById('exam-result').classList.add('show');
+  document.getElementById('escore-disp').textContent=`${correct}/15`;
+}
+
+function passExam(){
+  try{localStorage.setItem(ACAD_EXAM_STORE,'passed');}catch{}
+  toast('Exam result recorded','ok'); closeLesson(); renderAcademy();
+}
+
+document.addEventListener('DOMContentLoaded',()=>{
+  setTimeout(()=>{
+    const orig=window.goTo;
+    window.goTo=function(id){
+      orig(id);
+      if(id==='training')renderTrainingModules();
+      if(id==='academy')renderAcademy();
+    };
+  },200);
 });
 </script>
 </body>
