@@ -99,15 +99,37 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
         </div>
         <div class="fg full"><label>Add-Ons or Special Instructions</label><textarea id="b-notes" placeholder="Pet hair, stains, odour, anything we should know..."></textarea></div>
       </div>
+
+      <!-- DEPOSIT CALCULATOR -->
+      <div id="deposit-box" style="display:none;margin-top:18px;background:rgba(255,255,255,.03);border:1px solid rgba(184,200,214,.18);border-radius:8px;padding:18px 20px;">
+        <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--silver-d);margin-bottom:10px;">Booking Summary</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;">
+          <span>Estimated Service Total</span>
+          <span id="dep-total" style="color:var(--text);font-weight:600;">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:6px;">
+          <span>Deposit Required (35%)</span>
+          <span id="dep-amount" style="color:#6fcfa8;font-weight:700;">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim);padding-top:8px;border-top:1px solid rgba(255,255,255,.06);">
+          <span>Balance Due on Completion</span>
+          <span id="dep-balance">—</span>
+        </div>
+        <div style="font-size:10px;color:var(--dim);margin-top:10px;line-height:1.5;">
+          A deposit secures your appointment slot. Refundable with 24+ hours notice. Non-refundable for same-day cancellation or no-show.
+          Payment instructions sent via WhatsApp after booking confirmation.
+        </div>
+      </div>
+
       <button class="btn" onclick="submitIntake()">Send Booking Request &rarr;</button>
     </div>
-    <p class="footer-note">By submitting you agree to be contacted via WhatsApp to confirm your booking.<br><a href="/">Back to ecadja.com</a></p>
+    <p class="footer-note">By submitting you agree to be contacted via WhatsApp to confirm your booking and arrange your deposit.<br><a href="/">Back to ecadja.com</a></p>
   </div>
 
   <div class="success" id="success-wrap">
     <div class="success-icon">&#9989;</div>
     <h2>Thank You for Booking</h2>
-    <p>We've received your request and will confirm your appointment via WhatsApp within a few hours. No payment required upfront.</p>
+    <p>We've received your request and will confirm your appointment via WhatsApp shortly, along with deposit payment instructions to secure your slot.</p>
     <div class="social">Follow us for before &amp; after results<br><strong>@extracleanautoja &nbsp;&middot;&nbsp; @extra.clean.auto</strong></div>
   </div>
 </div>
@@ -119,6 +141,49 @@ const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publisha
 
 const d = document.getElementById('b-date');
 if (d) { const t = new Date(); t.setDate(t.getDate()+1); d.min = t.toISOString().split('T')[0]; }
+
+// ── DEPOSIT CALCULATOR ───────────────────────────────────────────
+const PRICES = {
+  'Sedan / Car':       { 't0':[5000,6000],  't1':[8000,10000],  't2':[13000,16000], 't3':[23000,28000], 'cr':[4000,5500],  'crs':[8000,10000] },
+  'SUV / Crossover':   { 't0':[6000,7000],  't1':[10000,12000], 't2':[16000,19000], 't3':[28000,35000], 'cr':[5500,7000],  'crs':[11000,13000] },
+  'Pickup / Van':      { 't0':[7000,8000],  't1':[12000,14000], 't2':[19000,22000], 't3':[33000,41000], 'cr':[6500,8000],  'crs':[13000,15000] }
+};
+const SVC_KEY = {
+  'Tier 0 — Quick Wash':      't0',
+  'Tier 1 — Full Clean':      't1',
+  'Tier 2 — Deep Clean':      't2',
+  'Tier 3 — Showroom Detail': 't3',
+  'Cabin Revival — Refresh':  'cr',
+  'Cabin Revival — Restore':  'crs'
+};
+const DEPOSIT_RATE = 0.35;
+
+function fmtJMD(n) { return 'JMD ' + Math.round(n).toLocaleString(); }
+
+function updateDeposit() {
+  const vtype = document.getElementById('b-vtype').value;
+  const svc   = document.getElementById('b-service').value;
+  const box   = document.getElementById('deposit-box');
+
+  const key = SVC_KEY[svc];
+  if (!vtype || !key || !PRICES[vtype] || !PRICES[vtype][key]) {
+    box.style.display = 'none';
+    return;
+  }
+
+  const [lo, hi] = PRICES[vtype][key];
+  const mid       = (lo + hi) / 2;
+  const deposit   = mid * DEPOSIT_RATE;
+  const balance   = mid - deposit;
+
+  document.getElementById('dep-total').textContent   = fmtJMD(lo) + ' – ' + fmtJMD(hi);
+  document.getElementById('dep-amount').textContent  = fmtJMD(deposit);
+  document.getElementById('dep-balance').textContent = fmtJMD(balance) + ' (approx.)';
+  box.style.display = 'block';
+}
+
+document.getElementById('b-vtype').addEventListener('change', updateDeposit);
+document.getElementById('b-service').addEventListener('change', updateDeposit);
 
 async function submitIntake() {
   const name  = document.getElementById('b-name').value.trim();
@@ -175,10 +240,12 @@ async function submitIntake() {
       }
 
       // Add service record as pending — use 'Vehicle detail:' prefix so dashboard extractVehicle() can parse it
+      const depositText = document.getElementById('dep-amount') ? document.getElementById('dep-amount').textContent : '';
       const jobNotes = [
         vehicleStr ? 'Vehicle detail: ' + vehicleStr : null,
         date ? 'Requested date: ' + date : null,
         time ? 'Requested time: ' + time : null,
+        depositText && depositText !== '—' ? 'Deposit required: ' + depositText : null,
         notes || null
       ].filter(Boolean).join(' | ');
 
