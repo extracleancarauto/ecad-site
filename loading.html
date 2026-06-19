@@ -280,7 +280,7 @@ const params = new URLSearchParams(window.location.search);
 const dest   = params.get('dest') || '/thankyou';
 const extra  = params.get('q')    || '';
 setTimeout(() => {
-  window.location.href = dest + (extra ? '?' + extra : '');
+  window.location.replace(dest + (extra ? '?' + extra : ''));
 }, 3200);
 </script>
 </body>
