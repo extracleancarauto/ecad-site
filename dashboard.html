@@ -8,7 +8,7 @@
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiBmaWxsPSIjMGEwYTBhIiByeD0iNiIvPgogIDx0ZXh0IHg9IjQiIHk9IjI0IiBmb250LWZhbWlseT0iR2VvcmdpYSxzZXJpZiIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9ImJvbGQiIGZpbGw9IiNiOGM4ZDYiPkVDPC90ZXh0Pgo8L3N2Zz4=">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Sora:wght@300;400;500;600;700&display=block" rel="stylesheet">
 <style>
 /* ── RESET & ROOT ───────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1981,13 +1981,15 @@ function showModLoader(cb) {
   document.getElementById('mod-loader-vref').textContent = '\u2014 ' + v[1];
   loader.classList.remove('fade-out');
   loader.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
   setTimeout(() => {
     loader.classList.add('fade-out');
     setTimeout(() => {
       loader.style.display = 'none';
+      document.body.style.overflow = '';
       if (cb) cb();
     }, 400);
-  }, 5000);
+  }, 1800);
 }
 
 // ── TRAINING DATA ──────────────────────────────────────────────────
@@ -2222,6 +2224,7 @@ function openLesson(idx) {
   }
   document.getElementById('trn-l-body').innerHTML = body;
   document.getElementById('trn-overlay').classList.add('open');
+  document.getElementById('trn-overlay').scrollTop = 0;
   showModLoader(() => {});
 }
 
@@ -2824,6 +2827,7 @@ function openAcadLesson(si, mi) {
   }
   document.getElementById('trn-l-body').innerHTML = body;
   document.getElementById('trn-overlay').classList.add('open');
+  document.getElementById('trn-overlay').scrollTop = 0;
   showModLoader(() => {});
 }
 
@@ -2874,6 +2878,7 @@ function openFinalExam() {
   </div>`;
   document.getElementById('trn-l-body').innerHTML=body;
   document.getElementById('trn-overlay').classList.add('open');
+  document.getElementById('trn-overlay').scrollTop = 0;
   showModLoader(() => {});
 }
 
