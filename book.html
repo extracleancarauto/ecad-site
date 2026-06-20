@@ -86,6 +86,16 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
             </optgroup>
           </select>
         </div>
+        <div class="fg full"><label>When was this vehicle last professionally detailed? *</label>
+          <select id="b-condition">
+            <option value="" disabled selected>Select an option</option>
+            <option value="recent">Within the last month</option>
+            <option value="moderate">1–3 months ago</option>
+            <option value="aged">3–6 months ago</option>
+            <option value="neglected">Over 6 months ago</option>
+            <option value="never">Never / Not sure</option>
+          </select>
+        </div>
         <div class="fg"><label>Preferred Date</label><input type="date" id="b-date"></div>
         <div class="fg"><label>Preferred Time</label>
           <select id="b-time">
@@ -158,12 +168,22 @@ const SVC_KEY = {
 };
 const DEPOSIT_RATE = 0.35;
 
+// Condition weighting — how far into the price range to anchor the estimate
+const CONDITION_WEIGHT = {
+  'recent':    0.20,  // lightly used range, closer to low end
+  'moderate':  0.40,
+  'aged':      0.65,
+  'neglected': 0.85,  // closer to high end
+  'never':     0.90
+};
+
 function fmtJMD(n) { return 'JMD ' + Math.round(n).toLocaleString(); }
 
 function updateDeposit() {
-  const vtype = document.getElementById('b-vtype').value;
-  const svc   = document.getElementById('b-service').value;
-  const box   = document.getElementById('deposit-box');
+  const vtype     = document.getElementById('b-vtype').value;
+  const svc       = document.getElementById('b-service').value;
+  const condition = document.getElementById('b-condition').value;
+  const box       = document.getElementById('deposit-box');
 
   const key = SVC_KEY[svc];
   if (!vtype || !key || !PRICES[vtype] || !PRICES[vtype][key]) {
@@ -172,9 +192,10 @@ function updateDeposit() {
   }
 
   const [lo, hi] = PRICES[vtype][key];
-  const mid       = (lo + hi) / 2;
-  const deposit   = mid * DEPOSIT_RATE;
-  const balance   = mid - deposit;
+  const weight    = CONDITION_WEIGHT[condition] !== undefined ? CONDITION_WEIGHT[condition] : 0.5;
+  const estimate  = lo + (hi - lo) * weight;
+  const deposit   = estimate * DEPOSIT_RATE;
+  const balance   = estimate - deposit;
 
   document.getElementById('dep-total').textContent   = fmtJMD(lo) + ' – ' + fmtJMD(hi);
   document.getElementById('dep-amount').textContent  = fmtJMD(deposit);
@@ -182,6 +203,7 @@ function updateDeposit() {
   box.style.display = 'block';
 }
 
+document.getElementById('b-condition').addEventListener('change', updateDeposit);
 document.getElementById('b-vtype').addEventListener('change', updateDeposit);
 document.getElementById('b-service').addEventListener('change', updateDeposit);
 
@@ -240,11 +262,14 @@ async function submitIntake() {
       }
 
       // Add service record as pending — use 'Vehicle detail:' prefix so dashboard extractVehicle() can parse it
-      const depositText = document.getElementById('dep-amount') ? document.getElementById('dep-amount').textContent : '';
+      const depositText  = document.getElementById('dep-amount') ? document.getElementById('dep-amount').textContent : '';
+      const conditionSel  = document.getElementById('b-condition');
+      const conditionText = conditionSel ? conditionSel.options[conditionSel.selectedIndex].text : '';
       const jobNotes = [
         vehicleStr ? 'Vehicle detail: ' + vehicleStr : null,
         date ? 'Requested date: ' + date : null,
         time ? 'Requested time: ' + time : null,
+        conditionText ? 'Last detailed: ' + conditionText : null,
         depositText && depositText !== '—' ? 'Deposit required: ' + depositText : null,
         notes || null
       ].filter(Boolean).join(' | ');
