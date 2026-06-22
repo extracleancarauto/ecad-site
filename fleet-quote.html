@@ -221,6 +221,16 @@ nav {
 }
 .tier-note strong { color: var(--silver); font-weight: 500; }
 
+/* ── TERMS & COVERAGE ────────────────────────────────────────── */
+.terms-sec { padding: 56px 0; position: relative; z-index: 1; border-top: 1px solid var(--bsoft); }
+.terms-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+.term-card { background: var(--s1); border: 1px solid var(--bsoft); border-radius: 8px; padding: 24px 22px; }
+.term-icon { font-size: 22px; margin-bottom: 12px; display: block; }
+.term-title { font-size: 13px; font-weight: 600; color: var(--silver-l); margin-bottom: 8px; letter-spacing: .01em; }
+.term-body { font-size: 12.5px; color: var(--muted); line-height: 1.7; }
+.term-card.flag { border-left: 3px solid var(--copper); }
+.term-card.flag .term-title { color: var(--copper-l); }
+
 /* ── FORM SECTION ─────────────────────────────────────────────── */
 .fleet-form-sec {
   padding: 64px 0 80px;
@@ -441,6 +451,7 @@ footer {
   .nav-cta { display: none; }
   .burger { display: flex; }
   .tier-strip { grid-template-columns: 1fr; }
+  .terms-grid { grid-template-columns: 1fr; }
   .fleet-form-layout { grid-template-columns: 1fr; }
   .ffl-left { position: static; }
   .form-grid { grid-template-columns: 1fr; }
@@ -558,6 +569,34 @@ footer {
     </div>
     <div class="tier-note fade">
       <strong>Not sure which tier fits?</strong> Fill out the form below with your vehicle count and types — we'll calculate the right tier and reply with a fully itemised rate sheet within 24 hours. No commitment to quote.
+    </div>
+  </div>
+</section>
+
+<!-- ── TERMS & COVERAGE ───────────────────────────────────────────── -->
+<section class="terms-sec">
+  <div class="wrap">
+    <div class="fade">
+      <span class="sec-label">Before You Decide</span>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:clamp(22px,3.5vw,36px);font-weight:300;margin-bottom:6px;">What you should <span class="silver">know upfront.</span></h2>
+      <p style="font-size:13px;color:var(--muted);max-width:520px;line-height:1.75;margin-bottom:0;">Straight answers to the questions every fleet decision-maker asks before signing.</p>
+    </div>
+    <div class="terms-grid fade">
+      <div class="term-card flag">
+        <span class="term-icon">&#128737;&#65039;</span>
+        <div class="term-title">Coverage & Liability</div>
+        <div class="term-body">Commercial insurance conversion is currently in progress. Until completed, work is carried out with the same care and accountability we apply to every vehicle — full pre-service condition documentation and photos protect both parties. We'll confirm in writing once commercial coverage is active.</div>
+      </div>
+      <div class="term-card">
+        <span class="term-icon">&#128179;</span>
+        <div class="term-title">Payment Terms</div>
+        <div class="term-body">Consolidated monthly invoicing, due within 7 days of receipt. Cash, bank transfer, or WiPay accepted. GCT receipts available on request for Tier C accounts. No deposit required to receive your initial quote.</div>
+      </div>
+      <div class="term-card">
+        <span class="term-icon">&#128196;</span>
+        <div class="term-title">Contract Flexibility</div>
+        <div class="term-body">Month-to-month for Tier A &amp; B — cancel anytime with 14 days notice. Tier C annual rate lock-in includes a 30-day mutual exit clause. No long-term lock-in required to get started.</div>
+      </div>
     </div>
   </div>
 </section>
