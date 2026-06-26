@@ -1582,7 +1582,7 @@ async function loadPending() {
           `<span class="td-m">${x(r.service_tier || '—')}</span>`,
           `<span class="td-m">${fd(r.service_date)}</span>`,
           `<span class="td-m" style="max-width:140px;white-space:normal;display:inline-block;">${x(r.clients?.service_address || '—')}</span>`,
-          `<span class="td-d" style="max-width:130px;white-space:normal;display:inline-block;">${x(r.job_notes || '—')}</span>`,
+          renderNotesCell(r.job_notes, 130),
           `<div style="display:flex;gap:6px;flex-wrap:wrap;">
              <button class="btn-act btn-approve" onclick="approveSR('${r.id}')">Approve</button>
              <button class="btn-act btn-reject"  onclick="rejectSR('${r.id}')">Reject</button>
@@ -1765,7 +1765,7 @@ async function loadRecords() {
         `<span class="td-m">${x(r.service_tier || '—')}</span>`,
         `<span class="td-m">${fd(r.service_date)}</span>`,
         pBadge(r.payment_status),
-        `<span class="td-d" style="max-width:180px;white-space:normal;display:inline-block;">${x(r.job_notes || '—')}</span>`,
+        renderNotesCell(r.job_notes, 180),
         `<div style="display:flex;gap:6px;flex-wrap:wrap;">
            <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',service:r.service_tier||'',date:r.service_date||'',notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
            ${(r.payment_status||'').toLowerCase() !== 'paid' && (r.payment_status||'').toLowerCase() !== 'completed'
@@ -1782,6 +1782,30 @@ async function loadRecords() {
 // ── HELPERS ───────────────────────────────────────────────────────
 function x(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function extractPhotos(notes) {
+  if (!notes) return [];
+  const m = notes.match(/Photos:\s*([^|]+)/i);
+  if (!m) return [];
+  return m[1].split(',').map(s => s.trim()).filter(u => u.startsWith('http'));
+}
+
+function notesWithoutPhotos(notes) {
+  if (!notes) return '';
+  return notes.replace(/Photos:\s*[^|]+\|?\s*/i, '').trim();
+}
+
+function renderNotesCell(notes, maxWidth) {
+  const photos = extractPhotos(notes);
+  const textOnly = notesWithoutPhotos(notes);
+  let html = `<span class="td-d" style="max-width:${maxWidth}px;white-space:normal;display:inline-block;">${x(textOnly || (photos.length ? '' : '—'))}</span>`;
+  if (photos.length) {
+    html += `<div style="display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;">` +
+      photos.map(url => `<a href="${x(url)}" target="_blank" rel="noopener" style="display:block;width:36px;height:36px;border-radius:4px;overflow:hidden;border:1px solid var(--bsoft);flex-shrink:0;"><img src="${x(url)}" style="width:100%;height:100%;object-fit:cover;display:block;" loading="lazy"></a>`).join('') +
+      `</div>`;
+  }
+  return html;
 }
 
 function fd(ds) {
