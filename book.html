@@ -29,6 +29,13 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
 .fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--silver-d)}
 .fg select option{background:#1a1a1a}
 .fg textarea{resize:vertical;min-height:80px}
+.fg input[type=file]{padding:9px 13px;cursor:pointer}
+.fg input[type=file]::-webkit-file-upload-button{background:var(--silver-d);color:#000;border:none;border-radius:3px;padding:6px 12px;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;cursor:pointer;margin-right:10px}
+.photo-thumb{position:relative;width:64px;height:64px;border-radius:6px;overflow:hidden;border:1px solid var(--bsoft)}
+.photo-thumb img{width:100%;height:100%;object-fit:cover;display:block}
+.photo-thumb .rm{position:absolute;top:2px;right:2px;background:rgba(0,0,0,.7);color:#fff;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;line-height:1}
+#photo-fg.field-error label{color:var(--red)}
+#photo-fg.field-error{border:1px solid rgba(207,91,91,.4);border-radius:6px;padding:10px;margin:-10px -10px 14px}
 .btn{background:var(--silver);color:#000;font-family:'Sora',sans-serif;font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:14px 28px;border-radius:4px;border:none;cursor:pointer;transition:background .2s;width:100%;margin-top:8px}
 .btn:hover{background:var(--silver-l)}
 .success{display:none;text-align:center;background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:48px 28px}
@@ -96,6 +103,12 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
             <option value="never">Never / Not sure</option>
           </select>
         </div>
+        <div class="fg full" id="photo-fg">
+          <label>Vehicle Condition Photos * <span style="color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0;">(2–3 photos — exterior, interior, any specific concerns)</span></label>
+          <input type="file" id="b-photos" accept="image/*" multiple>
+          <div id="photo-preview" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;"></div>
+          <div style="font-size:10.5px;color:var(--dim);margin-top:8px;line-height:1.5;">Photos let us quote accurately and prepare the right equipment — bookings without photos may be delayed or adjusted on arrival.</div>
+        </div>
         <div class="fg"><label>Preferred Date</label><input type="date" id="b-date"></div>
         <div class="fg"><label>Preferred Time</label>
           <select id="b-time">
@@ -148,6 +161,53 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
 emailjs.init({ publicKey: 'b3LqB5Gho1tr958F5' });
 const { createClient } = supabase;
 const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
+
+// ── PHOTO UPLOAD ─────────────────────────────────────────────────
+let selectedPhotos = [];
+
+document.getElementById('b-photos').addEventListener('change', function(e) {
+  selectedPhotos = Array.from(e.target.files);
+  renderPhotoPreview();
+});
+
+function renderPhotoPreview() {
+  const wrap = document.getElementById('photo-preview');
+  wrap.innerHTML = '';
+  selectedPhotos.forEach((file, i) => {
+    const url = URL.createObjectURL(file);
+    const div = document.createElement('div');
+    div.className = 'photo-thumb';
+    div.innerHTML = `<img src="${url}"><div class="rm" onclick="removePhoto(${i})">&times;</div>`;
+    wrap.appendChild(div);
+  });
+  document.getElementById('photo-fg').classList.remove('field-error');
+}
+
+function removePhoto(i) {
+  selectedPhotos.splice(i, 1);
+  renderPhotoPreview();
+}
+
+async function uploadPhotos(phone) {
+  const urls = [];
+  for (let i = 0; i < selectedPhotos.length; i++) {
+    const file = selectedPhotos[i];
+    const ext  = file.name.split('.').pop();
+    const path = `${phone.replace(/\D/g,'')}-${Date.now()}-${i}.${ext}`;
+    try {
+      const { error } = await db.storage.from('inspection-photos').upload(path, file);
+      if (!error) {
+        const { data } = db.storage.from('inspection-photos').getPublicUrl(path);
+        if (data && data.publicUrl) urls.push(data.publicUrl);
+      } else {
+        console.log('Photo upload error:', error);
+      }
+    } catch (e) {
+      console.log('Photo upload exception:', e);
+    }
+  }
+  return urls;
+}
 
 const d = document.getElementById('b-date');
 if (d) { const t = new Date(); t.setDate(t.getDate()+1); d.min = t.toISOString().split('T')[0]; }
@@ -220,6 +280,13 @@ async function submitIntake() {
     return;
   }
 
+  if (selectedPhotos.length === 0) {
+    document.getElementById('photo-fg').classList.add('field-error');
+    document.getElementById('photo-fg').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    alert('Please attach at least 2 photos of the vehicle (exterior and interior) before booking.');
+    return;
+  }
+
   const vdetail = document.getElementById('b-vdetail').value.trim();
   const plate   = document.getElementById('b-plate').value.trim();
   const color   = document.getElementById('b-color').value.trim();
@@ -231,7 +298,10 @@ async function submitIntake() {
   const vehicleStr = [vtype, vdetail, color, plate].filter(Boolean).join(' — ');
 
   const btn = document.querySelector('.btn');
-  btn.textContent = 'Sending...'; btn.disabled = true;
+  btn.textContent = 'Uploading photos...'; btn.disabled = true;
+
+  const photoUrls = await uploadPhotos(phone);
+  btn.textContent = 'Sending...';
 
   try {
     // Upsert client
@@ -271,6 +341,7 @@ async function submitIntake() {
         time ? 'Requested time: ' + time : null,
         conditionText ? 'Last detailed: ' + conditionText : null,
         depositText && depositText !== '—' ? 'Deposit required: ' + depositText : null,
+        photoUrls.length ? 'Photos: ' + photoUrls.join(', ') : 'Photos: none uploaded (check manually)',
         notes || null
       ].filter(Boolean).join(' | ');
 
