@@ -151,15 +151,50 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
   <p class="note">Estimates based on standard vehicle condition. Final price confirmed before work begins.</p>
 
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 var vtype = null;
 var tier  = null;
 
-var P = {
+// Fallback pricing — used instantly on load and if the live fetch below ever fails.
+// Kept in sync manually as a safety net; service_pricing table in Supabase is the source of truth.
+var DEFAULT_P = {
   sedan:  {t0:[5000,6000],  t1:[8000,10000],  t2:[13000,16000], t3:[23000,28000], cr:[4000,5500],  crs:[8000,10000]},
   suv:    {t0:[6000,7000],  t1:[10000,12000], t2:[16000,19000], t3:[28000,35000], cr:[5500,7000],  crs:[11000,13000]},
   pickup: {t0:[7000,8000],  t1:[12000,14000], t2:[19000,22000], t3:[33000,41000], cr:[6500,8000],  crs:[13000,15000]}
 };
+var P = DEFAULT_P;
+
+var VTYPE_KEY = { 'Sedan / Car': 'sedan', 'SUV / Crossover': 'suv', 'Pickup / Van': 'pickup' };
+
+async function loadLivePricing() {
+  try {
+    var { createClient } = supabase;
+    var db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
+    var { data, error } = await db.from('service_pricing').select('*');
+    if (error || !data || !data.length) return; // keep DEFAULT_P, fail silently
+
+    var fresh = { sedan: {}, suv: {}, pickup: {} };
+    data.forEach(function(row) {
+      var vk = VTYPE_KEY[row.vehicle_type];
+      if (vk) fresh[vk][row.service_key] = [row.price_low, row.price_high];
+    });
+
+    // Only adopt the fetched table if every cell DEFAULT_P has is present —
+    // a partially-seeded table should never silently blank out prices.
+    var complete = Object.keys(DEFAULT_P).every(function(vk) {
+      return Object.keys(DEFAULT_P[vk]).every(function(sk) { return fresh[vk] && fresh[vk][sk]; });
+    });
+    if (!complete) return;
+
+    P = fresh;
+    if (vtype && tier) recalc(); // refresh an already-visible result with live numbers
+  } catch (e) {
+    console.log('Live pricing fetch skipped, using defaults:', e);
+  }
+}
+loadLivePricing();
+
 
 var TN = {
   t0:'Quick Wash', t1:'Full Clean', t2:'Deep Clean',

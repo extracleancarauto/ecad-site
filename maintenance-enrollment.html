@@ -195,10 +195,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;
   <div class="suc-title">Enrollment <em style="font-style:italic;color:var(--silver)">Confirmed</em></div>
   <div class="suc-sub">The client has been enrolled in the Extra Clean Maintenance Plan. A notification has been sent to the office.</div>
   <div class="suc-name" id="suc-name"></div>
-  <div style="display:flex;gap:12px;margin-top:32px;justify-content:center;flex-wrap:wrap">
-    <button class="btn-new" onclick="printAgreement()" style="border-color:var(--silver-d);color:var(--silver-l)">Print Agreement (×2)</button>
-    <button class="btn-new" onclick="resetForm()">Enrol Another Client</button>
-  </div>
+  <button class="btn-new" onclick="resetForm()">Enrol Another Client</button>
 </div>
 
 <!-- ══ APP ════════════════════════════════════════════════════ -->
@@ -373,7 +370,7 @@ body::before{content:'';position:fixed;inset:0;z-index:0;
 <script>
 // ── CONSTANTS ─────────────────────────────────────────────────────
 const SB_URL = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhzeW5keHFyY25xc3Z4Y3Jwa3F4Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3OTQ5NDA3NywiZXhwIjoyMDk1MDcwMDc3fQ.FS8VtEPS86jaJHxCDCBEy2HUiELEnXzX7xMOA2cucM0';
+const SB_KEY = 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI';
 const EJS_SVC = 'service_zesixiz';
 const EJS_TPL = 'template_j082fuq';
 const EJS_KEY = 'b3LqB5Gho1tr958F5';
@@ -581,142 +578,6 @@ async function confirmEnrollment() {
   // ── 3. Show success ─────────────────────────────────────────────
   document.getElementById('suc-name').textContent = name + ' · ' + vehicle;
   document.getElementById('success').style.display = 'flex';
-}
-
-// ── PRINT AGREEMENT ───────────────────────────────────────────────
-function printAgreement() {
-  const name      = document.getElementById('f-name').value.trim();
-  const phone     = document.getElementById('f-phone').value.trim();
-  const email     = document.getElementById('f-email').value.trim() || 'Not provided';
-  const address   = document.getElementById('f-address').value.trim();
-  const vehicle   = document.getElementById('f-vehicle').value.trim();
-  const colour    = document.getElementById('f-colour').value.trim();
-  const plate     = document.getElementById('f-plate').value.trim().toUpperCase();
-  const startdate = document.getElementById('f-startdate').value;
-  const prefday   = document.getElementById('f-prefday').value;
-  const notes     = document.getElementById('f-notes').value.trim() || 'None';
-  const sigdata   = getSigData();
-  const planLabels = { sedan_7200:'Sedan / Car — JMD 7,200 per service', suv_9000:'SUV / Crossover — JMD 9,000 per service', van_10800:'Pickup / Van — JMD 10,800 per service' };
-  const planVal   = document.querySelector('input[name=plan]:checked')?.value || '';
-  const plan      = planLabels[planVal] || planVal;
-  const dateStr   = new Date().toLocaleDateString('en-JM', {year:'numeric',month:'long',day:'numeric'});
-  const startFmt  = startdate ? new Date(startdate + 'T00:00:00').toLocaleDateString('en-JM', {year:'numeric',month:'long',day:'numeric'}) : '';
-
-  const copy = (label) => `
-    <div class="copy-label">${label}</div>
-    <div class="header">
-      <div class="brand-block">
-        <div class="brand-name">EXTRA CLEAN AUTO DETAILING</div>
-        <div class="brand-sub">MOBILE PROFESSIONAL DETAILING · JAMAICA</div>
-      </div>
-      <div class="doc-title">MAINTENANCE PLAN AGREEMENT</div>
-      <div class="doc-sub">Recurring Service Enrollment &amp; Terms</div>
-    </div>
-
-    <div class="rule"></div>
-
-    <div class="section-title">01 · CLIENT &amp; VEHICLE INFORMATION</div>
-    <table class="info-table">
-      <tr><td class="lbl">Client Full Name</td><td>${name}</td></tr>
-      <tr><td class="lbl">Contact Number</td><td>${phone}</td></tr>
-      <tr><td class="lbl">Email Address</td><td>${email}</td></tr>
-      <tr><td class="lbl">Service Address</td><td>${address}</td></tr>
-      <tr><td class="lbl">Vehicle Make &amp; Model</td><td>${vehicle}</td></tr>
-      <tr><td class="lbl">Year &amp; Colour</td><td>${colour}</td></tr>
-      <tr><td class="lbl">Licence Plate</td><td>${plate}</td></tr>
-      <tr><td class="lbl">Plan Start Date</td><td>${startFmt}</td></tr>
-    </table>
-
-    <div class="section-title" style="margin-top:18px">02 · MAINTENANCE PLAN SELECTION</div>
-    <table class="info-table">
-      <tr><td class="lbl">Selected Plan</td><td>${plan}</td></tr>
-      <tr><td class="lbl">Preferred Service Day</td><td>${prefday}</td></tr>
-      <tr><td class="lbl">Service Address</td><td>${address}</td></tr>
-      <tr><td class="lbl">Notes</td><td>${notes}</td></tr>
-    </table>
-
-    <div class="section-title" style="margin-top:18px">03 · WHAT YOUR MAINTENANCE PLAN INCLUDES</div>
-    <div class="terms-body">
-      By enrolling in the Extra Clean Auto Detailing Maintenance Plan, the Client receives the following with each scheduled service:
-      <ul>
-        <li>Full Tier 1 Clean service at the discounted Maintenance Price (10% savings off standard pricing).</li>
-        <li>WhatsApp reminder notification sent three (3) days before each scheduled service.</li>
-        <li>Priority scheduling — Maintenance Plan clients receive first access to available time slots.</li>
-        <li>Complimentary tyre dressing and air freshener with every maintenance service.</li>
-        <li>Flexible rescheduling within the same week with 24 hours notice.</li>
-        <li>Service history tracking for all work performed on the vehicle.</li>
-      </ul>
-    </div>
-
-    <div class="section-title" style="margin-top:14px">04 · WHAT'S NOT INCLUDED</div>
-    <div class="terms-body">
-      The Maintenance Plan covers Tier 1 Full Clean only. Tier 2, Tier 3, and all add-on services (clay bar, ceramic sealant, paint correction, headlight restoration, odour treatment) are available separately at standard rates. Each vehicle requires its own Maintenance Plan enrollment.
-    </div>
-
-    <div class="section-title" style="margin-top:14px">05 · CANCELLATION &amp; TERMS</div>
-    <div class="terms-body">
-      The Maintenance Plan may be cancelled by either party with seven (7) days written notice. Pricing changes will be communicated with thirty (30) days notice to existing plan clients. The plan rate is locked for a minimum of six (6) months from the start date.
-    </div>
-
-    <div class="sig-section">
-      <div class="sig-col">
-        <div class="sig-label">Client Signature</div>
-        ${sigdata ? `<img src="${sigdata}" class="sig-img" alt="Client Signature">` : '<div class="sig-box"></div>'}
-        <div class="sig-line">${name}</div>
-        <div class="sig-date">Date: ${dateStr}</div>
-      </div>
-      <div class="sig-col">
-        <div class="sig-label">Authorised by — Extra Clean Auto Detailing</div>
-        <div class="sig-box"></div>
-        <div class="sig-line">Perry — Owner / Operator</div>
-        <div class="sig-date">Date: ${dateStr}</div>
-      </div>
-    </div>
-
-    <div class="footer">
-      Extra Clean Auto Detailing · extracleancarwash@gmail.com · ecadja.com · @extracleanautoja<br>
-      This agreement is valid from the plan start date and governed by the terms stated above.
-    </div>
-  `;
-
-  const win = window.open('', '_blank');
-  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ECAD Maintenance Agreement — ${name}</title>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Sora:wght@300;400;500&display=swap');
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Sora',sans-serif;font-size:10.5px;color:#1a1a1a;background:#fff}
-    .copy{width:100%;padding:28px 32px 24px;page-break-after:always}
-    .copy:last-child{page-break-after:auto}
-    .copy-label{font-size:8px;letter-spacing:.25em;text-transform:uppercase;color:#888;margin-bottom:10px;border-bottom:1px solid #e0e0e0;padding-bottom:6px}
-    .header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px}
-    .brand-name{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;letter-spacing:.06em;color:#0d1a2e}
-    .brand-sub{font-size:7.5px;letter-spacing:.2em;text-transform:uppercase;color:#666;margin-top:2px}
-    .doc-title{font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:600;letter-spacing:.08em;text-align:right;color:#0d1a2e}
-    .doc-sub{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#888;text-align:right;margin-top:2px}
-    .rule{height:1.5px;background:linear-gradient(90deg,#0d1a2e,#8a9bac,transparent);margin:10px 0}
-    .section-title{font-size:8px;letter-spacing:.22em;text-transform:uppercase;color:#0d1a2e;font-weight:500;margin:14px 0 6px;padding-bottom:3px;border-bottom:1px solid #e8e8e8}
-    .info-table{width:100%;border-collapse:collapse}
-    .info-table tr{border-bottom:1px solid #f0f0f0}
-    .info-table td{padding:4px 6px;vertical-align:top}
-    .lbl{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:#666;width:36%;font-weight:400}
-    .terms-body{font-size:9.5px;color:#333;line-height:1.65}
-    .terms-body ul{margin:5px 0 0 16px}
-    .terms-body li{margin-bottom:3px}
-    .sig-section{display:flex;gap:32px;margin-top:20px}
-    .sig-col{flex:1}
-    .sig-label{font-size:8px;letter-spacing:.16em;text-transform:uppercase;color:#666;margin-bottom:6px}
-    .sig-img{max-height:60px;max-width:100%;display:block;margin-bottom:4px}
-    .sig-box{height:60px;border-bottom:1px solid #1a1a1a;margin-bottom:4px}
-    .sig-line{font-family:'Cormorant Garamond',serif;font-size:11px;color:#1a1a1a}
-    .sig-date{font-size:8.5px;color:#666;margin-top:2px}
-    .footer{margin-top:16px;font-size:7.5px;color:#999;text-align:center;letter-spacing:.06em;border-top:1px solid #e8e8e8;padding-top:8px}
-    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-  </style></head><body>
-    <div class="copy">${copy('CLIENT COPY')}</div>
-    <div class="copy">${copy('EXTRA CLEAN AUTO DETAILING — OFFICE COPY')}</div>
-  <script>window.onload=function(){window.print()}<\/script>
-  </body></html>`);
-  win.document.close();
 }
 
 // ── RESET ─────────────────────────────────────────────────────────

@@ -558,11 +558,41 @@ document.getElementById('ticket-no').textContent =
   'NO. EC-' + Date.now().toString(36).slice(-5).toUpperCase();
 
 // ── DEPOSIT CALCULATOR ───────────────────────────────────────────
-const PRICES = {
+// Fallback pricing — used instantly on load and if the live fetch below ever fails.
+// Kept in sync manually as a safety net; service_pricing table in Supabase is the source of truth.
+const DEFAULT_PRICES = {
   'Sedan / Car':       { 't0':[5000,6000],  't1':[8000,10000],  't2':[13000,16000], 't3':[23000,28000], 'cr':[4000,5500],  'crs':[8000,10000] },
   'SUV / Crossover':   { 't0':[6000,7000],  't1':[10000,12000], 't2':[16000,19000], 't3':[28000,35000], 'cr':[5500,7000],  'crs':[11000,13000] },
   'Pickup / Van':      { 't0':[7000,8000],  't1':[12000,14000], 't2':[19000,22000], 't3':[33000,41000], 'cr':[6500,8000],  'crs':[13000,15000] }
 };
+let PRICES = DEFAULT_PRICES;
+
+async function loadLivePricing() {
+  try {
+    const { data, error } = await db.from('service_pricing').select('*');
+    if (error || !data || !data.length) return; // keep DEFAULT_PRICES, fail silently
+
+    const fresh = {};
+    data.forEach(row => {
+      if (!fresh[row.vehicle_type]) fresh[row.vehicle_type] = {};
+      fresh[row.vehicle_type][row.service_key] = [row.price_low, row.price_high];
+    });
+
+    // Only adopt the fetched table if every cell DEFAULT_PRICES has is present —
+    // a partially-seeded table should never silently blank out prices mid-booking.
+    const complete = Object.keys(DEFAULT_PRICES).every(vt =>
+      Object.keys(DEFAULT_PRICES[vt]).every(sk => fresh[vt] && fresh[vt][sk])
+    );
+    if (!complete) return;
+
+    PRICES = fresh;
+    updateDeposit(); // refresh an already-visible estimate with live numbers
+  } catch (e) {
+    console.log('Live pricing fetch skipped, using defaults:', e);
+  }
+}
+loadLivePricing();
+
 const SVC_KEY = {
   'Tier 0 — Quick Wash':      't0',
   'Tier 1 — Full Clean':      't1',
