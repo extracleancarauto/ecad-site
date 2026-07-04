@@ -104,6 +104,7 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>emailjs.init('v8hsDP3tvGl5hTKRPOA7f');</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
@@ -247,21 +248,50 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
 </div><!-- /wrap -->
 <script>
 // ── LOGIN GATE ───────────────────────────────────────────────────
-const INV_USERS = { 'Hyperion': 'ecad2026', 'Axion': 'Ax#7291' };
-function invLogin() {
+// Real Supabase Auth — no password is stored in this file. Accounts live under
+// Supabase → Authentication → Users. Same accounts as dashboard.html.
+const SB_URL = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co';
+const SB_KEY = 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI';
+const { createClient } = supabase;
+const invDb = createClient(SB_URL, SB_KEY);
+const INV_USER_EMAIL = { 'Hyperion': 'hyperion@ecadja.com', 'Axion': 'axion@ecadja.com' };
+
+async function invLogin() {
   const user = document.getElementById('il-user').value.trim();
   const pass = document.getElementById('il-pass').value;
   const err  = document.getElementById('il-err');
-  if (INV_USERS[user] && INV_USERS[user] === pass) {
-    document.getElementById('inv-login').style.display = 'none';
-    document.getElementById('inv-main').style.display  = 'block';
-    initInvoice();
-  } else {
+  const email = INV_USER_EMAIL[user];
+
+  if (!email) {
     err.textContent = 'Invalid credentials.';
     document.getElementById('il-pass').value = '';
     document.getElementById('il-pass').focus();
+    return;
   }
+
+  const { data, error } = await invDb.auth.signInWithPassword({ email, password: pass });
+
+  if (error || !data.session) {
+    err.textContent = 'Invalid credentials.';
+    document.getElementById('il-pass').value = '';
+    document.getElementById('il-pass').focus();
+    return;
+  }
+
+  document.getElementById('inv-login').style.display = 'none';
+  document.getElementById('inv-main').style.display  = 'block';
+  initInvoice();
 }
+
+// Restore an existing signed-in session on reload, instead of forcing re-login every visit.
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await invDb.auth.getSession();
+  if (!session) return;
+  document.getElementById('inv-login').style.display = 'none';
+  document.getElementById('inv-main').style.display  = 'block';
+  initInvoice();
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('il-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') invLogin(); });
   document.getElementById('il-user').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('il-pass').focus(); });

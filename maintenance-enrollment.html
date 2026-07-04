@@ -375,22 +375,42 @@ const EJS_SVC = 'service_zesixiz';
 const EJS_TPL = 'template_j082fuq';
 const EJS_KEY = 'b3LqB5Gho1tr958F5';
 
-const USERS = { hyperion: 'ecad2026', axion: 'Ax#7291' };
+// Friendly usernames map to real Supabase Auth accounts — no password stored in this file.
+// Accounts live under Supabase → Authentication → Users. Same accounts as dashboard.html.
+const USER_EMAIL = { hyperion: 'hyperion@ecadja.com', axion: 'axion@ecadja.com' };
 
 const { createClient } = window.supabase;
 const db = createClient(SB_URL, SB_KEY);
 emailjs.init(EJS_KEY);
 
+// Restore an existing signed-in session on reload, instead of forcing re-login every visit.
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return;
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+});
+
 // ── LOGIN ─────────────────────────────────────────────────────────
-function doLogin() {
+async function doLogin() {
   const un = document.getElementById('l-un').value.trim().toLowerCase();
   const pw = document.getElementById('l-pw').value;
-  if (USERS[un] && USERS[un] === pw) {
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  } else {
+  const email = USER_EMAIL[un];
+
+  if (!email) {
     document.getElementById('l-err').textContent = 'Invalid credentials.';
+    return;
   }
+
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pw });
+
+  if (error || !data.session) {
+    document.getElementById('l-err').textContent = 'Invalid credentials.';
+    return;
+  }
+
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
 }
 document.getElementById('l-pw').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 
