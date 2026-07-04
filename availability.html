@@ -214,10 +214,11 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
 const { createClient } = supabase;
 const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
 
-const USERS = {
-  'hyperion': { password: 'ecad2026', role: 'admin' },
-  'axion':    { password: 'Ax#7291',  role: 'view-only' }
-};
+// Friendly usernames map to real Supabase Auth accounts — no password stored in this file.
+// Accounts live under Supabase → Authentication → Users. Same accounts as dashboard.html.
+const USER_EMAIL   = { hyperion: 'hyperion@ecadja.com', axion: 'axion@ecadja.com' };
+const ROLE_BY_USER = { hyperion: 'admin',               axion: 'view-only' };
+const ROLE_BY_EMAIL = { 'hyperion@ecadja.com': 'admin', 'axion@ecadja.com': 'view-only' };
 
 let currentRole = null;
 let availData = {};
@@ -227,26 +228,52 @@ let editingDate = null;
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+// Restore an existing signed-in session on reload, instead of forcing re-login every visit.
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return;
+  currentRole = ROLE_BY_EMAIL[session.user.email] || 'view-only';
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  const now = new Date();
+  viewYear = now.getFullYear();
+  viewMonth = now.getMonth();
+  init();
+});
+
 // ── AUTH ──────────────────────────────────────────────────────────
-function doLogin() {
+async function doLogin() {
   const un = document.getElementById('un').value.trim().toLowerCase();
   const pw = document.getElementById('pw').value;
-  const user = USERS[un];
-  if (user && user.password === pw) {
-    currentRole = user.role;
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    const now = new Date();
-    viewYear = now.getFullYear();
-    viewMonth = now.getMonth();
-    init();
-  } else {
+  const email = USER_EMAIL[un];
+
+  if (!email) {
     const e = document.getElementById('login-err');
     e.style.display = 'block';
     setTimeout(() => e.style.display = 'none', 3000);
+    return;
   }
+
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pw });
+
+  if (error || !data.session) {
+    const e = document.getElementById('login-err');
+    e.style.display = 'block';
+    setTimeout(() => e.style.display = 'none', 3000);
+    return;
+  }
+
+  currentRole = ROLE_BY_USER[un];
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  const now = new Date();
+  viewYear = now.getFullYear();
+  viewMonth = now.getMonth();
+  init();
 }
 function doLogout() {
+  db.auth.signOut();
+  currentRole = null;
   document.getElementById('app').style.display = 'none';
   document.getElementById('login').style.display = 'flex';
   document.getElementById('pw').value = '';
