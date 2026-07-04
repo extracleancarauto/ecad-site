@@ -380,16 +380,8 @@ const EJS_KEY = 'b3LqB5Gho1tr958F5';
 const USER_EMAIL = { hyperion: 'hyperion@ecadja.com', axion: 'axion@ecadja.com' };
 
 const { createClient } = window.supabase;
-const db = createClient(SB_URL, SB_KEY);
+const db = createClient(SB_URL, SB_KEY, { auth: { persistSession: false } });
 emailjs.init(EJS_KEY);
-
-// Restore an existing signed-in session on reload, instead of forcing re-login every visit.
-window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await db.auth.getSession();
-  if (!session) return;
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-});
 
 // ── LOGIN ─────────────────────────────────────────────────────────
 async function doLogin() {

@@ -253,7 +253,7 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
 const SB_URL = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co';
 const SB_KEY = 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI';
 const { createClient } = supabase;
-const invDb = createClient(SB_URL, SB_KEY);
+const invDb = createClient(SB_URL, SB_KEY, { auth: { persistSession: false } });
 const INV_USER_EMAIL = { 'Hyperion': 'hyperion@ecadja.com', 'Axion': 'axion@ecadja.com' };
 
 async function invLogin() {
@@ -282,15 +282,6 @@ async function invLogin() {
   document.getElementById('inv-main').style.display  = 'block';
   initInvoice();
 }
-
-// Restore an existing signed-in session on reload, instead of forcing re-login every visit.
-window.addEventListener('DOMContentLoaded', async () => {
-  const { data: { session } } = await invDb.auth.getSession();
-  if (!session) return;
-  document.getElementById('inv-login').style.display = 'none';
-  document.getElementById('inv-main').style.display  = 'block';
-  initInvoice();
-});
 
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('il-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') invLogin(); });
