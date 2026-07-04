@@ -127,9 +127,9 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
     <div class="login-title">Availability</div>
     <div class="login-sub">Extra Clean Auto Detailing</div>
     <label for="un">Username</label>
-    <input type="text" id="un" placeholder="Username">
+    <input type="text" id="un" placeholder="Username" autocomplete="username">
     <label for="pw">Password</label>
-    <input type="password" id="pw" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" id="pw" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="login-err">Incorrect credentials</div>
     <button class="btn" onclick="doLogin()">Enter</button>
   </div>
