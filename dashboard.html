@@ -761,7 +761,8 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 /* ── WEATHER ────────────────────────────────────────────────────── */
 .weather-strip {
   display: flex; gap: 10px; overflow-x: auto;
-  padding: 18px 22px 22px;
+  padding: 18px 22px 22px; width: 100%; min-width: 0;
+  -webkit-overflow-scrolling: touch;
 }
 .weather-day {
   flex: 1 0 108px; min-width: 108px;
@@ -997,6 +998,17 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
   .burger-btn { display: flex; }
   .topbar-label { display: none; }
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+/* Phone width: the clock + user pill + Availability link + Sign Out
+   together don't fit any narrower than this — drop the two status
+   indicators first since they're informational, not actions, and keep
+   both real buttons (Availability, Sign Out) reachable without having
+   to scroll the whole topbar sideways to reach them. */
+@media (max-width: 480px) {
+  .live-clock { display: none; }
+  .topbar-user-pill { display: none; }
+  .topbar-right { gap: 8px; }
+  .btn-avail, .btn-logout { padding: 7px 10px; font-size: 9px; }
 }
 /* ── MAINTENANCE EXTRAS ─────────────────────────────────────────── */
 .b-maint {
