@@ -107,6 +107,13 @@ nav {
 .step-num { font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
 .step-title { font-family: 'Cormorant Garamond', serif; font-size: 23px; font-weight: 400; line-height: 1; color: var(--text); }
 .step-hint { font-size: 11px; color: var(--dim); margin-left: auto; letter-spacing: .04em; }
+#time-avail-note {
+  margin-top: 14px; padding: 12px 14px; border-radius: 8px;
+  font-size: 12px; line-height: 1.5; border: 1px solid;
+}
+#time-avail-note.note-info  { background: rgba(184,200,214,.06); border-color: var(--border); color: var(--muted); }
+#time-avail-note.note-warn  { background: var(--copper-b); border-color: rgba(201,120,60,.4); color: var(--copper-l); }
+#time-avail-note strong { color: var(--text); }
 
 .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 .fg { display: flex; flex-direction: column; gap: 6px; }
@@ -420,6 +427,7 @@ nav {
           </select>
         </div>
       </div>
+      <div id="time-avail-note" style="display:none;"></div>
     </div>
 
     <!-- DEPOSIT TICKET -->
@@ -552,6 +560,102 @@ async function uploadPhotos(phone) {
 
 const dateEl = document.getElementById('b-date');
 if (dateEl) { const t = new Date(); t.setDate(t.getDate()+1); dateEl.min = t.toISOString().split('T')[0]; }
+
+// ── SLOT CONFLICT CHECK ───────────────────────────────────────────
+// Each slot is a fixed 2-hour window. Booking directly into an already-taken
+// slot, or the slot immediately touching it, leaves no room for invoicing,
+// walkaround, maintenance lock-in, packing up, and travel to the next job.
+// Skipping one adjacent slot guarantees a minimum 120-minute buffer between
+// jobs (see the slot math: each window is 2 hours, contiguous, no gaps) —
+// comfortably inside the 90–120 minute target, and usually more since real
+// jobs rarely run the full window.
+const TIME_SLOTS = [
+  'Early Morning (7:00–9:00 AM)',
+  'Morning (9:00–11:00 AM)',
+  'Midday (11:00 AM–1:00 PM)',
+  'Afternoon (1:00–3:00 PM)',
+  'Late Afternoon (3:00–5:00 PM)'
+];
+
+let takenSlotIndexes = [];
+
+async function refreshTimeAvailability() {
+  const date = document.getElementById('b-date').value;
+  const timeSel = document.getElementById('b-time');
+  const note = document.getElementById('time-avail-note');
+  takenSlotIndexes = [];
+
+  // Reset all options to enabled/plain first. Note: these <option> elements
+  // have no explicit value="" attribute, so .value is computed live from
+  // textContent — resetting from opt.value would re-append onto whatever
+  // we last wrote. Reset from the canonical TIME_SLOTS array instead.
+  Array.from(timeSel.options).forEach((opt, i) => {
+    if (!opt.value) return;
+    const slotIdx = i - 1;
+    opt.disabled = false;
+    opt.textContent = TIME_SLOTS[slotIdx];
+  });
+
+  if (!date) { note.style.display = 'none'; return; }
+
+  try {
+    const { data, error } = await db.from('service_records')
+      .select('job_notes, payment_status')
+      .eq('service_date', date)
+      .neq('payment_status', 'Rejected');
+    if (error) throw error;
+
+    (data || []).forEach(r => {
+      const m = (r.job_notes || '').match(/Requested time:\s*([^|]+)/i);
+      if (!m) return;
+      const label = m[1].trim();
+      const idx = TIME_SLOTS.indexOf(label);
+      if (idx !== -1) takenSlotIndexes.push(idx);
+    });
+  } catch (e) {
+    console.log('Slot check failed:', e);
+    note.style.display = 'none';
+    return;
+  }
+
+  if (!takenSlotIndexes.length) { note.style.display = 'none'; return; }
+
+  // Block taken slots + their immediate neighbors (not enough buffer)
+  const blocked = new Set();
+  takenSlotIndexes.forEach(i => {
+    blocked.add(i);
+    if (i > 0) blocked.add(i - 1);
+    if (i < TIME_SLOTS.length - 1) blocked.add(i + 1);
+  });
+
+  Array.from(timeSel.options).forEach((opt, i) => {
+    if (!opt.value) return;
+    const slotIdx = i - 1; // account for the disabled placeholder option
+    if (blocked.has(slotIdx)) {
+      opt.disabled = true;
+      opt.textContent = opt.value + (takenSlotIndexes.includes(slotIdx) ? ' — Already booked' : ' — Too close to another job');
+    }
+  });
+
+  // If the currently selected time just became blocked, clear it
+  if (timeSel.selectedOptions[0]?.disabled) timeSel.value = '';
+
+  const recommended = TIME_SLOTS.findIndex((_, i) => !blocked.has(i));
+  const bookedLabels = [...new Set(takenSlotIndexes)].map(i => TIME_SLOTS[i]).join(', ');
+
+  if (recommended === -1) {
+    note.className = 'note-warn';
+    note.innerHTML = `<strong>This day is fully booked</strong> with enough buffer between jobs. Already booked: ${bookedLabels}. Please pick another date.`;
+  } else {
+    note.className = 'note-warn';
+    note.innerHTML = `<strong>Already booked:</strong> ${bookedLabels}. The slots right next to it are held back for invoicing, walkaround, and travel time. <strong>Next best slot: ${TIME_SLOTS[recommended]}</strong> — guarantees at least a 2-hour gap.`;
+  }
+  note.style.display = 'block';
+}
+
+if (dateEl) dateEl.addEventListener('change', refreshTimeAvailability);
+const timeSelEl = document.getElementById('b-time');
+if (timeSelEl) timeSelEl.addEventListener('focus', refreshTimeAvailability);
 
 /* Ticket number: EC- + last 5 of timestamp in base36, uppercased */
 document.getElementById('ticket-no').textContent =
@@ -697,6 +801,20 @@ async function submitIntake() {
   if (!name || !phone || !addr || !vtype || !svc || !email || !condition) {
     showErr('Please fill in all required fields marked *, including your email and when the vehicle was last detailed.');
     return;
+  }
+
+  // Final guard: re-check the selected slot isn't blocked, in case the client
+  // never triggered the date/time refresh (e.g. picked time before date).
+  const chosenTime = document.getElementById('b-time').value;
+  if (chosenTime) {
+    await refreshTimeAvailability();
+    const timeSel = document.getElementById('b-time');
+    const stillValid = Array.from(timeSel.options).some(o => o.value === chosenTime && !o.disabled);
+    if (!stillValid) {
+      showErr('That time slot is no longer available with enough buffer between jobs — please choose the recommended slot shown above.');
+      document.getElementById('time-avail-note').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
   }
 
   if (selectedPhotos.length === 0) {

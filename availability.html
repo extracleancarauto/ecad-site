@@ -97,6 +97,13 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
 .day-card-title{font-family:'Cormorant Garamond',serif;font-size:24px;color:var(--text);margin-bottom:4px}
 .day-card-sub{font-size:11px;color:var(--muted);margin-bottom:20px}
 .status-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.dp-bookings{background:var(--s3);border:1px solid var(--bsoft);border-radius:6px;padding:10px 12px;margin-bottom:14px;text-align:left;max-height:160px;overflow-y:auto}
+.dp-bookings-lbl{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.dp-booking-row{font-size:12px;color:var(--text);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.dp-booking-row:last-child{border-bottom:none}
+.dp-booking-row .nm{font-weight:600;color:var(--silver-l)}
+.dp-booking-row .mt{font-size:10.5px;color:var(--muted);display:block;margin-top:2px}
+.dp-booking-row .pend{color:var(--amber);font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-left:6px}
 .status-btn{padding:10px 8px;border-radius:6px;border:1px solid var(--bsoft);font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .2s;text-align:center;background:var(--s3);color:var(--muted)}
 .status-btn.active-available{background:rgba(76,175,130,.15);border-color:rgba(76,175,130,.4);color:var(--green)}
 .status-btn.active-booked{background:rgba(201,120,60,.15);border-color:rgba(201,120,60,.4);color:var(--copper)}
@@ -127,9 +134,9 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
     <div class="login-title">Availability</div>
     <div class="login-sub">Extra Clean Auto Detailing</div>
     <label for="un">Username</label>
-    <input type="text" id="un" placeholder="Username" autocomplete="username">
+    <input type="text" id="un" placeholder="Username">
     <label for="pw">Password</label>
-    <input type="password" id="pw" placeholder="Password" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" id="pw" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="login-err">Incorrect credentials</div>
     <button class="btn" onclick="doLogin()">Enter</button>
   </div>
@@ -202,6 +209,7 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
       <div class="status-btn" id="sb-booked" onclick="setStatus('booked')">&#126; Booked</div>
       <div class="status-btn" id="sb-fully-booked" onclick="setStatus('fully-booked')">&#10005; Full</div>
     </div>
+    <div class="dp-bookings" id="dp-bookings" style="display:none;"></div>
     <textarea class="note-input" id="dp-note" placeholder="Optional note (e.g. 2 slots taken, morning only...)"></textarea>
     <div class="panel-btns">
       <button class="btn sm ghost" onclick="closeDayPanel()">Cancel</button>
@@ -212,15 +220,19 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
 
 <script>
 const { createClient } = supabase;
-const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI', { auth: { persistSession: false } });
+const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
 
-// Friendly usernames map to real Supabase Auth accounts — no password stored in this file.
-// Accounts live under Supabase → Authentication → Users. Same accounts as dashboard.html.
-const USER_EMAIL   = { hyperion: 'hyperion@ecadja.com', axion: 'axion@ecadja.com' };
-const ROLE_BY_USER = { hyperion: 'admin',               axion: 'view-only' };
+const USERS = {
+  'hyperion': { password: 'ecad2026', role: 'admin' },
+  'axion':    { password: 'Ax#7291',  role: 'view-only' }
+};
 
 let currentRole = null;
 let availData = {};
+let bookingsByDate = {};
+// How many confirmed/pending jobs in one day count as "fully booked".
+// Adjust this if actual daily capacity changes (e.g. smaller jobs allow 3).
+const FULL_DAY_JOBS = 2;
 let viewYear, viewMonth;
 let editingDate = null;
 
@@ -228,38 +240,25 @@ const MONTHS = ['January','February','March','April','May','June','July','August
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
 // ── AUTH ──────────────────────────────────────────────────────────
-async function doLogin() {
+function doLogin() {
   const un = document.getElementById('un').value.trim().toLowerCase();
   const pw = document.getElementById('pw').value;
-  const email = USER_EMAIL[un];
-
-  if (!email) {
+  const user = USERS[un];
+  if (user && user.password === pw) {
+    currentRole = user.role;
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    const now = new Date();
+    viewYear = now.getFullYear();
+    viewMonth = now.getMonth();
+    init();
+  } else {
     const e = document.getElementById('login-err');
     e.style.display = 'block';
     setTimeout(() => e.style.display = 'none', 3000);
-    return;
   }
-
-  const { data, error } = await db.auth.signInWithPassword({ email, password: pw });
-
-  if (error || !data.session) {
-    const e = document.getElementById('login-err');
-    e.style.display = 'block';
-    setTimeout(() => e.style.display = 'none', 3000);
-    return;
-  }
-
-  currentRole = ROLE_BY_USER[un];
-  document.getElementById('login').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  const now = new Date();
-  viewYear = now.getFullYear();
-  viewMonth = now.getMonth();
-  init();
 }
 function doLogout() {
-  db.auth.signOut();
-  currentRole = null;
   document.getElementById('app').style.display = 'none';
   document.getElementById('login').style.display = 'flex';
   document.getElementById('pw').value = '';
@@ -268,7 +267,7 @@ function doLogout() {
 
 // ── INIT ──────────────────────────────────────────────────────────
 async function init() {
-  await loadAvailability();
+  await Promise.all([loadAvailability(), loadBookings()]);
   renderCalendar();
   renderUpcoming();
   renderBanner();
@@ -278,6 +277,41 @@ async function loadAvailability() {
   const { data } = await db.from('availability').select('*');
   availData = {};
   if (data) data.forEach(d => { availData[d.date] = d; });
+}
+
+// Pulls real bookings from service_records so the calendar reflects what's
+// actually booked, not just what was manually marked. Excludes rejected
+// bookings; pending AND confirmed both occupy a slot since pending requests
+// are exactly the double-booking risk this is meant to catch.
+async function loadBookings() {
+  bookingsByDate = {};
+  try {
+    const today = new Date();
+    const cutoff = new Date(today.getFullYear(), today.getMonth() - 1, 1).toISOString().split('T')[0];
+    const { data, error } = await db.from('service_records')
+      .select('service_date, service_tier, payment_status, job_notes, clients(full_name)')
+      .neq('payment_status', 'Rejected')
+      .gte('service_date', cutoff);
+    if (error) throw error;
+    (data || []).forEach(r => {
+      if (!r.service_date) return;
+      if (!bookingsByDate[r.service_date]) bookingsByDate[r.service_date] = [];
+      bookingsByDate[r.service_date].push(r);
+    });
+  } catch (e) {
+    console.error('loadBookings failed', e);
+  }
+}
+
+// Combines the owner's manually-set base status with real booking counts.
+// Manual "fully-booked" always wins (e.g. an off-shift day). Otherwise the
+// actual number of bookings that day upgrades available -> booked -> full.
+function effectiveStatus(dateStr, manualStatus) {
+  if (manualStatus === 'fully-booked') return 'fully-booked';
+  const count = (bookingsByDate[dateStr] || []).length;
+  if (count >= FULL_DAY_JOBS) return 'fully-booked';
+  if (count >= 1) return 'booked';
+  return manualStatus;
 }
 
 // ── CALENDAR ──────────────────────────────────────────────────────
@@ -313,7 +347,8 @@ function renderCalendar() {
     let cls = 'cal-day';
 
     if (avail) {
-      cls += ' ' + avail.status;
+      const eff = effectiveStatus(dateStr, avail.status);
+      cls += ' ' + eff;
       if (dateObj < today) cls += ' past';
     } else {
       cls += ' work';
@@ -328,9 +363,11 @@ function renderCalendar() {
     cell.appendChild(num);
 
     if (avail) {
+      const eff = effectiveStatus(dateStr, avail.status);
       const lbl = document.createElement('div');
       lbl.className = 'day-label';
-      lbl.textContent = avail.status === 'available' ? 'open' : avail.status === 'booked' ? 'busy' : 'full';
+      const count = (bookingsByDate[dateStr] || []).length;
+      lbl.textContent = eff === 'available' ? 'open' : eff === 'booked' ? `busy (${count})` : 'full';
       cell.appendChild(lbl);
 
       if (currentRole === 'admin' && dateObj >= today) {
@@ -441,6 +478,24 @@ function openDayPanel(dateStr, dateObj) {
     document.getElementById('sb-' + s).className = 'status-btn' + (avail?.status === s ? ' active-' + s : '');
   });
 
+  const bookings = bookingsByDate[dateStr] || [];
+  const bkEl = document.getElementById('dp-bookings');
+  if (bookings.length) {
+    bkEl.style.display = 'block';
+    bkEl.innerHTML = `<div class="dp-bookings-lbl">Booked (${bookings.length}) — real bookings, not the manual status</div>` +
+      bookings.map(b => {
+        const name = b.clients?.full_name || 'Unnamed client';
+        const tier = b.service_tier || 'Service TBC';
+        const timeNote = (b.job_notes || '').match(/Requested time:\s*([^\n]+)/i);
+        const time = timeNote ? timeNote[1] : null;
+        const pending = b.payment_status === 'Pending' ? '<span class="pend">Pending</span>' : '';
+        return `<div class="dp-booking-row"><span class="nm">${name}</span>${pending}<span class="mt">${tier}${time ? ' · ' + time : ''}</span></div>`;
+      }).join('');
+  } else {
+    bkEl.style.display = 'none';
+    bkEl.innerHTML = '';
+  }
+
   document.getElementById('day-panel').classList.add('open');
 }
 
@@ -464,7 +519,7 @@ async function saveDay() {
 
   await db.from('availability').upsert({ date: editingDate, status, note }, { onConflict: 'date' });
   closeDayPanel();
-  await loadAvailability();
+  await Promise.all([loadAvailability(), loadBookings()]);
   renderCalendar();
   renderUpcoming();
   renderBanner();
