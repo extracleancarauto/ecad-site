@@ -758,6 +758,40 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── WEATHER ────────────────────────────────────────────────────── */
+.weather-strip {
+  display: flex; gap: 10px; overflow-x: auto;
+  padding: 18px 22px 22px;
+}
+.weather-day {
+  flex: 1 0 108px; min-width: 108px;
+  background: var(--s2);
+  border: 1px solid var(--bsoft);
+  border-radius: 8px;
+  padding: 14px 8px 12px;
+  text-align: center;
+  transition: border-color .2s;
+}
+.weather-day.is-today { border-color: rgba(184,200,214,.4); }
+.weather-day-name {
+  font-size: 9px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 8px;
+}
+.weather-icon { font-size: 26px; margin-bottom: 6px; line-height: 1; }
+.weather-temp {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px; color: var(--silver-l); font-weight: 400;
+}
+.weather-temp .lo { color: var(--dim); font-size: 12px; margin-left: 3px; }
+.weather-rain { font-size: 9.5px; color: var(--muted); margin-top: 5px; }
+.weather-tag {
+  font-size: 7.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  padding: 3px 6px; border-radius: 3px; margin-top: 9px; display: inline-block; white-space: nowrap;
+}
+.weather-tag.good    { background: var(--green-d); color: var(--green); }
+.weather-tag.caution { background: var(--amber-d); color: var(--amber); }
+.weather-tag.avoid   { background: var(--red-d);   color: var(--red); }
+
 /* ── DOCUMENTS ──────────────────────────────────────────────────── */
 .doc-grid {
   display: grid;
@@ -1233,6 +1267,16 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 
         <div class="section-card">
           <div class="sc-head">
+            <span class="sc-title">This Week's Weather</span>
+            <span class="sc-meta" id="weather-meta">Kingston / St. Andrew — plan outdoor jobs around it</span>
+          </div>
+          <div class="weather-strip" id="weather-strip">
+            <div class="loading">Loading</div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="sc-head">
             <span class="sc-title">Recent Bookings</span>
             <button class="btn-ghost" onclick="goTo('pending')">View Pending →</button>
           </div>
@@ -1461,6 +1505,26 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         <div class="view-head">
           <span class="view-eyebrow">Reference Library</span>
           <h1 class="view-h1">Operations <em>Documents</em></h1>
+        </div>
+
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Culture &amp; Direction</span>
+            <span class="sc-meta">Why this business exists, and the standard it's held to.</span>
+          </div>
+          <div style="padding:18px 22px 22px;">
+            <div class="doc-grid">
+              <div class="doc-card">
+                <span class="doc-cat">Foundation</span>
+                <span class="doc-title">Mission &amp; Values</span>
+                <span class="doc-desc">Purpose, standard, and direction — what ECAD is being built toward and why, beyond the numbers.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('mission-values','Mission & Values')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/mission-values.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="section-card">
@@ -1763,7 +1827,7 @@ function goTo(name) {
   document.getElementById('v-' + name).classList.add('active');
   document.getElementById('nb-' + name).classList.add('active');
 
-  if (name === 'overview')    loadOverview();
+  if (name === 'overview')    { loadOverview(); loadWeather(); }
   if (name === 'pending')     loadPending();
   if (name === 'bookings')    loadBookings();
   if (name === 'clients')     loadClients();
@@ -1816,7 +1880,58 @@ function closeSidebar() {
 // ── BOOT ─────────────────────────────────────────────────────────
 async function bootData() {
   await loadOverview();
+  loadWeather();
   await refreshBadge();
+}
+
+// ── WEATHER (Open-Meteo — free, no key, Kingston/St. Andrew) ──────
+const WMO = {
+  0:['☀️','Clear'], 1:['🌤️','Mostly Clear'], 2:['⛅','Partly Cloudy'], 3:['☁️','Cloudy'],
+  45:['🌫️','Foggy'], 48:['🌫️','Foggy'],
+  51:['🌦️','Light Drizzle'], 53:['🌦️','Drizzle'], 55:['🌧️','Heavy Drizzle'],
+  61:['🌦️','Light Rain'], 63:['🌧️','Rain'], 65:['🌧️','Heavy Rain'],
+  80:['🌦️','Rain Showers'], 81:['🌧️','Rain Showers'], 82:['⛈️','Violent Showers'],
+  95:['⛈️','Thunderstorm'], 96:['⛈️','Storm w/ Hail'], 99:['⛈️','Storm w/ Hail']
+};
+function weatherTag(code, tMax, precipProb) {
+  if (precipProb >= 60 || [65,82,95,96,99].includes(code)) return ['avoid', 'Rain likely'];
+  if (precipProb >= 35 || [61,63,80,81].includes(code))    return ['caution', 'Rain possible'];
+  if (tMax >= 33) return ['caution', 'Very hot'];
+  return ['good', 'Good for jobs'];
+}
+async function loadWeather() {
+  const strip = document.getElementById('weather-strip');
+  if (!strip) return;
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=17.9970&longitude=-76.7936'
+      + '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max'
+      + '&timezone=America%2FJamaica&forecast_days=7';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('weather fetch failed');
+    const data = await res.json();
+    const days = data.daily.time;
+    const cards = days.map((dateStr, i) => {
+      const code = data.daily.weathercode[i];
+      const tMax = Math.round(data.daily.temperature_2m_max[i]);
+      const tMin = Math.round(data.daily.temperature_2m_min[i]);
+      const precip = data.daily.precipitation_probability_max[i] ?? 0;
+      const [icon, label] = WMO[code] || ['🌡️', '—'];
+      const [tagClass, tagText] = weatherTag(code, tMax, precip);
+      const d = new Date(dateStr + 'T12:00:00');
+      const isToday = i === 0;
+      const dayName = isToday ? 'Today' : d.toLocaleDateString('en-US', { weekday: 'short' });
+      return `<div class="weather-day${isToday ? ' is-today' : ''}">
+        <div class="weather-day-name">${dayName}</div>
+        <div class="weather-icon" title="${label}">${icon}</div>
+        <div class="weather-temp">${tMax}°<span class="lo">${tMin}°</span></div>
+        <div class="weather-rain">💧 ${precip}%</div>
+        <span class="weather-tag ${tagClass}">${tagText}</span>
+      </div>`;
+    }).join('');
+    strip.innerHTML = cards;
+  } catch (err) {
+    strip.innerHTML = '<div class="empty" style="padding:24px;"><div class="empty-txt">Could not load forecast right now.</div></div>';
+  }
 }
 
 // ── OVERVIEW ─────────────────────────────────────────────────────
