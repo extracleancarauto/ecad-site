@@ -600,15 +600,19 @@ async function refreshTimeAvailability() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('job_notes, payment_status')
+      .select('time_slot, job_notes, payment_status')
       .eq('service_date', date)
       .neq('payment_status', 'Rejected');
     if (error) throw error;
 
     (data || []).forEach(r => {
-      const m = (r.job_notes || '').match(/Requested time:\s*([^|]+)/i);
-      if (!m) return;
-      const label = m[1].trim();
+      // Prefer the structured column; fall back to parsing job_notes for
+      // any bookings made before this column existed.
+      let label = r.time_slot;
+      if (!label) {
+        const m = (r.job_notes || '').match(/Requested time:\s*([^|]+)/i);
+        label = m ? m[1].trim() : null;
+      }
       const idx = TIME_SLOTS.indexOf(label);
       if (idx !== -1) takenSlotIndexes.push(idx);
     });
@@ -841,6 +845,9 @@ async function submitIntake() {
   const photoUrls = await uploadPhotos(phone);
   btn.textContent = 'Sending...';
 
+  let bookingSaved = false;
+  let bookingErrorMsg = '';
+
   try {
     // Upsert client
     const { data: existing } = await db.from('clients').select('id').eq('phone', phone).maybeSingle();
@@ -884,16 +891,41 @@ async function submitIntake() {
         notes || null
       ].filter(Boolean).join(' | ');
 
-      await db.from('service_records').insert([{
+      // This insert can now be rejected by the database's own slot-buffer
+      // trigger (see slot_buffer_migration.sql), not just the client-side
+      // check above. If it's rejected here, the booking genuinely did not
+      // save — this must NOT fall through to "booking confirmed" emails.
+      const { error: srError } = await db.from('service_records').insert([{
         client_id: clientId,
         vehicle_id: vehicleId,
         service_date: date || new Date().toISOString().split('T')[0],
         service_tier: svc,
+        time_slot: time || null,
         job_notes: jobNotes || null,
         payment_status: 'Pending'
       }]);
+
+      if (srError) {
+        bookingErrorMsg = /buffer window|conflicts with an existing booking/i.test(srError.message)
+          ? 'That time slot was just taken by another booking. Please pick a different time.'
+          : 'Something went wrong saving your booking. Please try again or contact us directly on WhatsApp.';
+        throw new Error(bookingErrorMsg);
+      }
+      bookingSaved = true;
     }
-  } catch (e) { console.log('DB:', e); }
+  } catch (e) {
+    console.log('DB:', e);
+    if (!bookingErrorMsg) bookingErrorMsg = 'Something went wrong saving your booking. Please try again or contact us directly on WhatsApp.';
+  }
+
+  if (!bookingSaved) {
+    btn.textContent = 'Send Booking Request →';
+    btn.disabled = false;
+    showErr(bookingErrorMsg);
+    await refreshTimeAvailability();
+    document.getElementById('time-avail-note').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
 
   // Send emails and wait before redirecting
   const emailPromises = [];
