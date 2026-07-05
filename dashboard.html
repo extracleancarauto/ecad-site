@@ -2140,9 +2140,10 @@ async function loadClients() {
 }
 
 async function delClient(id, name) {
-  if (!confirm(`Delete client "${name}"?\n\nLinked service records will also be removed.`)) return;
+  if (!confirm(`Delete client "${name}"?\n\nLinked vehicles and service records will also be removed. This can't be undone.`)) return;
   try {
     await db.from('service_records').delete().eq('client_id', id);
+    await db.from('vehicles').delete().eq('client_id', id);
     await db.from('clients').delete().eq('id', id);
     toast('Client removed', '');
     loadClients();
