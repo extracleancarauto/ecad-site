@@ -455,7 +455,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
 
 <div class="avail-banner" id="avail-banner">
   <span id="avail-text">Loading availability...</span>
-  <a href="/book">Book Now &rarr;</a>
+  <a href="/loading?dest=/book&label=Preparing%20your%20booking&sub=One%20moment%E2%80%A6&ms=1100">Book Now &rarr;</a>
 </div>
 <nav>
   <div class="nav-inner">
@@ -1115,7 +1115,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       <p>Select your service, confirm your details, and secure your appointment with a deposit. Takes less than two minutes.</p>
     </div>
     <div class="fade" style="max-width:480px;margin:40px auto 0;text-align:center;">
-      <a href="/loading?dest=/book" class="btn-submit" style="display:inline-block;text-decoration:none;padding:18px 48px;width:auto;">
+      <a href="/loading?dest=/book&label=Preparing%20your%20booking&sub=One%20moment%E2%80%A6&ms=1100" class="btn-submit" style="display:inline-block;text-decoration:none;padding:18px 48px;width:auto;">
         Book Now &rarr;
       </a>
       <p class="form-disc" style="margin-top:18px;">
@@ -1184,44 +1184,18 @@ emailjs.init({ publicKey: 'b3LqB5Gho1tr958F5' });
 const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
 
 // ── AVAILABILITY BANNER ──────────────────────────────────────────
-// Mirrors the exact same escalation rule as availability.html's admin view:
-// a day manually marked "available" still shows as booked/full here once
-// real bookings land on it. Computed independently in both files rather
-// than persisted in one column, so the owner's manual off-shift flag is
-// never silently overwritten. If FULL_DAY_JOBS ever changes, update it
-// in both places — availability.html and here.
-const FULL_DAY_JOBS = 2;
-
-function effectiveStatus(manualStatus, bookingCount) {
-  if (manualStatus === 'fully-booked') return 'fully-booked';
-  if (bookingCount >= FULL_DAY_JOBS) return 'fully-booked';
-  if (bookingCount >= 1) return 'booked';
-  return manualStatus;
-}
-
 async function loadAvailBanner() {
   try {
     const today = new Date().toISOString().split('T')[0];
+    const res = await db.from('availability')
+      .select('date,status')
+      .gte('date', today)
+      .order('date', { ascending: true })
+      .limit(30);
 
-    const [availRes, bookingsRes] = await Promise.all([
-      db.from('availability').select('date,status').gte('date', today).order('date', { ascending: true }).limit(30),
-      db.from('service_records').select('service_date').neq('payment_status', 'Rejected').gte('service_date', today)
-    ]);
+    if (!res.data || !res.data.length) return;
 
-    if (!availRes.data || !availRes.data.length) return;
-
-    const bookingCounts = {};
-    (bookingsRes.data || []).forEach(r => {
-      if (!r.service_date) return;
-      bookingCounts[r.service_date] = (bookingCounts[r.service_date] || 0) + 1;
-    });
-
-    const withEffective = availRes.data.map(d => ({
-      date: d.date,
-      status: effectiveStatus(d.status, bookingCounts[d.date] || 0)
-    }));
-
-    const avail = withEffective.filter(d => d.status !== 'fully-booked');
+    const avail = res.data.filter(d => d.status !== 'fully-booked');
     if (!avail.length) {
       document.getElementById('avail-text').textContent = 'Currently fully booked — check back soon or contact us directly.';
       document.getElementById('avail-banner').style.display = 'block';

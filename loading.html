@@ -232,8 +232,8 @@ body::before{
   <div class="bubbles" id="bubbles"></div>
 </div>
 
-<p class="label">Confirming your booking</p>
-<p class="sub">Please wait a moment&hellip;</p>
+<p class="label" id="label-text">Confirming your booking</p>
+<p class="sub" id="sub-text">Please wait a moment&hellip;</p>
 <div class="bar-wrap"><div class="bar-fill"></div></div>
 
 <script>
@@ -276,12 +276,32 @@ sprayConfig.forEach(s => {
 });
 
 // ── Redirect after animation completes ──────────────────────────
+// dest/q: where to go, unchanged from before (book.html's post-submit
+// flow still works exactly as it did).
+// label/sub/ms: new, optional — let plain page-to-page navigation
+// (index<->book) show accurate text and a shorter wait instead of
+// inheriting "Confirming your booking" and a full 3.2s meant for an
+// actual submission.
 const params = new URLSearchParams(window.location.search);
 const dest   = params.get('dest') || '/thankyou';
 const extra  = params.get('q')    || '';
+const label  = params.get('label');
+const sub    = params.get('sub');
+const ms     = parseInt(params.get('ms'), 10) || 3200;
+
+if (label) document.getElementById('label-text').textContent = label;
+if (sub)   document.getElementById('sub-text').textContent = sub;
+
+// Scale the progress bar animation to match a shorter/longer wait so it
+// doesn't look stalled if ms is set much lower than the default 3.2s.
+if (ms !== 3200) {
+  const barFill = document.querySelector('.bar-fill');
+  if (barFill) barFill.style.animationDuration = (ms / 1000) + 's';
+}
+
 setTimeout(() => {
   window.location.replace(dest + (extra ? '?' + extra : ''));
-}, 3200);
+}, ms);
 </script>
 </body>
 </html>
