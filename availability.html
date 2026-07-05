@@ -99,6 +99,32 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
 .status-btns{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
 .dp-bookings{background:var(--s3);border:1px solid var(--bsoft);border-radius:6px;padding:10px 12px;margin-bottom:14px;text-align:left;max-height:160px;overflow-y:auto}
 .dp-bookings-lbl{font-size:8px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+
+/* WEATHER */
+.weather-strip{display:flex;gap:8px;overflow-x:auto;padding:14px 4px 4px}
+.weather-day{flex:1 0 92px;min-width:92px;background:var(--s2);border:1px solid var(--bsoft);border-radius:8px;padding:12px 6px 10px;text-align:center;cursor:pointer;transition:border-color .2s}
+.weather-day:hover,.weather-day.is-today{border-color:var(--border)}
+.weather-day-name{font-size:8px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+.weather-icon{font-size:22px;margin-bottom:4px;line-height:1}
+.weather-temp{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--silver-l)}
+.weather-temp .lo{color:var(--dim);font-size:11px;margin-left:2px}
+.weather-rain{font-size:9px;color:var(--muted);margin-top:4px}
+.weather-tag{font-size:7px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 5px;border-radius:3px;margin-top:7px;display:inline-block;white-space:nowrap}
+.weather-tag.good{background:rgba(76,175,130,.14);color:var(--green)}
+.weather-tag.caution{background:rgba(201,168,76,.16);color:var(--amber)}
+.weather-tag.avoid{background:rgba(207,91,91,.14);color:var(--red)}
+
+/* Detailed weather block inside the day panel */
+.dp-weather{background:var(--s3);border:1px solid var(--bsoft);border-radius:6px;padding:12px 14px;margin-bottom:14px;text-align:left}
+.dp-weather-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.dp-weather-icon{font-size:24px}
+.dp-weather-title{font-family:'Cormorant Garamond',serif;font-size:16px;color:var(--silver-l)}
+.dp-weather-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;margin-bottom:10px}
+.dp-weather-stat{font-size:11px;color:var(--text)}
+.dp-weather-stat .lbl{display:block;font-size:8px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:2px}
+.dp-weather-note{font-size:11px;line-height:1.5;color:var(--muted);border-top:1px solid var(--bsoft);padding-top:9px}
+.dp-weather-note strong{color:var(--text)}
+.dp-weather-unavailable{font-size:11px;color:var(--dim);font-style:italic}
 .dp-booking-row{font-size:12px;color:var(--text);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .dp-booking-row:last-child{border-bottom:none}
 .dp-booking-row .nm{font-weight:600;color:var(--silver-l)}
@@ -164,6 +190,12 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
       <div class="bp-note">This updates automatically on ecadja.com when you change day statuses below</div>
     </div>
 
+    <!-- WEATHER -->
+    <div class="upcoming">
+      <div class="upcoming-title">This Week's Weather — Kingston / St. Andrew</div>
+      <div class="weather-strip" id="weather-strip"><div style="font-size:12px;color:var(--dim)">Loading...</div></div>
+    </div>
+
     <!-- UPCOMING ROTATIONS -->
     <div class="upcoming">
       <div class="upcoming-title">Upcoming Availability — Next 4 Rotations</div>
@@ -209,6 +241,7 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
       <div class="status-btn" id="sb-booked" onclick="setStatus('booked')">&#126; Booked</div>
       <div class="status-btn" id="sb-fully-booked" onclick="setStatus('fully-booked')">&#10005; Full</div>
     </div>
+    <div class="dp-weather" id="dp-weather" style="display:none;"></div>
     <div class="dp-bookings" id="dp-bookings" style="display:none;"></div>
     <textarea class="note-input" id="dp-note" placeholder="Optional note (e.g. 2 slots taken, morning only...)"></textarea>
     <div class="panel-btns">
@@ -271,6 +304,113 @@ async function init() {
   renderCalendar();
   renderUpcoming();
   renderBanner();
+  loadWeather();
+}
+
+// ── WEATHER (Open-Meteo — free, no key, Kingston/St. Andrew) ──────
+// Pulls more than a quick-glance temp/rain check: feels-like temp, wind
+// speed, UV index, and actual expected rainfall, then turns that into a
+// plain verdict specific to detailing work (wind = loose equipment and
+// dust on wet panels; UV = sun exposure and sealant cure time; humidity
+// proxy via feels-like = drying time), not just "will it rain."
+const WMO = {
+  0:['☀️','Clear'], 1:['🌤️','Mostly Clear'], 2:['⛅','Partly Cloudy'], 3:['☁️','Cloudy'],
+  45:['🌫️','Foggy'], 48:['🌫️','Foggy'],
+  51:['🌦️','Light Drizzle'], 53:['🌦️','Drizzle'], 55:['🌧️','Heavy Drizzle'],
+  61:['🌦️','Light Rain'], 63:['🌧️','Rain'], 65:['🌧️','Heavy Rain'],
+  80:['🌦️','Rain Showers'], 81:['🌧️','Rain Showers'], 82:['⛈️','Violent Showers'],
+  95:['⛈️','Thunderstorm'], 96:['⛈️','Storm w/ Hail'], 99:['⛈️','Storm w/ Hail']
+};
+let weatherByDate = {};
+
+function weatherTag(code, tMax, precipProb) {
+  if (precipProb >= 60 || [65,82,95,96,99].includes(code)) return ['avoid', 'Rain likely'];
+  if (precipProb >= 35 || [61,63,80,81].includes(code))    return ['caution', 'Rain possible'];
+  if (tMax >= 33) return ['caution', 'Very hot'];
+  return ['good', 'Good for jobs'];
+}
+
+// Builds the longer, detailing-specific read on a day's conditions —
+// this is the "more detailed" version shown inside the day panel.
+function weatherVerdict(w) {
+  const notes = [];
+  if (w.precipProb >= 60) {
+    notes.push(`<strong>Rain likely</strong> (${w.precipProb}% chance, ~${w.precipSum}mm expected) — pad the schedule or move indoors-adjacent work first.`);
+  } else if (w.precipProb >= 35) {
+    notes.push(`<strong>Rain possible</strong> (${w.precipProb}%) — keep a tarp or cover on hand for wet-sanding/sealant steps.`);
+  } else {
+    notes.push(`<strong>Low rain risk</strong> (${w.precipProb}%) — clear to run the full service without weather interruption.`);
+  }
+  if (w.windMax >= 25) {
+    notes.push(`<strong>Windy</strong> (up to ${Math.round(w.windMax)} km/h) — secure loose microfibers and spray bottles; dust may land on wet panels mid-wipe.`);
+  }
+  if (w.uvMax >= 8) {
+    notes.push(`<strong>High UV</strong> (index ${Math.round(w.uvMax)}) — sun protection for yourself, and ceramic sealant may flash-cure faster than usual in direct sun.`);
+  }
+  if (w.tempMax >= 33) {
+    notes.push(`<strong>Very hot</strong> (feels like ${Math.round(w.feelsMax)}°) — hydrate on schedule, not when you notice you're thirsty.`);
+  }
+  return notes.join(' ');
+}
+
+async function loadWeather() {
+  const strip = document.getElementById('weather-strip');
+  if (!strip) return;
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=17.9970&longitude=-76.7936'
+      + '&daily=weathercode,temperature_2m_max,temperature_2m_min,apparent_temperature_max,apparent_temperature_min,'
+      + 'precipitation_probability_max,precipitation_sum,windspeed_10m_max,uv_index_max,sunrise,sunset'
+      + '&timezone=America%2FJamaica&forecast_days=7';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('weather fetch failed');
+    const data = await res.json();
+    const days = data.daily.time;
+    weatherByDate = {};
+
+    const cards = days.map((dateStr, i) => {
+      const code = data.daily.weathercode[i];
+      const tMax = Math.round(data.daily.temperature_2m_max[i]);
+      const tMin = Math.round(data.daily.temperature_2m_min[i]);
+      const precip = data.daily.precipitation_probability_max[i] ?? 0;
+      const [icon, label] = WMO[code] || ['🌡️', '—'];
+      const [tagClass, tagText] = weatherTag(code, tMax, precip);
+
+      weatherByDate[dateStr] = {
+        icon, label, tempMax: tMax, tempMin: tMin,
+        feelsMax: data.daily.apparent_temperature_max[i],
+        feelsMin: data.daily.apparent_temperature_min[i],
+        precipProb: precip,
+        precipSum: (data.daily.precipitation_sum[i] ?? 0).toFixed(1),
+        windMax: data.daily.windspeed_10m_max[i] ?? 0,
+        uvMax: data.daily.uv_index_max[i] ?? 0,
+        sunrise: data.daily.sunrise[i], sunset: data.daily.sunset[i],
+        tagClass, tagText
+      };
+
+      const isToday = i === 0;
+      const dayName = isToday ? 'Today' : new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'short' });
+      return `<div class="weather-day${isToday ? ' is-today' : ''}" onclick="jumpToWeatherDay('${dateStr}')">
+        <div class="weather-day-name">${dayName}</div>
+        <div class="weather-icon" title="${label}">${icon}</div>
+        <div class="weather-temp">${tMax}°<span class="lo">${tMin}°</span></div>
+        <div class="weather-rain">💧 ${precip}%</div>
+        <span class="weather-tag ${tagClass}">${tagText}</span>
+      </div>`;
+    }).join('');
+    strip.innerHTML = cards;
+  } catch (err) {
+    strip.innerHTML = '<div style="font-size:11px;color:var(--dim)">Could not load forecast right now.</div>';
+  }
+}
+
+// Tapping a weather card opens that day's panel directly (if it's a real,
+// clickable calendar day) so the forecast and the booking decision sit
+// in the same view instead of two separate places.
+function jumpToWeatherDay(dateStr) {
+  const dateObj = new Date(dateStr + 'T00:00:00');
+  if (availData[dateStr]) {
+    openDayPanel(dateStr, dateObj);
+  }
 }
 
 async function loadAvailability() {
@@ -477,6 +617,32 @@ function openDayPanel(dateStr, dateObj) {
   ['available','booked','fully-booked'].forEach(s => {
     document.getElementById('sb-' + s).className = 'status-btn' + (avail?.status === s ? ' active-' + s : '');
   });
+
+  const wEl = document.getElementById('dp-weather');
+  const w = weatherByDate[dateStr];
+  if (w) {
+    wEl.style.display = 'block';
+    const fmtTime = t => new Date(t).toLocaleTimeString('en-JM', { hour: 'numeric', minute: '2-digit' });
+    wEl.innerHTML = `
+      <div class="dp-weather-head">
+        <span class="dp-weather-icon">${w.icon}</span>
+        <span class="dp-weather-title">${w.tempMax}° / ${w.tempMin}° &mdash; ${w.label}</span>
+        <span class="weather-tag ${w.tagClass}" style="margin-left:auto">${w.tagText}</span>
+      </div>
+      <div class="dp-weather-grid">
+        <div class="dp-weather-stat"><span class="lbl">Feels Like</span>${Math.round(w.feelsMax)}° / ${Math.round(w.feelsMin)}°</div>
+        <div class="dp-weather-stat"><span class="lbl">Rain Chance</span>${w.precipProb}% (~${w.precipSum}mm)</div>
+        <div class="dp-weather-stat"><span class="lbl">Wind</span>${Math.round(w.windMax)} km/h max</div>
+        <div class="dp-weather-stat"><span class="lbl">UV Index</span>${Math.round(w.uvMax)}</div>
+        <div class="dp-weather-stat"><span class="lbl">Sunrise</span>${fmtTime(w.sunrise)}</div>
+        <div class="dp-weather-stat"><span class="lbl">Sunset</span>${fmtTime(w.sunset)}</div>
+      </div>
+      <div class="dp-weather-note">${weatherVerdict(w)}</div>
+    `;
+  } else {
+    wEl.style.display = 'block';
+    wEl.innerHTML = '<div class="dp-weather-unavailable">Forecast only covers the next 7 days — this date is too far out to show weather yet.</div>';
+  }
 
   const bookings = bookingsByDate[dateStr] || [];
   const bkEl = document.getElementById('dp-bookings');
