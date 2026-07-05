@@ -758,6 +758,112 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── DOCUMENTS ──────────────────────────────────────────────────── */
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px; margin-bottom: 22px;
+}
+.doc-card {
+  background: var(--s1);
+  border: 1px solid var(--bsoft);
+  border-radius: 10px;
+  padding: 20px 20px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+  transition: border-color .25s, transform .25s;
+}
+.doc-card:hover { border-color: var(--border); transform: translateY(-2px); }
+.doc-cat {
+  font-size: 8px; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase;
+  color: var(--silver-d);
+}
+.doc-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 20px; font-weight: 400; color: var(--silver-l);
+  line-height: 1.15;
+}
+.doc-desc { font-size: 11.5px; color: var(--muted); line-height: 1.5; flex-grow: 1; }
+.doc-actions { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+.doc-actions .btn-primary, .doc-actions .btn-ghost { flex: 1; text-align: center; }
+.doc-actions a.btn-ghost { text-decoration: none; display: inline-block; }
+
+/* ── DOC READER MODAL ───────────────────────────────────────────── */
+.reader-bg {
+  display: none; position: fixed; inset: 0; z-index: 700;
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(6px);
+  align-items: flex-start; justify-content: center;
+  padding: 32px 16px;
+  overflow-y: auto;
+}
+.reader-bg.open { display: flex; }
+.reader-panel {
+  background: var(--s2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  width: 100%; max-width: 820px;
+  animation: fadeUp .28s ease forwards;
+  margin-bottom: 32px;
+}
+.reader-head {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--s2);
+  border-bottom: 1px solid var(--bsoft);
+  border-radius: 12px 12px 0 0;
+  padding: 18px 24px;
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.reader-head-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 19px; font-weight: 400; color: var(--silver-l);
+}
+.reader-head-actions { display: flex; gap: 8px; align-items: center; }
+.reader-close {
+  background: transparent; border: 1px solid var(--bsoft); color: var(--silver-d);
+  width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
+  font-size: 16px; line-height: 1; transition: border-color .2s, color .2s;
+}
+.reader-close:hover { border-color: var(--border); color: var(--silver); }
+.reader-body { padding: 28px 30px 40px; }
+
+/* Prose styling for embedded documents */
+.doc-prose { color: var(--text); font-size: 13.5px; line-height: 1.65; }
+.doc-prose h1 {
+  font-family: 'Cormorant Garamond', serif; font-weight: 400;
+  font-size: 28px; color: var(--silver-l); margin: 0 0 6px;
+}
+.doc-prose > h1:first-child { margin-top: 0; }
+.doc-prose h2 {
+  font-family: 'Cormorant Garamond', serif; font-weight: 400;
+  font-size: 21px; color: var(--silver-l); margin: 28px 0 10px;
+  padding-top: 14px; border-top: 1px solid var(--bsoft);
+}
+.doc-prose h2:first-of-type { border-top: none; padding-top: 0; }
+.doc-prose h3 {
+  font-family: 'Sora', sans-serif; font-weight: 700;
+  font-size: 12px; letter-spacing: .04em; color: var(--silver);
+  margin: 20px 0 8px;
+}
+.doc-prose p { margin: 0 0 12px; color: var(--text); }
+.doc-prose strong { color: var(--silver-l); font-weight: 600; }
+.doc-prose em { color: var(--muted); }
+.doc-prose ul, .doc-prose ol { margin: 0 0 14px; padding-left: 20px; }
+.doc-prose li { margin-bottom: 6px; color: var(--text); }
+.doc-prose hr { border: none; border-top: 1px solid var(--bsoft); margin: 24px 0; }
+.doc-prose table { width: 100%; border-collapse: collapse; margin: 14px 0 18px; font-size: 12px; }
+.doc-prose th {
+  font-size: 8px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--dim); padding: 9px 12px; text-align: left;
+  border-bottom: 1px solid var(--bsoft);
+}
+.doc-prose td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.025); vertical-align: top; }
+.doc-prose blockquote {
+  border-left: 2px solid var(--silver-d); margin: 14px 0; padding: 4px 0 4px 16px;
+  color: var(--muted); font-style: italic;
+}
+.doc-loading { text-align: center; padding: 60px 20px; font-size: 11px; color: var(--dim); letter-spacing: .14em; text-transform: uppercase; }
+
 /* ── MODAL ──────────────────────────────────────────────────────── */
 .modal-bg {
   display: none; position: fixed; inset: 0; z-index: 600;
@@ -1080,6 +1186,14 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
           </svg>
           Pricing
         </button>
+        <button class="nav-btn" id="nb-documents" onclick="goTo('documents')">
+          <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+          </svg>
+          Documents
+        </button>
       </div>
 
     </aside>
@@ -1342,9 +1456,149 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         </div>
       </div>
 
+      <!-- ── DOCUMENTS ─────────────────────────────────────────── -->
+      <div class="view" id="v-documents">
+        <div class="view-head">
+          <span class="view-eyebrow">Reference Library</span>
+          <h1 class="view-h1">Operations <em>Documents</em></h1>
+        </div>
+
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Foundational Plans</span>
+            <span class="sc-meta">The strategic core — read these first, revisit them often.</span>
+          </div>
+          <div style="padding:18px 22px 22px;">
+            <div class="doc-grid">
+              <div class="doc-card">
+                <span class="doc-cat">Master Reference</span>
+                <span class="doc-title">Operations Playbook</span>
+                <span class="doc-desc">Foundations, financial systems, sales, marketing, hiring, and the path from operator to owner. The full ten-chapter reference.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('operations-playbook-1','Mobile Detailing Operations Playbook')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/operations-playbook-1.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+              <div class="doc-card">
+                <span class="doc-cat">Strategy</span>
+                <span class="doc-title">The Comprehensive Plan</span>
+                <span class="doc-desc">Built on honest numbers, calibrated to real capacity — foundation through Year 2 growth and the scaling path.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('comprehensive-plan','The Comprehensive Plan')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/comprehensive-plan.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+              <div class="doc-card">
+                <span class="doc-cat">Strategy</span>
+                <span class="doc-title">Comprehensive Plan — Addendum</span>
+                <span class="doc-desc">What the core plan didn't cover: going public now, social media discipline, protection, alignment, and continuity.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('comprehensive-plan-addendum','The Comprehensive Plan — Addendum')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/comprehensive-plan-addendum.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+              <div class="doc-card">
+                <span class="doc-cat">Execution</span>
+                <span class="doc-title">The 30-Day Launch Plan</span>
+                <span class="doc-desc">Exactly what to do next, week by week. No planning without execution — check items as you complete them.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('30-day-plan','The 30-Day Launch Plan')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/30-day-plan.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Client-Facing Agreements</span>
+            <span class="sc-meta">Print or send for signature at booking.</span>
+          </div>
+          <div style="padding:18px 22px 22px;">
+            <div class="doc-grid">
+              <div class="doc-card">
+                <span class="doc-cat">Contract</span>
+                <span class="doc-title">Service Agreement</span>
+                <span class="doc-desc">Detailing service contract and liability disclosure — used on every job, every client, every time.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('service-contract','Service Agreement')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/service-contract.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+              <div class="doc-card">
+                <span class="doc-cat">Contract</span>
+                <span class="doc-title">Maintenance Plan Agreement</span>
+                <span class="doc-desc">Recurring service enrollment and terms — anchor the renewal date at signing, not after.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('maintenance-plan-agreement','Maintenance Plan Agreement')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/maintenance-plan-agreement.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="sc-head">
+            <span class="sc-title">Financial &amp; Owner Reference</span>
+            <span class="sc-meta">Numbers you should know cold.</span>
+          </div>
+          <div style="padding:18px 22px 22px;">
+            <div class="doc-grid">
+              <div class="doc-card">
+                <span class="doc-cat">Finance</span>
+                <span class="doc-title">Owner Compensation Plan</span>
+                <span class="doc-desc">What to pay yourself from the business, phased to actual profit — not aspiration.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('owner-compensation','Owner Compensation Plan')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/owner-compensation.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+              <div class="doc-card">
+                <span class="doc-cat">Finance</span>
+                <span class="doc-title">Profit Margin Analysis</span>
+                <span class="doc-desc">Estimated operating costs per job in the Jamaican market — chemicals, fuel, wear, and consumables.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('profit-margins','Profit Margin Analysis')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/profit-margins.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+              <div class="doc-card">
+                <span class="doc-cat">Reference</span>
+                <span class="doc-title">Supplementary Reference</span>
+                <span class="doc-desc">Everything not fully addressed elsewhere: maintenance plans, pricing reviews, complaints, taxes, competitors, seasons.</span>
+                <div class="doc-actions">
+                  <button class="btn-primary" onclick="openDoc('supplementary-reference','The Supplementary Reference')">Read</button>
+                  <a class="btn-ghost" href="docs/pdf/supplementary-reference.pdf" target="_blank" rel="noopener">Download PDF</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </main>
   </div>
 </div><!-- /dashboard -->
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<!--  DOCUMENT READER MODAL                                      -->
+<!-- ─────────────────────────────────────────────────────────── -->
+<div class="reader-bg" id="reader-bg" onclick="readerBgClose(event)">
+  <div class="reader-panel">
+    <div class="reader-head">
+      <span class="reader-head-title" id="reader-title">Document</span>
+      <div class="reader-head-actions">
+        <a class="btn-ghost" id="reader-download" href="#" target="_blank" rel="noopener">Download PDF</a>
+        <button class="reader-close" onclick="closeReader()">✕</button>
+      </div>
+    </div>
+    <div class="reader-body" id="reader-body">
+      <div class="doc-loading">Loading</div>
+    </div>
+  </div>
+</div>
 
 <!-- ─────────────────────────────────────────────────────────── -->
 <!--  ADD CLIENT MODAL                                           -->
@@ -1499,7 +1753,7 @@ function playChime() {
 }
 
 // ── NAVIGATION ───────────────────────────────────────────────────
-const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'training', 'academy', 'command', 'pricing'];
+const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'training', 'academy', 'command', 'pricing', 'documents'];
 
 function goTo(name) {
   VIEWS.forEach(v => {
@@ -1520,6 +1774,33 @@ function goTo(name) {
 
   // Close sidebar on mobile
   if (window.innerWidth <= 820) closeSidebar();
+}
+
+// ── DOCUMENT READER ──────────────────────────────────────────────
+const docCache = {};
+function openDoc(key, title) {
+  document.getElementById('reader-title').textContent = title;
+  document.getElementById('reader-download').href = 'docs/pdf/' + key + '.pdf';
+  const body = document.getElementById('reader-body');
+  body.innerHTML = '<div class="doc-loading">Loading</div>';
+  document.getElementById('reader-bg').classList.add('open');
+
+  if (docCache[key]) {
+    body.innerHTML = docCache[key];
+    return;
+  }
+  fetch('docs/html/' + key + '.html')
+    .then(r => { if (!r.ok) throw new Error('not found'); return r.text(); })
+    .then(html => { docCache[key] = html; body.innerHTML = html; })
+    .catch(() => {
+      body.innerHTML = '<div class="empty"><div class="empty-ico">⚠</div><div class="empty-txt">Could not load this document. Use Download PDF instead, or check that the /docs folder was uploaded alongside dashboard.html.</div></div>';
+    });
+}
+function closeReader() {
+  document.getElementById('reader-bg').classList.remove('open');
+}
+function readerBgClose(e) {
+  if (e.target.id === 'reader-bg') closeReader();
 }
 
 function toggleSidebar() {
