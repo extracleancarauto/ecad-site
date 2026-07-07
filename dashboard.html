@@ -852,8 +852,10 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 .reader-head-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 19px; font-weight: 400; color: var(--silver-l);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  min-width: 0; flex: 1;
 }
-.reader-head-actions { display: flex; gap: 8px; align-items: center; }
+.reader-head-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
 .reader-close {
   background: transparent; border: 1px solid var(--bsoft); color: var(--silver-d);
   width: 30px; height: 30px; border-radius: 6px; cursor: pointer;
