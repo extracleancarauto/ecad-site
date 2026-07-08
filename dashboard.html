@@ -710,6 +710,11 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
   border-color: rgba(184,200,214,.28);
 }
 .btn-inv:hover { background: var(--navy); border-color: var(--silver-d); color: var(--silver-l); }
+.btn-edit {
+  background: rgba(255,255,255,.05); color: var(--silver-d);
+  border-color: var(--bsoft);
+}
+.btn-edit:hover { background: rgba(255,255,255,.1); color: var(--silver-l); border-color: var(--silver-d); }
 
 .btn-primary {
   background: var(--silver); color: #000;
@@ -1343,7 +1348,7 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         <div class="section-card">
           <div class="sc-head">
             <span class="sc-title">All Clients</span>
-            <button class="btn-primary" onclick="openModal()">+ Add Client</button>
+            <button class="btn-primary" onclick="openModal(null)">+ Add Client</button>
           </div>
           <div class="tbl-scroll" id="clients-wrap">
             <div class="loading">Loading</div>
@@ -1361,6 +1366,8 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
           <div class="sc-head">
             <span class="sc-title">All Records</span>
             <span class="sc-meta" id="records-meta">—</span>
+            <span style="flex:1"></span>
+            <button class="btn-primary" onclick="openRecordModal()">+ Book Appointment</button>
           </div>
           <div class="tbl-scroll" id="records-wrap">
             <div class="loading">Loading</div>
@@ -1683,7 +1690,7 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 <!-- ─────────────────────────────────────────────────────────── -->
 <div class="modal-bg" id="modal-bg" onclick="bgClose(event)">
   <div class="modal">
-    <h2 class="modal-title">Add New Client</h2>
+    <h2 class="modal-title" id="client-modal-title">Add New Client</h2>
     <div class="mfield">
       <label class="mlabel" for="m-name">Full Name <span style="color:var(--red)">*</span></label>
       <input class="minput" id="m-name" type="text" placeholder="Client's full name">
@@ -1703,6 +1710,44 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
     <div class="mactions">
       <button class="btn-cancel" onclick="closeModal()">Cancel</button>
       <button class="btn-save" onclick="saveClient()">Save Client</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────────────────────────────────────────────────── -->
+<!--  BOOK / EDIT APPOINTMENT MODAL                               -->
+<!-- ─────────────────────────────────────────────────────────── -->
+<div class="modal-bg" id="record-modal-bg" onclick="bgCloseRecord(event)">
+  <div class="modal" style="max-width:520px">
+    <h2 class="modal-title" id="record-modal-title">Book Appointment</h2>
+    <div class="mfield">
+      <label class="mlabel" for="rm-client">Client <span style="color:var(--red)">*</span></label>
+      <select class="minput" id="rm-client"><option value="">Loading clients…</option></select>
+    </div>
+    <div class="mfield">
+      <label class="mlabel" for="rm-service">Service / Tier <span style="color:var(--red)">*</span></label>
+      <select class="minput" id="rm-service"><option value="">Loading…</option></select>
+    </div>
+    <div class="mfield">
+      <label class="mlabel" for="rm-date">Service Date <span style="color:var(--red)">*</span></label>
+      <input class="minput" id="rm-date" type="date">
+    </div>
+    <div class="mfield">
+      <label class="mlabel" for="rm-status">Status</label>
+      <select class="minput" id="rm-status">
+        <option value="Pending">Pending</option>
+        <option value="Confirmed">Confirmed</option>
+        <option value="Paid">Paid / Complete</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+    </div>
+    <div class="mfield">
+      <label class="mlabel" for="rm-notes">Job Notes</label>
+      <textarea class="minput" id="rm-notes" rows="3" style="resize:vertical;font-family:'Sora',sans-serif;" placeholder="Details, special requests…"></textarea>
+    </div>
+    <div class="mactions">
+      <button class="btn-cancel" onclick="closeRecordModal()">Cancel</button>
+      <button class="btn-save" onclick="saveRecord()">Save Appointment</button>
     </div>
   </div>
 </div>
@@ -2139,14 +2184,26 @@ async function loadClients() {
 
     wrap.innerHTML = tblHtml(
       ['Name', 'Phone', 'Address', 'Source', 'Added', ''],
-      data.map(c => [
-        `<span class="td-name">${x(c.full_name || '—')}</span>`,
-        `<span class="td-m">${x(c.phone || '—')}</span>`,
-        `<span class="td-m" style="max-width:180px;white-space:normal;display:inline-block;">${x(c.service_address || '—')}</span>`,
-        `<span class="td-d">${x(c.referral_source || '—')}</span>`,
-        `<span class="td-d">${fd(c.created_at)}</span>`,
-        `<button class="btn-act btn-del" onclick="delClient('${c.id}','${x(c.full_name)}')">Delete</button>`
-      ])
+      data.map(c => {
+        const cData = encodeURIComponent(JSON.stringify({
+          id: c.id,
+          full_name: c.full_name || '',
+          phone: c.phone || '',
+          service_address: c.service_address || '',
+          referral_source: c.referral_source || ''
+        }));
+        return [
+          `<span class="td-name">${x(c.full_name || '—')}</span>`,
+          `<span class="td-m">${x(c.phone || '—')}</span>`,
+          `<span class="td-m" style="max-width:180px;white-space:normal;display:inline-block;">${x(c.service_address || '—')}</span>`,
+          `<span class="td-d">${x(c.referral_source || '—')}</span>`,
+          `<span class="td-d">${fd(c.created_at)}</span>`,
+          `<div style="display:flex;gap:6px;flex-wrap:wrap;">
+             <button class="btn-act btn-edit" data-client="${cData}" onclick="openModal(this)">Edit</button>
+             <button class="btn-act btn-del" onclick="delClient('${c.id}','${x(c.full_name)}')">Delete</button>
+           </div>`
+        ];
+      })
     );
   } catch(e) {
     wrap.innerHTML = `<div class="empty"><p class="empty-txt" style="color:var(--red)">${x(e.message)}</p></div>`;
@@ -2165,10 +2222,23 @@ async function delClient(id, name) {
 }
 
 // Modal
-function openModal() { document.getElementById('modal-bg').classList.add('open'); }
+let editingClientId = null;
+function openModal(el) {
+  editingClientId = null;
+  const c = (el && el.dataset && el.dataset.client) ? JSON.parse(decodeURIComponent(el.dataset.client)) : null;
+  document.getElementById('client-modal-title').textContent = c ? 'Edit Client' : 'Add New Client';
+  document.getElementById('m-name').value = c?.full_name || '';
+  document.getElementById('m-phone').value = c?.phone || '';
+  document.getElementById('m-addr').value = c?.service_address || '';
+  document.getElementById('m-ref').value = c?.referral_source || '';
+  if (c) editingClientId = c.id;
+  document.getElementById('modal-bg').classList.add('open');
+}
 function closeModal() {
   document.getElementById('modal-bg').classList.remove('open');
   ['m-name','m-phone','m-addr','m-ref'].forEach(i => document.getElementById(i).value = '');
+  editingClientId = null;
+  document.getElementById('client-modal-title').textContent = 'Add New Client';
 }
 function bgClose(e) { if (e.target.id === 'modal-bg') closeModal(); }
 
@@ -2181,6 +2251,20 @@ async function saveClient() {
   if (!name || !phone) { toast('Name and phone are required', 'err'); return; }
 
   try {
+    if (editingClientId) {
+      const { error } = await db.from('clients').update({
+        full_name:       name,
+        phone:           phone,
+        service_address: addr || null,
+        referral_source: ref  || null
+      }).eq('id', editingClientId);
+      if (error) throw error;
+      closeModal();
+      toast('Client updated', 'ok');
+      loadClients();
+      return;
+    }
+
     const { error } = await db.from('clients').insert([{
       full_name:       name,
       phone:           phone,
@@ -2218,20 +2302,32 @@ async function loadRecords() {
 
     wrap.innerHTML = tblHtml(
       ['Client', 'Phone', 'Service / Tier', 'Service Date', 'Payment', 'Notes', ''],
-      data.map(r => [
-        `<span class="td-name">${x(r.clients?.full_name || '—')}</span>`,
-        `<span class="td-m">${x(r.clients?.phone || '—')}</span>`,
-        `<span class="td-m">${x(r.service_tier || '—')}</span>`,
-        `<span class="td-m">${fd(r.service_date)}</span>`,
-        pBadge(r.payment_status),
-        renderNotesCell(r.job_notes, 180),
-        `<div style="display:flex;gap:6px;flex-wrap:wrap;">
-           <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',service:r.service_tier||'',date:r.service_date||'',notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
-           ${(r.payment_status||'').toLowerCase() !== 'paid' && (r.payment_status||'').toLowerCase() !== 'completed'
-             ? `<button class="btn-act btn-approve" onclick="markComplete('${r.id}')">✓ Complete</button>`
-             : '<span class="badge b-approved" style="align-self:center;">Done</span>'}
-         </div>`
-      ])
+      data.map(r => {
+        const recData = encodeURIComponent(JSON.stringify({
+          id: r.id,
+          client_id: r.client_id || '',
+          client_name: r.clients?.full_name || '',
+          service_tier: r.service_tier || '',
+          service_date: r.service_date || '',
+          payment_status: r.payment_status || 'Pending',
+          job_notes: r.job_notes || ''
+        }));
+        return [
+          `<span class="td-name">${x(r.clients?.full_name || '—')}</span>`,
+          `<span class="td-m">${x(r.clients?.phone || '—')}</span>`,
+          `<span class="td-m">${x(r.service_tier || '—')}</span>`,
+          `<span class="td-m">${fd(r.service_date)}</span>`,
+          pBadge(r.payment_status),
+          renderNotesCell(r.job_notes, 180),
+          `<div style="display:flex;gap:6px;flex-wrap:wrap;">
+             <button class="btn-act btn-edit" data-rec="${recData}" onclick="openRecordModal(this)">Edit</button>
+             <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',service:r.service_tier||'',date:r.service_date||'',notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
+             ${(r.payment_status||'').toLowerCase() !== 'paid' && (r.payment_status||'').toLowerCase() !== 'completed'
+               ? `<button class="btn-act btn-approve" onclick="markComplete('${r.id}')">✓ Complete</button>`
+               : '<span class="badge b-approved" style="align-self:center;">Done</span>'}
+           </div>`
+        ];
+      })
     );
   } catch(e) {
     wrap.innerHTML = `<div class="empty"><p class="empty-txt" style="color:var(--red)">${x(e.message)}</p></div>`;
@@ -2335,6 +2431,117 @@ async function markComplete(id) {
     if (error) throw error;
     toast('Job marked as complete', 'ok');
     loadRecords();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+// ── BOOK / EDIT APPOINTMENT (manual booking, any date) ─────────────
+let editingRecordId = null;
+
+function bgCloseRecord(e) { if (e.target.id === 'record-modal-bg') closeRecordModal(); }
+
+function closeRecordModal() {
+  document.getElementById('record-modal-bg').classList.remove('open');
+  editingRecordId = null;
+}
+
+async function openRecordModal(el) {
+  editingRecordId = null;
+  const rec = (el && el.dataset && el.dataset.rec) ? JSON.parse(decodeURIComponent(el.dataset.rec)) : null;
+
+  document.getElementById('record-modal-title').textContent = rec ? 'Edit Appointment' : 'Book Appointment';
+  document.getElementById('record-modal-bg').classList.add('open');
+
+  const clientSel  = document.getElementById('rm-client');
+  const serviceSel = document.getElementById('rm-service');
+  clientSel.innerHTML  = '<option value="">Loading…</option>';
+  serviceSel.innerHTML = '<option value="">Loading…</option>';
+
+  try {
+    const [{ data: clients, error: cErr }, { data: pricing }] = await Promise.all([
+      db.from('clients').select('id, full_name, phone').order('full_name'),
+      db.from('service_pricing').select('service_key, service_name').order('sort_order')
+    ]);
+    if (cErr) throw cErr;
+
+    const seen = new Set();
+    const services = (pricing || []).filter(p => {
+      if (!p.service_name || seen.has(p.service_name)) return false;
+      seen.add(p.service_name);
+      return true;
+    });
+
+    clientSel.innerHTML = '<option value="">Select client…</option>' +
+      (clients || []).map(c => `<option value="${x(c.id)}">${x(c.full_name)}${c.phone ? ' — ' + x(c.phone) : ''}</option>`).join('');
+
+    serviceSel.innerHTML = services.map(s => `<option value="${x(s.service_name)}">${x(s.service_name)}</option>`).join('')
+      + '<option value="__custom">Custom / Other…</option>';
+
+    if (rec) {
+      editingRecordId = rec.id;
+
+      if (rec.client_id) clientSel.value = rec.client_id;
+      if (clientSel.value !== rec.client_id && rec.client_name) {
+        clientSel.insertAdjacentHTML('afterbegin',
+          `<option value="${x(rec.client_id)}" selected>${x(rec.client_name)} (current)</option>`);
+        clientSel.value = rec.client_id;
+      }
+
+      const hasTier = [...serviceSel.options].some(o => o.value === rec.service_tier);
+      if (hasTier) {
+        serviceSel.value = rec.service_tier;
+      } else if (rec.service_tier) {
+        serviceSel.insertAdjacentHTML('afterbegin', `<option value="${x(rec.service_tier)}" selected>${x(rec.service_tier)}</option>`);
+        serviceSel.value = rec.service_tier;
+      }
+
+      document.getElementById('rm-date').value   = rec.service_date || '';
+      document.getElementById('rm-status').value = rec.payment_status || 'Pending';
+      document.getElementById('rm-notes').value  = rec.job_notes || '';
+    } else {
+      document.getElementById('rm-date').value   = new Date().toISOString().slice(0, 10);
+      document.getElementById('rm-status').value = 'Confirmed';
+      document.getElementById('rm-notes').value  = '';
+    }
+  } catch(e) {
+    toast(e.message, 'err');
+  }
+}
+
+async function saveRecord() {
+  const clientId = document.getElementById('rm-client').value;
+  let service    = document.getElementById('rm-service').value;
+  const date     = document.getElementById('rm-date').value;
+  const status   = document.getElementById('rm-status').value;
+  const notes    = document.getElementById('rm-notes').value.trim();
+
+  if (service === '__custom') {
+    service = (prompt('Enter the service / tier name:') || '').trim();
+    if (!service) { toast('Service name is required', 'err'); return; }
+  }
+
+  if (!clientId || !service || !date) { toast('Client, service and date are required', 'err'); return; }
+
+  try {
+    if (editingRecordId) {
+      const { error } = await db.from('service_records').update({
+        client_id: clientId, service_tier: service, service_date: date,
+        payment_status: status, job_notes: notes || null
+      }).eq('id', editingRecordId);
+      if (error) throw error;
+      toast('Appointment updated', 'ok');
+    } else {
+      const { error } = await db.from('service_records').insert([{
+        client_id: clientId, service_tier: service, service_date: date,
+        payment_status: status, job_notes: notes || null
+      }]);
+      if (error) throw error;
+      toast('Appointment booked', 'ok');
+    }
+    closeRecordModal();
+    loadRecords();
+    loadBookings();
+    loadOverview();
+    refreshBadge();
   } catch(e) { toast(e.message, 'err'); }
 }
 
