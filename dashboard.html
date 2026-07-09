@@ -2657,6 +2657,8 @@ const SERVICE_ORDER = ['t0', 't1', 't2', 't3', 'cr', 'crs'];
 const VEHICLE_ORDER  = ['Sedan / Car', 'SUV / Crossover', 'Pickup / Van'];
 let pricingRows = [];
 
+const TOGGLE_FUNCTION_URL = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co/functions/v1/toggle-site-setting';
+
 async function loadCardPaymentToggle() {
   const toggle = document.getElementById('card-payment-toggle');
   const track = document.getElementById('card-toggle-track');
@@ -2664,9 +2666,10 @@ async function loadCardPaymentToggle() {
   const status = document.getElementById('card-toggle-status');
 
   try {
-    const { data, error } = await db.from('site_settings').select('value').eq('key', 'card_payment_enabled').maybeSingle();
-    if (error) throw error;
-    const isOn = data?.value === 'true';
+    const resp = await fetch(`${TOGGLE_FUNCTION_URL}?key=card_payment_enabled`);
+    const result = await resp.json();
+    if (result.error) throw new Error(result.error);
+    const isOn = result.data?.value === 'true';
     toggle.checked = isOn;
     track.style.background = isOn ? 'rgba(120,200,150,.55)' : 'rgba(255,255,255,.12)';
     knob.style.left = isOn ? '27px' : '3px';
@@ -2687,30 +2690,25 @@ async function toggleCardPayment(turnOn) {
 
   status.textContent = 'Saving…';
 
-  const updateResult = await db.from('site_settings')
-    .update({ value: turnOn ? 'true' : 'false', updated_at: new Date().toISOString() })
-    .eq('key', 'card_payment_enabled');
+  try {
+    const resp = await fetch(TOGGLE_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ key: 'card_payment_enabled', value: turnOn ? 'true' : 'false' })
+    });
+    const result = await resp.json();
+    if (result.error) throw new Error(result.error);
 
-  // Separate follow-up read, completely decoupled from the update call above
-  const verifyResult = await db.from('site_settings')
-    .select('*')
-    .eq('key', 'card_payment_enabled');
-
-  alert('DEBUG — update call:\n' + JSON.stringify(updateResult, null, 2) +
-        '\n\nDEBUG — verify read right after:\n' + JSON.stringify(verifyResult, null, 2));
-
-  if (updateResult.error) {
-    alert('Could not save this change: ' + updateResult.error.message + '\n\nThe toggle has been reset — please try again.');
+    track.style.background = turnOn ? 'rgba(120,200,150,.55)' : 'rgba(255,255,255,.12)';
+    knob.style.left = turnOn ? '27px' : '3px';
+    status.textContent = turnOn
+      ? 'Card payments are LIVE — clients can pay by card right now.'
+      : 'Card payments are OFF — clients only see bank transfer.';
+  } catch (e) {
+    alert('Could not save this change: ' + (e.message || e) + '\n\nThe toggle has been reset — please try again.');
     toggle.checked = !turnOn;
     loadCardPaymentToggle();
-    return;
   }
-
-  track.style.background = turnOn ? 'rgba(120,200,150,.55)' : 'rgba(255,255,255,.12)';
-  knob.style.left = turnOn ? '27px' : '3px';
-  status.textContent = turnOn
-    ? 'Card payments are LIVE — clients can pay by card right now.'
-    : 'Card payments are OFF — clients only see bank transfer.';
 }
 
 async function loadPricing() {

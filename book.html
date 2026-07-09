@@ -13,7 +13,7 @@
 <style>
 /* ── RESET & ROOT ─────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
   background: #0a0a0a;
   color: #f0ede6;
@@ -822,9 +822,10 @@ function updateVtypeHint() {
 
 async function loadCardPaymentSetting() {
   try {
-    const { data, error } = await db.from('site_settings').select('value').eq('key', 'card_payment_enabled').maybeSingle();
-    if (!error && data) {
-      CARD_PAYMENT_ENABLED = data.value === 'true';
+    const resp = await fetch('https://xsyndxqrcnqsvxcrpkqx.supabase.co/functions/v1/toggle-site-setting?key=card_payment_enabled');
+    const result = await resp.json();
+    if (!result.error && result.data) {
+      CARD_PAYMENT_ENABLED = result.data.value === 'true';
     }
   } catch (e) {
     console.log('Could not load card payment setting, defaulting to off:', e);
