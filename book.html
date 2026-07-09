@@ -381,12 +381,13 @@ nav {
       </div>
       <div class="form-grid">
         <div class="fg"><label>Vehicle Type *</label>
-          <select id="b-vtype">
+          <select id="b-vtype" onchange="updateVtypeHint()">
             <option value="" disabled selected>Select type</option>
             <option>Sedan / Car</option>
             <option>SUV / Crossover</option>
             <option>Pickup / Van</option>
           </select>
+          <div id="vtype-hint" style="font-size:10px;color:var(--dim);margin-top:5px;line-height:1.5;min-height:14px;"></div>
         </div>
         <div class="fg"><label>Make, Model &amp; Year</label><input type="text" id="b-vdetail" placeholder="e.g. Toyota Corolla 2021"></div>
         <div class="fg"><label>License Plate</label><input type="text" id="b-plate" placeholder="AB 1234"></div>
@@ -807,6 +808,16 @@ function renderAvailCal() {
 
     grid.appendChild(cell);
   }
+}
+
+const VTYPE_EXAMPLES = {
+  'Sedan / Car': 'e.g. Corolla, Civic, Sentra, Accord, Axio',
+  'SUV / Crossover': 'e.g. CR-V, RAV4, Tucson, Creta, X-Trail, Vitz+ (small SUVs)',
+  'Pickup / Van': 'e.g. Hilux, Ranger, D-Max, Serena, Voxy, Noah, HiAce (minivans &amp; people carriers count here too)'
+};
+function updateVtypeHint() {
+  const val = document.getElementById('b-vtype').value;
+  document.getElementById('vtype-hint').innerHTML = VTYPE_EXAMPLES[val] || '';
 }
 
 async function loadCardPaymentSetting() {
