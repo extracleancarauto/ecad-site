@@ -465,7 +465,7 @@ nav {
         <div class="pay-options">
           <div class="pay-options-label">Secure Your Deposit Now</div>
           <div class="pay-options-row">
-            <button type="button" class="pay-btn pay-btn-card" id="pay-wipay-btn" onclick="payWithWiPay()" style="display:none;">Pay by Card (WiPay)</button>
+            <button type="button" class="pay-btn pay-btn-card" id="pay-wipay-btn" onclick="payWithWiPay()">Pay by Card (WiPay)</button>
             <!-- Card payment button hidden until WiPay sandbox issue is resolved and ENVIRONMENT is flipped to live -->
             <span class="pay-manual">Bank transfer instructions sent via <strong>WhatsApp</strong> after you submit below</span>
           </div>
@@ -644,16 +644,26 @@ const WIPAY = {
   RESPONSE_URL:   'https://xsyndxqrcnqsvxcrpkqx.supabase.co/functions/v1/super-service'
 };
 
+// ── ONE SWITCH TO TURN CARD PAYMENT ON/OFF ──────────────────────
+// Set to true once WiPay confirms sandbox/live is working correctly.
+// This single line controls both the button's visibility and whether
+// tapping it actually works — no other edits needed anywhere else.
+const CARD_PAYMENT_ENABLED = false;
+
+// Show/hide the button to match the flag above — runs once the page loads.
+document.addEventListener('DOMContentLoaded', () => {
+  const btn = document.getElementById('pay-wipay-btn');
+  if (btn) btn.style.display = CARD_PAYMENT_ENABLED ? '' : 'none';
+});
+
 async function payWithWiPay() {
-  // SAFETY GUARD — card payment temporarily disabled site-wide while a WiPay
-  // sandbox issue is under investigation. Remove this block once resolved
-  // and the "Pay by Card" button is un-hidden above.
-  alert('Card payment is temporarily unavailable. Please use bank transfer — instructions will be sent via WhatsApp after you submit your booking.');
-  return;
+  if (!CARD_PAYMENT_ENABLED) {
+    alert('Card payment is temporarily unavailable. Please use bank transfer — instructions will be sent via WhatsApp after you submit your booking.');
+    return;
+  }
 
   const depositText = document.getElementById('dep-amount').textContent; // e.g. "JMD 5,250"
   const depositNum = parseFloat(depositText.replace(/[^\d.]/g, ''));
-
   if (!depositNum || depositNum <= 0) {
     showErr('Please select a vehicle type and service tier first so we know your deposit amount.');
     return;
