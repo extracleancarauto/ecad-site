@@ -689,16 +689,14 @@ async function payWithWiPay() {
       booking_date: bDate, booking_time: bTime,
       ticket: ticketNo
     }]);
-    // TEMPORARY DEBUG — show the complete raw response so we can see exactly
-    // what Supabase returned, not just a filtered error check.
-    alert('DEBUG — wipay_pending insert result:\n\n' + JSON.stringify(pendingResult, null, 2));
     if (pendingResult.error) {
+      alert('Could not save booking context before payment:\n\n' + pendingResult.error.message + '\n\nPayment cannot proceed safely — please try again or use bank transfer.');
       btn.disabled = false;
       btn.textContent = 'Pay by Card (WiPay)';
       return;
     }
   } catch (e) {
-    alert('DEBUG — wipay_pending insert threw an exception:\n\n' + (e.message || e));
+    alert('Could not save booking context before payment:\n\n' + (e.message || e) + '\n\nPayment cannot proceed safely — please try again or use bank transfer.');
     btn.disabled = false;
     btn.textContent = 'Pay by Card (WiPay)';
     return;
