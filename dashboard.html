@@ -2686,16 +2686,21 @@ async function toggleCardPayment(turnOn) {
   const toggle = document.getElementById('card-payment-toggle');
 
   status.textContent = 'Saving…';
-  const result = await db.from('site_settings')
+
+  const updateResult = await db.from('site_settings')
     .update({ value: turnOn ? 'true' : 'false', updated_at: new Date().toISOString() })
-    .eq('key', 'card_payment_enabled')
-    .select();
+    .eq('key', 'card_payment_enabled');
 
-  // TEMPORARY DEBUG — show exactly what Supabase returned
-  alert('DEBUG toggle result:\n\n' + JSON.stringify(result, null, 2));
+  // Separate follow-up read, completely decoupled from the update call above
+  const verifyResult = await db.from('site_settings')
+    .select('*')
+    .eq('key', 'card_payment_enabled');
 
-  if (result.error) {
-    alert('Could not save this change: ' + result.error.message + '\n\nThe toggle has been reset — please try again.');
+  alert('DEBUG — update call:\n' + JSON.stringify(updateResult, null, 2) +
+        '\n\nDEBUG — verify read right after:\n' + JSON.stringify(verifyResult, null, 2));
+
+  if (updateResult.error) {
+    alert('Could not save this change: ' + updateResult.error.message + '\n\nThe toggle has been reset — please try again.');
     toggle.checked = !turnOn;
     loadCardPaymentToggle();
     return;
