@@ -634,7 +634,8 @@ const DEPOSIT_RATE = 0.35;
 // TODO: replace ACCOUNT_NUMBER with your real WiPay Account Number (WiPay dashboard → Account).
 // Switch ENVIRONMENT to 'live' only after a successful sandbox test end-to-end.
 const WIPAY = {
-  ACCOUNT_NUMBER: '2324353163',
+  LIVE_ACCOUNT_NUMBER:    '2324353163',
+  SANDBOX_ACCOUNT_NUMBER: '1234567890', // WiPay's fixed test account — required in sandbox, do not change
   COUNTRY_CODE:   'JM',
   CURRENCY:       'JMD',
   ENVIRONMENT:    'sandbox', // change to 'live' when ready to accept real payments
@@ -666,8 +667,9 @@ function payWithWiPay() {
   btn.textContent = 'Redirecting to secure payment...';
 
   const ticketNo = document.getElementById('ticket-no').textContent.replace('NO. ', '');
-  // order_id must be alphanumeric, start/end alphanumeric, unique per attempt
-  const orderId = 'EC' + ticketNo.replace(/[^a-zA-Z0-9]/g, '') + Date.now().toString(36).toUpperCase();
+  // WiPay JM order_id: alphanumeric only, must start/end alphanumeric, max 16 chars, must be unique
+  const ticketSuffix = ticketNo.replace(/[^a-zA-Z0-9]/g, '').slice(-4);
+  const orderId = (ticketSuffix + Date.now().toString(36).toUpperCase()).slice(0, 16);
 
   // Stash booking context so payment-response.html can finish creating the record after payment
   try {
@@ -685,7 +687,7 @@ function payWithWiPay() {
   form.style.display = 'none';
 
   const fields = {
-    account_number: WIPAY.ACCOUNT_NUMBER,
+    account_number: WIPAY.ENVIRONMENT === 'live' ? WIPAY.LIVE_ACCOUNT_NUMBER : WIPAY.SANDBOX_ACCOUNT_NUMBER,
     country_code:   WIPAY.COUNTRY_CODE,
     currency:       WIPAY.CURRENCY,
     environment:    WIPAY.ENVIRONMENT,
