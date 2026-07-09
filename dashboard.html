@@ -2686,22 +2686,26 @@ async function toggleCardPayment(turnOn) {
   const toggle = document.getElementById('card-payment-toggle');
 
   status.textContent = 'Saving…';
-  try {
-    const { error } = await db.from('site_settings')
-      .update({ value: turnOn ? 'true' : 'false', updated_at: new Date().toISOString() })
-      .eq('key', 'card_payment_enabled');
-    if (error) throw error;
+  const result = await db.from('site_settings')
+    .update({ value: turnOn ? 'true' : 'false', updated_at: new Date().toISOString() })
+    .eq('key', 'card_payment_enabled')
+    .select();
 
-    track.style.background = turnOn ? 'rgba(120,200,150,.55)' : 'rgba(255,255,255,.12)';
-    knob.style.left = turnOn ? '27px' : '3px';
-    status.textContent = turnOn
-      ? 'Card payments are LIVE — clients can pay by card right now.'
-      : 'Card payments are OFF — clients only see bank transfer.';
-  } catch (e) {
-    alert('Could not save this change: ' + (e.message || e) + '\n\nThe toggle has been reset — please try again.');
+  // TEMPORARY DEBUG — show exactly what Supabase returned
+  alert('DEBUG toggle result:\n\n' + JSON.stringify(result, null, 2));
+
+  if (result.error) {
+    alert('Could not save this change: ' + result.error.message + '\n\nThe toggle has been reset — please try again.');
     toggle.checked = !turnOn;
     loadCardPaymentToggle();
+    return;
   }
+
+  track.style.background = turnOn ? 'rgba(120,200,150,.55)' : 'rgba(255,255,255,.12)';
+  knob.style.left = turnOn ? '27px' : '3px';
+  status.textContent = turnOn
+    ? 'Card payments are LIVE — clients can pay by card right now.'
+    : 'Card payments are OFF — clients only see bank transfer.';
 }
 
 async function loadPricing() {
