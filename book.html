@@ -113,6 +113,42 @@ nav {
 .fg.full { grid-column: 1/-1; }
 .fg label { font-size: 9px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
 .fg label .soft { color: var(--dim); font-weight: 400; text-transform: none; letter-spacing: 0; }
+
+/* ── AVAILABILITY CALENDAR (read-only, public) ─────────────────── */
+.avail-cal-toggle {
+  margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--bsoft);
+  font-size: 11px; color: var(--silver); cursor: pointer; text-align: center;
+  letter-spacing: .02em; transition: color .2s;
+}
+.avail-cal-toggle:hover { color: var(--silver-l); }
+.avail-cal-wrap { margin-top: 16px; }
+.avail-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.avail-cal-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; color: var(--silver-l); }
+.avail-cal-nav {
+  background: none; border: 1px solid var(--bsoft); color: var(--silver);
+  border-radius: 5px; width: 28px; height: 28px; cursor: pointer; font-size: 13px;
+}
+.avail-cal-nav:hover { border-color: var(--silver-d); color: var(--silver-l); }
+.avail-cal-legend { display: flex; gap: 14px; margin-bottom: 12px; font-size: 10px; color: var(--dim); flex-wrap: wrap; }
+.avail-cal-legend span { display: flex; align-items: center; gap: 5px; }
+.avail-dot { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+.avail-dot-open { background: rgba(120,190,150,.6); }
+.avail-dot-busy { background: rgba(210,160,90,.6); }
+.avail-dot-full { background: rgba(200,110,110,.6); }
+.avail-cal-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 3px; }
+.avail-cal-dow { font-size: 8px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); text-align: center; padding: 4px 0; }
+.avail-cal-day {
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 5px; font-size: 11px; color: var(--muted); border: 1px solid transparent;
+}
+.avail-cal-day.empty { background: transparent; }
+.avail-cal-day.past { opacity: .3; }
+.avail-cal-day.open { background: rgba(120,190,150,.1); border-color: rgba(120,190,150,.22); color: rgba(150,210,170,.95); cursor: pointer; font-weight: 500; }
+.avail-cal-day.open:hover { background: rgba(120,190,150,.2); }
+.avail-cal-day.busy { background: rgba(210,160,90,.1); border-color: rgba(210,160,90,.22); color: rgba(220,180,120,.95); }
+.avail-cal-day.full { background: rgba(200,110,110,.1); border-color: rgba(200,110,110,.22); color: rgba(215,140,140,.95); }
+.avail-cal-day.today { box-shadow: 0 0 0 1px var(--silver-d); }
+.avail-cal-note { font-size: 10px; color: var(--dim); margin-top: 12px; line-height: 1.6; }
 .fg input, .fg select, .fg textarea {
   background: var(--s3);
   border: 1px solid var(--bsoft);
@@ -436,6 +472,24 @@ nav {
           </select>
         </div>
       </div>
+
+      <div class="avail-cal-toggle" id="avail-cal-toggle" onclick="toggleAvailCal()">
+        <span id="avail-cal-toggle-text">Not sure which day? See open days →</span>
+      </div>
+      <div class="avail-cal-wrap" id="avail-cal-wrap" style="display:none;">
+        <div class="avail-cal-head">
+          <button type="button" class="avail-cal-nav" onclick="changeAvailMonth(-1)">&larr;</button>
+          <span class="avail-cal-title" id="avail-cal-title">—</span>
+          <button type="button" class="avail-cal-nav" onclick="changeAvailMonth(1)">&rarr;</button>
+        </div>
+        <div class="avail-cal-legend">
+          <span><i class="avail-dot avail-dot-open"></i>Open</span>
+          <span><i class="avail-dot avail-dot-busy"></i>Limited</span>
+          <span><i class="avail-dot avail-dot-full"></i>Fully Booked</span>
+        </div>
+        <div class="avail-cal-grid" id="avail-cal-grid"></div>
+        <p class="avail-cal-note">Tap an open day to select it above. Unmarked days are normal working days — book any date and we'll confirm via WhatsApp.</p>
+      </div>
     </div>
 
     <!-- DEPOSIT TICKET -->
@@ -652,6 +706,108 @@ const WIPAY = {
 // Reads from Supabase on page load. If that fails for any reason, falls
 // back to OFF (the safe default) rather than risking it being silently on.
 let CARD_PAYMENT_ENABLED = false;
+
+// ── AVAILABILITY CALENDAR (read-only, public) ────────────────────
+let availCalData = {};
+let availCalYear, availCalMonth;
+let availCalLoaded = false;
+const AVAIL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const AVAIL_DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+function toggleAvailCal() {
+  const wrap = document.getElementById('avail-cal-wrap');
+  const toggleText = document.getElementById('avail-cal-toggle-text');
+  const isOpen = wrap.style.display !== 'none';
+
+  if (isOpen) {
+    wrap.style.display = 'none';
+    toggleText.textContent = 'Not sure which day? See open days →';
+    return;
+  }
+
+  wrap.style.display = 'block';
+  toggleText.textContent = 'Hide calendar ↑';
+
+  if (!availCalLoaded) {
+    const now = new Date();
+    availCalYear = now.getFullYear();
+    availCalMonth = now.getMonth();
+    loadAvailCalData();
+  }
+}
+
+async function loadAvailCalData() {
+  const grid = document.getElementById('avail-cal-grid');
+  grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--dim);font-size:11px;padding:20px 0;">Loading…</div>';
+  try {
+    const { data, error } = await db.from('availability').select('*');
+    if (error) throw error;
+    availCalData = {};
+    (data || []).forEach(d => { availCalData[d.date] = d; });
+    availCalLoaded = true;
+    renderAvailCal();
+  } catch (e) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--dim);font-size:11px;padding:20px 0;">Could not load calendar — you can still book any date below, we\'ll confirm availability via WhatsApp.</div>';
+    console.log('Availability calendar load failed:', e);
+  }
+}
+
+function changeAvailMonth(dir) {
+  availCalMonth += dir;
+  if (availCalMonth > 11) { availCalMonth = 0; availCalYear++; }
+  if (availCalMonth < 0) { availCalMonth = 11; availCalYear--; }
+  renderAvailCal();
+}
+
+function renderAvailCal() {
+  document.getElementById('avail-cal-title').textContent = AVAIL_MONTHS[availCalMonth] + ' ' + availCalYear;
+  const grid = document.getElementById('avail-cal-grid');
+  grid.innerHTML = '';
+
+  AVAIL_DOW.forEach(d => {
+    const dow = document.createElement('div');
+    dow.className = 'avail-cal-dow';
+    dow.textContent = d;
+    grid.appendChild(dow);
+  });
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const firstDay = new Date(availCalYear, availCalMonth, 1).getDay();
+  const daysInMonth = new Date(availCalYear, availCalMonth + 1, 0).getDate();
+
+  for (let i = 0; i < firstDay; i++) {
+    const e = document.createElement('div');
+    e.className = 'avail-cal-day empty';
+    grid.appendChild(e);
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = availCalYear + '-' + String(availCalMonth+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+    const dateObj = new Date(availCalYear, availCalMonth, d);
+    const avail = availCalData[dateStr];
+    const isPast = dateObj < today;
+
+    const cell = document.createElement('div');
+    let cls = 'avail-cal-day';
+    if (avail && avail.status === 'available') cls += ' open';
+    else if (avail && avail.status === 'booked') cls += ' busy';
+    else if (avail && avail.status === 'fully-booked') cls += ' full';
+    if (isPast) cls += ' past';
+    if (dateObj.toDateString() === today.toDateString()) cls += ' today';
+    cell.className = cls;
+    cell.textContent = d;
+
+    if (avail && avail.status === 'available' && !isPast) {
+      cell.onclick = () => {
+        document.getElementById('b-date').value = dateStr;
+        document.getElementById('b-date').dispatchEvent(new Event('change'));
+      };
+    }
+
+    grid.appendChild(cell);
+  }
+}
 
 async function loadCardPaymentSetting() {
   try {
