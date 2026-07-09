@@ -89,27 +89,11 @@ async function handleResponse() {
       <a class="btn" href="${continueUrl}">Continue</a>
     `;
 
-    // Log to Supabase and notify — best-effort, non-blocking for the user
+    // Client and service record creation now happens server-side in the
+    // verification edge function (reliable — uses Supabase data, not
+    // sessionStorage). This just sends the owner a heads-up notification.
     try {
       if (pending) {
-        const { data: existing } = await db.from('clients').select('id').eq('phone', pending.phone).maybeSingle();
-        let clientId = existing?.id;
-        if (!clientId) {
-          const { data: nc } = await db.from('clients').insert([{
-            full_name: pending.name, phone: pending.phone, email: pending.email || null,
-            referral_source: 'Website — Book Page (WiPay)'
-          }]).select('id').single();
-          clientId = nc?.id;
-        }
-        if (clientId) {
-          await db.from('service_records').insert([{
-            client_id: clientId,
-            service_date: new Date().toISOString().split('T')[0],
-            job_notes: `Booking ref: ${pending.ticket} | WiPay deposit paid | Order: ${orderId} | Transaction: ${transactionId}`,
-            payment_status: 'Deposit Paid (WiPay)'
-          }]);
-        }
-
         emailjs.send('service_zesixiz', 'template_kr6ydp8', {
           to_email: 'extracleancarwash@gmail.com',
           client_name: pending.name,
