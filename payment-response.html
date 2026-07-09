@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Payment Status · Extra Clean Auto Detailing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0a0a0a; color: #f0ede6; font-family: 'Sora', sans-serif; font-weight: 300;
+  min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.card {
+  max-width: 460px; width: 100%; background: #111; border: 1px solid rgba(184,200,214,.18);
+  border-radius: 12px; padding: 40px 32px; text-align: center;
+}
+.icon { font-size: 44px; margin-bottom: 18px; }
+h1 { font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: 28px; margin-bottom: 12px; }
+p { font-size: 13px; color: #8a8378; line-height: 1.7; margin-bottom: 8px; }
+.amt { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: #d4e2ec; margin: 14px 0; }
+.ref { font-size: 11px; color: #5a574f; letter-spacing: .08em; margin-top: 18px; }
+a.btn {
+  display: inline-block; margin-top: 24px; background: #b8c8d6; color: #0a0a0a; text-decoration: none;
+  font-size: 12px; font-weight: 600; letter-spacing: .04em; padding: 12px 22px; border-radius: 6px;
+}
+.fail .icon, .fail h1 { color: #e08b8b; }
+</style>
+</head>
+<body>
+  <div class="card" id="card">
+    <div class="icon">⏳</div>
+    <h1>Confirming your payment&hellip;</h1>
+    <p>Please don&rsquo;t close this page.</p>
+  </div>
+
+<script>
+emailjs.init({ publicKey: 'b3LqB5Gho1tr958F5' });
+const { createClient } = supabase;
+const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
+
+function qs(name) {
+  return new URLSearchParams(window.location.search).get(name);
+}
+
+async function handleResponse() {
+  const status = qs('status');           // success | failed | error
+  const message = qs('message') || '';
+  const orderId = qs('order_id') || '';
+  const total = qs('total') || '';
+  const transactionId = qs('transaction_id') || '';
+
+  const card = document.getElementById('card');
+
+  let pending = null;
+  try {
+    pending = JSON.parse(sessionStorage.getItem('ecad_pending_booking') || 'null');
+  } catch (e) { console.log('No pending booking context:', e); }
+
+  if (status === 'success') {
+    card.innerHTML = `
+      <div class="icon">&#9989;</div>
+      <h1>Deposit Received</h1>
+      <p>Your card payment was successful. Your slot is now secured.</p>
+      <div class="amt">JMD ${Number(total).toLocaleString()}</div>
+      <p class="ref">TRANSACTION ${transactionId}<br>ORDER ${orderId}</p>
+      <a class="btn" href="/thankyou">Continue</a>
+    `;
+
+    // Log to Supabase and notify — best-effort, non-blocking for the user
+    try {
+      if (pending) {
+        const { data: existing } = await db.from('clients').select('id').eq('phone', pending.phone).maybeSingle();
+        let clientId = existing?.id;
+        if (!clientId) {
+          const { data: nc } = await db.from('clients').insert([{
+            full_name: pending.name, phone: pending.phone, email: pending.email || null,
+            referral_source: 'Website — Book Page (WiPay)'
+          }]).select('id').single();
+          clientId = nc?.id;
+        }
+        if (clientId) {
+          await db.from('service_records').insert([{
+            client_id: clientId,
+            service_date: new Date().toISOString().split('T')[0],
+            job_notes: `Booking ref: ${pending.ticket} | WiPay deposit paid | Order: ${orderId} | Transaction: ${transactionId}`,
+            payment_status: 'Deposit Paid (WiPay)'
+          }]);
+        }
+
+        emailjs.send('service_zesixiz', 'template_kr6ydp8', {
+          to_email: 'extracleancarwash@gmail.com',
+          client_name: pending.name,
+          phone: pending.phone,
+          service: 'WiPay deposit payment received',
+          date: 'See booking record',
+          time: '',
+          address: `Order ${orderId} — JMD ${total} — Txn ${transactionId}`
+        }).catch(e => console.log('Owner notify failed:', e));
+      }
+    } catch (e) {
+      console.log('Post-payment logging failed (payment itself still succeeded):', e);
+    }
+
+    sessionStorage.removeItem('ecad_pending_booking');
+
+  } else if (status === 'failed' || status === 'error') {
+    card.classList.add('fail');
+    card.innerHTML = `
+      <div class="icon">&#10060;</div>
+      <h1>Payment Not Completed</h1>
+      <p>${message || 'Your card payment could not be processed.'}</p>
+      <p>No charge was made. You can try again or use bank transfer instead — nothing has been booked yet.</p>
+      <a class="btn" href="/book">Back to Booking</a>
+    `;
+  } else {
+    card.classList.add('fail');
+    card.innerHTML = `
+      <div class="icon">&#10068;</div>
+      <h1>Something Went Wrong</h1>
+      <p>We couldn&rsquo;t confirm the payment status. If you completed a card payment, please WhatsApp us your reference before assuming it went through.</p>
+      <a class="btn" href="/book">Back to Booking</a>
+    `;
+  }
+}
+
+handleResponse();
+</script>
+</body>
+</html>
