@@ -63,13 +63,22 @@ async function handleResponse() {
   } catch (e) { console.log('No pending booking context:', e); }
 
   if (status === 'success') {
+    const tyParams = new URLSearchParams({
+      name: pending?.name || '',
+      svc: pending?.svc || '',
+      date: pending?.date || '',
+      time: pending?.time || '',
+      addr: pending?.addr || ''
+    });
+    const continueUrl = '/thankyou?' + tyParams.toString();
+
     card.innerHTML = `
       <div class="icon">&#9989;</div>
       <h1>Deposit Received</h1>
       <p>Your card payment was successful. Your slot is now secured.</p>
       <div class="amt">JMD ${Number(total).toLocaleString()}</div>
       <p class="ref">TRANSACTION ${transactionId}<br>ORDER ${orderId}</p>
-      <a class="btn" href="/thankyou">Continue</a>
+      <a class="btn" href="${continueUrl}">Continue</a>
     `;
 
     // Log to Supabase and notify — best-effort, non-blocking for the user

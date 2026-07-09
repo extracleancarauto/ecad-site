@@ -656,6 +656,10 @@ function payWithWiPay() {
   const name  = document.getElementById('b-name').value.trim();
   const email = document.getElementById('b-email').value.trim();
   const phone = document.getElementById('b-phone').value.trim();
+  const addr  = document.getElementById('b-addr').value.trim();
+  const svc   = document.getElementById('b-service').value;
+  const bDate = document.getElementById('b-date').value;
+  const bTime = document.getElementById('b-time').value;
 
   if (!name || !email || !phone) {
     showErr('Please fill in your name, email, and phone before paying — we need these to confirm your booking.');
@@ -671,13 +675,15 @@ function payWithWiPay() {
   const ticketSuffix = ticketNo.replace(/[^a-zA-Z0-9]/g, '').slice(-4);
   const orderId = (ticketSuffix + Date.now().toString(36).toUpperCase()).slice(0, 16);
 
-  // Stash booking context so payment-response.html can finish creating the record after payment
+  // Stash booking context so payment-response.html can finish creating the record
+  // AND build a proper thank-you page link with the client's actual booking details
   try {
     sessionStorage.setItem('ecad_pending_booking', JSON.stringify({
       order_id: orderId,
       name, email, phone,
       deposit: depositNum,
-      ticket: ticketNo
+      ticket: ticketNo,
+      svc, addr, date: bDate, time: bTime
     }));
   } catch (e) { console.log('sessionStorage unavailable:', e); }
 
