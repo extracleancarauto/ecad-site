@@ -648,13 +648,25 @@ const WIPAY = {
 // Set to true once WiPay confirms sandbox/live is working correctly.
 // This single line controls both the button's visibility and whether
 // tapping it actually works — no other edits needed anywhere else.
-const CARD_PAYMENT_ENABLED = false;
+// ── CARD PAYMENT ON/OFF — controlled live from the dashboard ────────
+// Reads from Supabase on page load. If that fails for any reason, falls
+// back to OFF (the safe default) rather than risking it being silently on.
+let CARD_PAYMENT_ENABLED = false;
 
-// Show/hide the button to match the flag above — runs once the page loads.
-document.addEventListener('DOMContentLoaded', () => {
+async function loadCardPaymentSetting() {
+  try {
+    const { data, error } = await db.from('site_settings').select('value').eq('key', 'card_payment_enabled').maybeSingle();
+    if (!error && data) {
+      CARD_PAYMENT_ENABLED = data.value === 'true';
+    }
+  } catch (e) {
+    console.log('Could not load card payment setting, defaulting to off:', e);
+  }
   const btn = document.getElementById('pay-wipay-btn');
   if (btn) btn.style.display = CARD_PAYMENT_ENABLED ? '' : 'none';
-});
+}
+
+document.addEventListener('DOMContentLoaded', loadCardPaymentSetting);
 
 async function payWithWiPay() {
   if (!CARD_PAYMENT_ENABLED) {

@@ -1513,6 +1513,25 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
           <span class="view-eyebrow">Single Source of Truth</span>
           <h1 class="view-h1">Service <em>Pricing</em></h1>
         </div>
+
+        <div class="section-card" style="margin-bottom:20px;">
+          <div class="sc-head">
+            <span class="sc-title">Payment Settings</span>
+            <span class="sc-meta">Controls the "Pay by Card" button on the live booking site</span>
+          </div>
+          <div style="padding:20px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="font-size:13px;color:var(--silver-l);font-weight:500;margin-bottom:4px;">Accept Card Payments (WiPay)</div>
+              <div style="font-size:11px;color:var(--silver-d);" id="card-toggle-status">Loading current status…</div>
+            </div>
+            <label style="position:relative;display:inline-block;width:52px;height:28px;flex-shrink:0;">
+              <input type="checkbox" id="card-payment-toggle" onchange="toggleCardPayment(this.checked)" style="opacity:0;width:0;height:0;">
+              <span id="card-toggle-track" style="position:absolute;cursor:pointer;inset:0;background:rgba(255,255,255,.12);border-radius:28px;transition:.2s;"></span>
+              <span id="card-toggle-knob" style="position:absolute;height:22px;width:22px;left:3px;top:3px;background:var(--silver-l);border-radius:50%;transition:.2s;"></span>
+            </label>
+          </div>
+        </div>
+
         <div class="section-card">
           <div class="sc-head">
             <span class="sc-title">Live Price Grid</span>
@@ -1927,7 +1946,7 @@ function goTo(name) {
   if (name === 'records')     loadRecords();
   if (name === 'maintenance') loadMaintenance();
   if (name === 'command')     loadCommand();
-  if (name === 'pricing')     loadPricing();
+  if (name === 'pricing')     { loadPricing(); loadCardPaymentToggle(); }
 
   // Close sidebar on mobile
   if (window.innerWidth <= 820) closeSidebar();
@@ -2637,6 +2656,53 @@ async function loadMaintenance() {
 const SERVICE_ORDER = ['t0', 't1', 't2', 't3', 'cr', 'crs'];
 const VEHICLE_ORDER  = ['Sedan / Car', 'SUV / Crossover', 'Pickup / Van'];
 let pricingRows = [];
+
+async function loadCardPaymentToggle() {
+  const toggle = document.getElementById('card-payment-toggle');
+  const track = document.getElementById('card-toggle-track');
+  const knob = document.getElementById('card-toggle-knob');
+  const status = document.getElementById('card-toggle-status');
+
+  try {
+    const { data, error } = await db.from('site_settings').select('value').eq('key', 'card_payment_enabled').maybeSingle();
+    if (error) throw error;
+    const isOn = data?.value === 'true';
+    toggle.checked = isOn;
+    track.style.background = isOn ? 'rgba(120,200,150,.55)' : 'rgba(255,255,255,.12)';
+    knob.style.left = isOn ? '27px' : '3px';
+    status.textContent = isOn
+      ? 'Card payments are LIVE — clients can pay by card right now.'
+      : 'Card payments are OFF — clients only see bank transfer.';
+  } catch (e) {
+    status.textContent = 'Could not load current status — check connection and reopen this tab.';
+    console.log('loadCardPaymentToggle error:', e);
+  }
+}
+
+async function toggleCardPayment(turnOn) {
+  const track = document.getElementById('card-toggle-track');
+  const knob = document.getElementById('card-toggle-knob');
+  const status = document.getElementById('card-toggle-status');
+  const toggle = document.getElementById('card-payment-toggle');
+
+  status.textContent = 'Saving…';
+  try {
+    const { error } = await db.from('site_settings')
+      .update({ value: turnOn ? 'true' : 'false', updated_at: new Date().toISOString() })
+      .eq('key', 'card_payment_enabled');
+    if (error) throw error;
+
+    track.style.background = turnOn ? 'rgba(120,200,150,.55)' : 'rgba(255,255,255,.12)';
+    knob.style.left = turnOn ? '27px' : '3px';
+    status.textContent = turnOn
+      ? 'Card payments are LIVE — clients can pay by card right now.'
+      : 'Card payments are OFF — clients only see bank transfer.';
+  } catch (e) {
+    alert('Could not save this change: ' + (e.message || e) + '\n\nThe toggle has been reset — please try again.');
+    toggle.checked = !turnOn;
+    loadCardPaymentToggle();
+  }
+}
 
 async function loadPricing() {
   const wrap = document.getElementById('pricing-wrap');
