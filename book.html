@@ -332,6 +332,7 @@ nav {
         <div class="fg"><label>WhatsApp / Phone *</label><input type="tel" id="b-phone" placeholder="(876) 000-0000" autocomplete="tel"></div>
         <div class="fg"><label>Email *</label><input type="email" id="b-email" placeholder="email@example.com" autocomplete="email" required></div>
         <div class="fg full"><label>Service Address *</label><input type="text" id="b-addr" placeholder="Where should we come to?"></div>
+        <div class="fg full"><label>Referral Code <span style="opacity:.5;font-weight:400;">(optional — got a code from a friend?)</span></label><input type="text" id="b-referral" placeholder="e.g. PERR482" style="text-transform:uppercase;" maxlength="10"></div>
       </div>
     </div>
 
@@ -631,7 +632,6 @@ const SVC_ACCENT = {
 const DEPOSIT_RATE = 0.35;
 
 // ── WIPAY CONFIGURATION ──────────────────────────────────────────
-// TODO: replace ACCOUNT_NUMBER with your real WiPay Account Number (WiPay dashboard → Account).
 // Switch ENVIRONMENT to 'live' only after a successful sandbox test end-to-end.
 const WIPAY = {
   LIVE_ACCOUNT_NUMBER:    '2324353163',
@@ -799,6 +799,7 @@ async function submitIntake() {
   const svc   = document.getElementById('b-service').value;
   const email = document.getElementById('b-email').value.trim();
   const condition = document.getElementById('b-condition').value;
+  const referralCode = document.getElementById('b-referral').value.trim().toUpperCase();
   document.getElementById('form-err').classList.remove('show');
 
   if (!name || !phone || !addr || !vtype || !svc || !email || !condition) {
@@ -841,6 +842,32 @@ async function submitIntake() {
         service_address: addr, referral_source: 'Website — Book Page'
       }]).select('id').single();
       clientId = nc?.id;
+
+      // If a referral code was entered, look up the referrer and log it —
+      // only for genuinely new clients, so existing clients can't repeatedly
+      // "refer themselves" or double-dip on old bookings.
+      if (clientId && referralCode) {
+        try {
+          const { data: referrer } = await db
+            .from('clients')
+            .select('id, referral_code')
+            .eq('referral_code', referralCode)
+            .maybeSingle();
+
+          if (referrer) {
+            await db.from('referrals').insert([{
+              referral_code: referralCode,
+              referrer_client_id: referrer.id,
+              new_client_id: clientId,
+              new_client_name: name,
+              new_client_phone: phone,
+              status: 'booked'
+            }]);
+          }
+        } catch (e) {
+          console.log('Referral lookup/logging failed (booking still proceeds):', e);
+        }
+      }
     }
 
     if (clientId) {
@@ -864,6 +891,7 @@ async function submitIntake() {
       const conditionText = conditionSel ? conditionSel.options[conditionSel.selectedIndex].text : '';
       const jobNotes = [
         'Booking ref: ' + ticketNo,
+        referralCode ? 'Referral code used: ' + referralCode : null,
         vehicleStr ? 'Vehicle detail: ' + vehicleStr : null,
         date ? 'Requested date: ' + date : null,
         time ? 'Requested time: ' + time : null,
