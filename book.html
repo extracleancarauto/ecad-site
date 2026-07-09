@@ -681,7 +681,7 @@ async function payWithWiPay() {
   // own response. Supabase is the source of truth here, not sessionStorage (which is also
   // less reliable across the redirect to a different domain and back).
   try {
-    await db.from('wipay_pending').insert([{
+    const { error: pendingErr } = await db.from('wipay_pending').insert([{
       order_id: orderId,
       original_total: depositNum,
       name, email, phone,
@@ -689,8 +689,17 @@ async function payWithWiPay() {
       booking_date: bDate, booking_time: bTime,
       ticket: ticketNo
     }]);
+    if (pendingErr) {
+      alert('Could not save booking context before payment:\n\n' + pendingErr.message + '\n\nPayment cannot proceed safely — please try again or use bank transfer.');
+      btn.disabled = false;
+      btn.textContent = 'Pay by Card (WiPay)';
+      return;
+    }
   } catch (e) {
-    console.log('Could not store pending WiPay context:', e);
+    alert('Could not save booking context before payment:\n\n' + (e.message || e) + '\n\nPayment cannot proceed safely — please try again or use bank transfer.');
+    btn.disabled = false;
+    btn.textContent = 'Pay by Card (WiPay)';
+    return;
   }
 
   // Stash booking context locally too, as a fallback for the thank-you page
