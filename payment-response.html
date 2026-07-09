@@ -63,12 +63,20 @@ async function handleResponse() {
   } catch (e) { console.log('No pending booking context:', e); }
 
   if (status === 'success') {
+    // Prefer booking details passed directly by the verification edge function
+    // (reliable, server-side) over sessionStorage (can fail across the WiPay redirect).
+    const edgeName = qs('name');
+    const edgeSvc  = qs('svc');
+    const edgeDate = qs('bdate');
+    const edgeTime = qs('btime');
+    const edgeAddr = qs('addr');
+
     const tyParams = new URLSearchParams({
-      name: pending?.name || '',
-      svc: pending?.svc || '',
-      date: pending?.date || '',
-      time: pending?.time || '',
-      addr: pending?.addr || ''
+      name: edgeName || pending?.name || '',
+      svc: edgeSvc || pending?.svc || '',
+      date: edgeDate || pending?.date || '',
+      time: edgeTime || pending?.time || '',
+      addr: edgeAddr || pending?.addr || ''
     });
     const continueUrl = '/thankyou?' + tyParams.toString();
 

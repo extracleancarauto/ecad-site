@@ -644,7 +644,7 @@ const WIPAY = {
   RESPONSE_URL:   'https://xsyndxqrcnqsvxcrpkqx.supabase.co/functions/v1/super-service'
 };
 
-function payWithWiPay() {
+async function payWithWiPay() {
   const depositText = document.getElementById('dep-amount').textContent; // e.g. "JMD 5,250"
   const depositNum = parseFloat(depositText.replace(/[^\d.]/g, ''));
 
@@ -675,8 +675,25 @@ function payWithWiPay() {
   const ticketSuffix = ticketNo.replace(/[^a-zA-Z0-9]/g, '').slice(-4);
   const orderId = (ticketSuffix + Date.now().toString(36).toUpperCase()).slice(0, 16);
 
-  // Stash booking context so payment-response.html can finish creating the record
-  // AND build a proper thank-you page link with the client's actual booking details
+  // Store the ORIGINAL pre-fee total and booking details in Supabase, keyed by order_id.
+  // This is critical: WiPay's returned "total" includes their transaction fee, but the
+  // hash verification must use the ORIGINAL total — so it can't be read back from WiPay's
+  // own response. Supabase is the source of truth here, not sessionStorage (which is also
+  // less reliable across the redirect to a different domain and back).
+  try {
+    await db.from('wipay_pending').insert([{
+      order_id: orderId,
+      original_total: depositNum,
+      name, email, phone,
+      svc, addr,
+      booking_date: bDate, booking_time: bTime,
+      ticket: ticketNo
+    }]);
+  } catch (e) {
+    console.log('Could not store pending WiPay context:', e);
+  }
+
+  // Stash booking context locally too, as a fallback for the thank-you page
   try {
     sessionStorage.setItem('ecad_pending_booking', JSON.stringify({
       order_id: orderId,
