@@ -2058,7 +2058,12 @@ async function loadOverview() {
       { data: mData }
     ] = await Promise.all([
       db.from('clients').select('*', { count: 'exact', head: true }),
-      db.from('service_records').select('*', { count: 'exact', head: true }).eq('payment_status', 'Pending'),
+      db.from('service_records').select('*', { count: 'exact', head: true }).in('payment_status', [
+        'Pending',
+        'Deposit Paid (WiPay — Verified)',
+        'WiPay Unverified — Check Manually',
+        'Deposit Paid (WiPay)'
+      ]),
       db.from('service_records').select('*', { count: 'exact', head: true }),
       db.from('service_records').select('id').gte('created_at', monthStart)
     ]);
@@ -2105,7 +2110,12 @@ async function loadPending() {
   try {
     const { data, error } = await db.from('service_records')
       .select('*, clients(full_name, phone, service_address)')
-      .eq('payment_status', 'Pending')
+      .in('payment_status', [
+        'Pending',
+        'Deposit Paid (WiPay — Verified)',
+        'WiPay Unverified — Check Manually',
+        'Deposit Paid (WiPay)'
+      ])
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -2156,7 +2166,12 @@ async function refreshBadge() {
   try {
     const { count } = await db.from('service_records')
       .select('*', { count: 'exact', head: true })
-      .eq('payment_status', 'Pending');
+      .in('payment_status', [
+        'Pending',
+        'Deposit Paid (WiPay — Verified)',
+        'WiPay Unverified — Check Manually',
+        'Deposit Paid (WiPay)'
+      ]);
     const b = document.getElementById('badge-pending');
     if (count > 0) { b.textContent = count; b.classList.add('vis'); }
     else b.classList.remove('vis');
@@ -2165,7 +2180,13 @@ async function refreshBadge() {
 
 async function approveSR(id) {
   try {
-    await db.from('service_records').update({ payment_status: 'Confirmed' }).eq('id', id);
+    // Preserve any WiPay payment record instead of overwriting it — losing
+    // that history would make it look like no deposit was ever collected.
+    const { data: current } = await db.from('service_records').select('payment_status').eq('id', id).maybeSingle();
+    const wasWiPay = current?.payment_status && current.payment_status.includes('WiPay');
+    const newStatus = wasWiPay ? `Confirmed — ${current.payment_status}` : 'Confirmed';
+
+    await db.from('service_records').update({ payment_status: newStatus }).eq('id', id);
     toast('Booking confirmed', 'ok');
     loadPending();
     refreshBadge();
