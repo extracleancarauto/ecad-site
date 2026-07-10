@@ -15,6 +15,7 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
   --border:rgba(184,200,214,0.22);--bsoft:rgba(255,255,255,0.06);
   --text:#f0ede6;--muted:#8a8378;--dim:#5a574f;
   --green:#4caf82;--amber:#c9a84c;--red:#cf5b5b;--copper:#c9783c;
+  --green-d:rgba(76,175,130,0.14);--amber-d:rgba(212,168,67,0.14);--red-d:rgba(207,91,91,0.13);
 }
 
 /* LOGIN */
@@ -68,6 +69,25 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
 .cal-day.fully-booked:hover{background:rgba(207,91,91,.22)}
 .cal-day.past{opacity:.35;cursor:default}
 .day-count-badge{position:absolute;top:3px;right:3px;background:var(--silver-l,#d4e2ec);color:#0a0a0a;font-size:9px;font-weight:700;min-width:14px;height:14px;border-radius:7px;display:flex;align-items:center;justify-content:center;padding:0 3px;line-height:1;}
+
+/* ── WEATHER ────────────────────────────────────────────────────── */
+.weather-strip{display:flex;gap:10px;overflow-x:auto;padding:14px 2px 4px;width:100%;min-width:0;-webkit-overflow-scrolling:touch;}
+.weather-day{flex:1 0 100px;min-width:100px;background:var(--s2);border:1px solid var(--bsoft);border-radius:8px;padding:12px 8px 10px;text-align:center;transition:border-color .2s;cursor:pointer;}
+.weather-day.is-today{border-color:rgba(184,200,214,.4);}
+.weather-day-name{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);margin-bottom:8px;}
+.weather-icon{font-size:24px;margin-bottom:6px;line-height:1;}
+.weather-temp{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--silver-l);font-weight:400;}
+.weather-temp .lo{color:var(--dim);font-size:11px;margin-left:3px;}
+.weather-rain{font-size:9px;color:var(--muted);margin-top:5px;}
+.weather-tag{font-size:7.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:3px;margin-top:8px;display:inline-block;white-space:nowrap;}
+.weather-tag.good{background:var(--green-d);color:var(--green);}
+.weather-tag.caution{background:var(--amber-d);color:var(--amber);}
+.weather-tag.avoid{background:var(--red-d);color:var(--red);}
+.dp-weather{background:var(--s2);border:1px solid var(--bsoft);border-radius:8px;padding:14px 16px;margin-bottom:14px;}
+.dp-weather-row{display:flex;align-items:center;gap:12px;}
+.dp-weather-icon{font-size:32px;line-height:1;}
+.dp-weather-detail{font-size:11px;color:var(--muted);line-height:1.7;}
+.dp-weather-detail strong{color:var(--silver-l);font-weight:500;}
 .cal-day.today{box-shadow:0 0 0 2px var(--silver-d)}
 .day-num{font-size:13px;line-height:1}
 .day-label{font-size:8px;margin-top:2px;letter-spacing:.04em}
@@ -158,6 +178,12 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
       <div class="bp-note">This updates automatically on ecadja.com when you change day statuses below</div>
     </div>
 
+    <!-- WEATHER -->
+    <div class="upcoming">
+      <div class="upcoming-title">This Week's Weather — Kingston / St. Andrew</div>
+      <div class="weather-strip" id="weather-strip"><div style="font-size:12px;color:var(--dim)">Loading...</div></div>
+    </div>
+
     <!-- UPCOMING ROTATIONS -->
     <div class="upcoming">
       <div class="upcoming-title">Upcoming Availability — Next 4 Rotations</div>
@@ -198,6 +224,7 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
   <div class="day-card">
     <div class="day-card-title" id="dp-date"></div>
     <div class="day-card-sub" id="dp-dow"></div>
+    <div id="dp-weather" style="display:none;"></div>
     <div id="dp-bookings-list" style="margin-bottom:16px;"></div>
     <div class="status-btns">
       <div class="status-btn" id="sb-available" onclick="setStatus('available')">&#10003; Available</div>
@@ -286,12 +313,73 @@ function doLogout() {
   document.getElementById('un').value = '';
 }
 
+// ── WEATHER (Open-Meteo — free, no key, Kingston/St. Andrew) ──────
+const WMO = {
+  0:['☀️','Clear'], 1:['🌤️','Mostly Clear'], 2:['⛅','Partly Cloudy'], 3:['☁️','Cloudy'],
+  45:['🌫️','Foggy'], 48:['🌫️','Foggy'],
+  51:['🌦️','Light Drizzle'], 53:['🌦️','Drizzle'], 55:['🌧️','Heavy Drizzle'],
+  61:['🌦️','Light Rain'], 63:['🌧️','Rain'], 65:['🌧️','Heavy Rain'],
+  80:['🌦️','Rain Showers'], 81:['🌧️','Rain Showers'], 82:['⛈️','Violent Showers'],
+  95:['⛈️','Thunderstorm'], 96:['⛈️','Storm w/ Hail'], 99:['⛈️','Storm w/ Hail']
+};
+function weatherTag(code, tMax, precipProb) {
+  if (precipProb >= 60 || [65,82,95,96,99].includes(code)) return ['avoid', 'Rain likely'];
+  if (precipProb >= 35 || [61,63,80,81].includes(code))    return ['caution', 'Rain possible'];
+  if (tMax >= 33) return ['caution', 'Very hot'];
+  return ['good', 'Good for jobs'];
+}
+
+let weatherByDate = {};
+
+async function loadWeather() {
+  const strip = document.getElementById('weather-strip');
+  if (!strip) return;
+  try {
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=17.9970&longitude=-76.7936'
+      + '&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_probability_max,windspeed_10m_max,uv_index_max'
+      + '&timezone=America%2FJamaica&forecast_days=7';
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('weather fetch failed');
+    const data = await res.json();
+    const days = data.daily.time;
+    weatherByDate = {};
+
+    const cards = days.map((dateStr, i) => {
+      const code = data.daily.weathercode[i];
+      const tMax = Math.round(data.daily.temperature_2m_max[i]);
+      const tMin = Math.round(data.daily.temperature_2m_min[i]);
+      const precip = data.daily.precipitation_probability_max[i] ?? 0;
+      const wind = Math.round(data.daily.windspeed_10m_max?.[i] ?? 0);
+      const uv = data.daily.uv_index_max?.[i] ?? null;
+      const [icon, label] = WMO[code] || ['🌡️', '—'];
+      const [tagClass, tagText] = weatherTag(code, tMax, precip);
+
+      weatherByDate[dateStr] = { icon, label, tMax, tMin, precip, wind, uv, tagClass, tagText };
+
+      const d = new Date(dateStr + 'T12:00:00');
+      const isToday = i === 0;
+      const dayName = isToday ? 'Today' : d.toLocaleDateString('en-US', { weekday: 'short' });
+      return `<div class="weather-day${isToday ? ' is-today' : ''}">
+        <div class="weather-day-name">${dayName}</div>
+        <div class="weather-icon" title="${label}">${icon}</div>
+        <div class="weather-temp">${tMax}°<span class="lo">${tMin}°</span></div>
+        <div class="weather-rain">💧 ${precip}%</div>
+        <span class="weather-tag ${tagClass}">${tagText}</span>
+      </div>`;
+    }).join('');
+    strip.innerHTML = cards;
+  } catch (err) {
+    strip.innerHTML = '<div style="font-size:12px;color:var(--dim);padding:8px 0;">Could not load forecast right now.</div>';
+  }
+}
+
 // ── INIT ──────────────────────────────────────────────────────────
 let bookingCounts = {};
 
 async function init() {
   await loadAvailability();
   await loadBookingCounts();
+  loadWeather();
   renderCalendar();
   renderUpcoming();
   renderBanner();
@@ -490,6 +578,24 @@ function openDayPanel(dateStr, dateObj) {
   ['available','booked','fully-booked'].forEach(s => {
     document.getElementById('sb-' + s).className = 'status-btn' + (avail?.status === s ? ' active-' + s : '');
   });
+
+  const wxWrap = document.getElementById('dp-weather');
+  const wx = weatherByDate[dateStr];
+  if (wx) {
+    wxWrap.style.display = 'block';
+    wxWrap.innerHTML = `
+      <div class="dp-weather-row">
+        <div class="dp-weather-icon" title="${wx.label}">${wx.icon}</div>
+        <div class="dp-weather-detail">
+          <strong>${wx.tMax}°</strong> / ${wx.tMin}° &middot; ${wx.label}<br>
+          💧 ${wx.precip}% rain chance &middot; 💨 ${wx.wind} km/h wind${wx.uv !== null ? ' &middot; UV ' + wx.uv : ''}<br>
+          <span class="weather-tag ${wx.tagClass}" style="margin-top:6px;">${wx.tagText}</span>
+        </div>
+      </div>`;
+  } else {
+    wxWrap.style.display = 'none';
+    wxWrap.innerHTML = '';
+  }
 
   document.getElementById('day-panel').classList.add('open');
   loadDayBookings(dateStr);
