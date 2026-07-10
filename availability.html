@@ -38,11 +38,11 @@ body{overflow-x:hidden}
 
 /* APP */
 #app{display:none;flex-direction:column;min-height:100vh}
-.topbar{background:rgba(10,10,10,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100}
+.topbar{background:rgba(10,10,10,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100;min-width:0}
 .topbar-inner{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;min-height:56px;padding:8px 0}
 .topbar-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--silver-l)}
 .topbar-title span{font-size:9px;font-family:'Sora',sans-serif;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-left:10px}
-.main{max-width:900px;margin:0 auto;padding:28px 20px}
+.main{max-width:900px;margin:0 auto;padding:28px 20px;min-width:0;width:100%}
 
 /* BANNER PREVIEW */
 .banner-preview{background:linear-gradient(135deg,#0d1520,#111e30);border:1px solid var(--silver-d);border-radius:10px;padding:22px 24px;margin-bottom:24px}
@@ -394,25 +394,6 @@ async function init() {
   renderCalendar();
   renderUpcoming();
   renderBanner();
-
-  // TEMPORARY DEBUG — find exactly what's forcing the page wider than the viewport
-  setTimeout(() => {
-    const vw = window.innerWidth;
-    const bodyWidth = document.body.scrollWidth;
-    let report = `Viewport width: ${vw}\nBody scrollWidth: ${bodyWidth}\n\n`;
-    if (bodyWidth > vw) {
-      report += 'OVERFLOWING ELEMENTS:\n';
-      document.querySelectorAll('body *').forEach(el => {
-        const rect = el.getBoundingClientRect();
-        if (rect.right > vw + 2) {
-          report += `${el.tagName}.${el.className || '(no class)'} — right edge: ${Math.round(rect.right)}, width: ${Math.round(rect.width)}\n`;
-        }
-      });
-    } else {
-      report += 'No overflow detected at this moment.';
-    }
-    alert(report);
-  }, 1500);
 }
 
 async function loadBookingCounts() {
