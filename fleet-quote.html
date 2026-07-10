@@ -662,10 +662,6 @@ footer {
             <!-- Fleet details -->
             <div class="form-section-label">Fleet Details</div>
 
-            <div class="fg count-field">
-              <label for="fq-count">Total Number of Vehicles <span class="req-star">*</span></label>
-              <input type="number" id="fq-count" placeholder="e.g. 8" min="3" max="200">
-            </div>
             <div class="fg">
               <label for="fq-industry">Industry / Business Type</label>
               <select id="fq-industry">
@@ -680,42 +676,59 @@ footer {
                 <option>Other</option>
               </select>
             </div>
+            <div class="fg">
+              <label for="fq-service">Service Tier <span class="req-star">*</span></label>
+              <select id="fq-service" onchange="calcFleetEstimate()">
+                <option value="" disabled selected>Select a service type</option>
+                <option data-tier="t0">Tier 0 — Quick Wash (exterior only)</option>
+                <option data-tier="t1">Tier 1 — Full Clean (exterior full detail)</option>
+                <option data-tier="t2">Tier 2 — Deep Clean</option>
+                <option data-tier="t3">Tier 3 — Showroom Detail</option>
+              </select>
+            </div>
+
+            <div class="form-section-label" style="margin-top:20px;">Vehicle Count by Category</div>
+            <div class="fg">
+              <label for="fq-n-sedan">Sedan / Car</label>
+              <input type="number" id="fq-n-sedan" min="0" value="0" oninput="calcFleetEstimate()">
+            </div>
+            <div class="fg">
+              <label for="fq-n-suv">SUV / Crossover</label>
+              <input type="number" id="fq-n-suv" min="0" value="0" oninput="calcFleetEstimate()">
+            </div>
+            <div class="fg">
+              <label for="fq-n-pickup">Pickup / Van</label>
+              <input type="number" id="fq-n-pickup" min="0" value="0" oninput="calcFleetEstimate()">
+            </div>
+
+            <!-- LIVE ESTIMATE -->
+            <div class="fg full" id="fleet-estimate-box" style="display:none;background:#141414;border:1px solid rgba(184,200,214,.18);border-radius:8px;padding:18px 20px;margin:6px 0 4px;">
+              <div style="font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:#8a8378;margin-bottom:10px;">Estimated Investment</div>
+              <div id="fleet-estimate-lines" style="font-size:12px;color:#b8c8d6;line-height:1.9;"></div>
+              <div style="border-top:1px solid rgba(255,255,255,.08);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;align-items:baseline;">
+                <span style="font-size:11px;color:#8a8378;">Per-Visit Total (fleet-discounted)</span>
+                <span id="fleet-estimate-total" style="font-family:'Cormorant Garamond',serif;font-size:24px;color:#d4e2ec;">—</span>
+              </div>
+              <div id="fleet-estimate-recurring" style="font-size:11px;color:#8a8378;margin-top:8px;"></div>
+              <div style="font-size:10px;color:#5a574f;margin-top:10px;line-height:1.6;">Estimate only — final pricing confirmed after an on-site walkthrough. Fleet discount tiers: 3–5 vehicles (10% off), 6–14 (15% off), 15+ (20% off).</div>
+            </div>
+
             <div class="fg full fleet-list">
-              <label for="fq-vehicles">Vehicle Mix <span class="req-star">*</span></label>
-              <textarea id="fq-vehicles" placeholder="List your vehicles — type, make, model, year where known.&#10;e.g. 4× Toyota Hiace 2019, 2× Toyota Axio 2021, 1× Suzuki Jimny 2020"></textarea>
+              <label for="fq-vehicles">Vehicle Details <span style="opacity:.5;font-weight:400;text-transform:none;letter-spacing:0;">(optional — make, model, year)</span></label>
+              <textarea id="fq-vehicles" placeholder="e.g. 4× Toyota Hiace 2019, 2× Toyota Axio 2021, 1× Suzuki Jimny 2020"></textarea>
             </div>
 
             <!-- Service preferences -->
             <div class="form-section-label">Service Preferences</div>
 
             <div class="fg">
-              <label for="fq-service">Preferred Service Tier</label>
-              <select id="fq-service">
-                <option value="" disabled selected>Select a service type</option>
-                <optgroup label="── Exterior ──">
-                  <option>Tier 0 — Quick Wash (exterior only)</option>
-                  <option>Tier 1 — Full Clean (exterior full detail)</option>
-                  <option>Tier 2 — Deep Clean</option>
-                  <option>Tier 3 — Showroom Detail</option>
-                </optgroup>
-                <optgroup label="── Interior ──">
-                  <option>Cabin Revival — Refresh (interior)</option>
-                  <option>Cabin Revival — Restore (full interior)</option>
-                </optgroup>
-                <optgroup label="── Combined ──">
-                  <option>Full Clean + Cabin Revival (exterior &amp; interior)</option>
-                  <option>Mixed — varies per vehicle</option>
-                </optgroup>
-              </select>
-            </div>
-            <div class="fg">
               <label for="fq-frequency">Service Frequency</label>
-              <select id="fq-frequency">
+              <select id="fq-frequency" onchange="calcFleetEstimate()">
                 <option value="" disabled selected>How often?</option>
-                <option>Weekly</option>
-                <option>Bi-weekly (every 2 weeks)</option>
-                <option>Monthly</option>
-                <option>Bi-monthly (every 2 months)</option>
+                <option data-per-year="52">Weekly</option>
+                <option data-per-year="26">Bi-weekly (every 2 weeks)</option>
+                <option data-per-year="12">Monthly</option>
+                <option data-per-year="6">Bi-monthly (every 2 months)</option>
                 <option>Custom / Discuss with us</option>
               </select>
             </div>
@@ -856,22 +869,115 @@ const db = createClient(
   'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI'
 );
 
+// ── FLEET PRICING CALCULATOR ──────────────────────────────────────
+// Fallback pricing — matches quote-calculator.html exactly. service_pricing
+// table in Supabase is the source of truth; this is only the safety net.
+var FLEET_DEFAULT_P = {
+  sedan:  {t0:[5000,6000],  t1:[8000,10000],  t2:[13000,16000], t3:[23000,28000]},
+  suv:    {t0:[6000,7000],  t1:[10000,12000], t2:[16000,19000], t3:[28000,35000]},
+  pickup: {t0:[7000,8000],  t1:[12000,14000], t2:[19000,22000], t3:[33000,41000]}
+};
+var FLEET_P = FLEET_DEFAULT_P;
+
+async function loadFleetLivePricing() {
+  try {
+    var { data, error } = await db.from('service_pricing').select('*');
+    if (error || !data || !data.length) return; // keep default, fail silently
+    var VTYPE_KEY = { 'Sedan / Car': 'sedan', 'SUV / Crossover': 'suv', 'Pickup / Van': 'pickup' };
+    var fresh = { sedan: {}, suv: {}, pickup: {} };
+    data.forEach(function(row) {
+      var vk = VTYPE_KEY[row.vehicle_type];
+      if (vk && ['t0','t1','t2','t3'].includes(row.service_key)) {
+        fresh[vk][row.service_key] = [row.price_low, row.price_high];
+      }
+    });
+    FLEET_P = fresh;
+  } catch (e) { /* keep default */ }
+}
+loadFleetLivePricing();
+
+function fleetDiscountFor(count) {
+  if (count >= 15) return { pct: 0.20, label: '15+ vehicles — 20% off' };
+  if (count >= 6)  return { pct: 0.15, label: '6–14 vehicles — 15% off' };
+  if (count >= 3)  return { pct: 0.10, label: '3–5 vehicles — 10% off' };
+  return { pct: 0, label: 'Under 3 vehicles — standard retail rate applies' };
+}
+
+function calcFleetEstimate() {
+  const box = document.getElementById('fleet-estimate-box');
+  const tierSel = document.getElementById('fq-service');
+  const tierKey = tierSel.options[tierSel.selectedIndex]?.dataset.tier;
+
+  const counts = {
+    sedan:  parseInt(document.getElementById('fq-n-sedan').value, 10)  || 0,
+    suv:    parseInt(document.getElementById('fq-n-suv').value, 10)    || 0,
+    pickup: parseInt(document.getElementById('fq-n-pickup').value, 10) || 0
+  };
+  const totalCount = counts.sedan + counts.suv + counts.pickup;
+
+  if (!tierKey || totalCount === 0) {
+    box.style.display = 'none';
+    return;
+  }
+
+  const labels = { sedan: 'Sedan / Car', suv: 'SUV / Crossover', pickup: 'Pickup / Van' };
+  const lines = [];
+  let subtotalLow = 0, subtotalHigh = 0;
+
+  Object.keys(counts).forEach(key => {
+    const n = counts[key];
+    if (n <= 0) return;
+    const range = FLEET_P[key]?.[tierKey];
+    if (!range) return;
+    const [low, high] = range;
+    subtotalLow  += low  * n;
+    subtotalHigh += high * n;
+    lines.push(`${n} × ${labels[key]} &mdash; JMD ${low.toLocaleString()}&ndash;${high.toLocaleString()} each`);
+  });
+
+  const disc = fleetDiscountFor(totalCount);
+  const discLow  = Math.round(subtotalLow  * (1 - disc.pct));
+  const discHigh = Math.round(subtotalHigh * (1 - disc.pct));
+
+  document.getElementById('fleet-estimate-lines').innerHTML =
+    lines.join('<br>') + `<br><span style="color:#5a574f;">Fleet tier: ${disc.label}</span>`;
+  document.getElementById('fleet-estimate-total').textContent =
+    `JMD ${discLow.toLocaleString()}–${discHigh.toLocaleString()}`;
+
+  const freqSel = document.getElementById('fq-frequency');
+  const perYear = freqSel.options[freqSel.selectedIndex]?.dataset.perYear;
+  const recurEl = document.getElementById('fleet-estimate-recurring');
+  if (perYear) {
+    const visitsPerYear = parseInt(perYear, 10);
+    const annualLow  = discLow  * visitsPerYear;
+    const annualHigh = discHigh * visitsPerYear;
+    recurEl.textContent = `≈ JMD ${annualLow.toLocaleString()}–${annualHigh.toLocaleString()} annually at this frequency (${visitsPerYear} visits/year)`;
+  } else {
+    recurEl.textContent = '';
+  }
+
+  box.style.display = 'block';
+}
+
 async function submitFleetQuote() {
   const name     = document.getElementById('fq-name').value.trim();
   const company  = document.getElementById('fq-company').value.trim();
   const phone    = document.getElementById('fq-phone').value.trim();
   const email    = document.getElementById('fq-email').value.trim();
   const location = document.getElementById('fq-location').value.trim();
-  const count    = document.getElementById('fq-count').value.trim();
+  const nSedan   = parseInt(document.getElementById('fq-n-sedan').value, 10)  || 0;
+  const nSuv     = parseInt(document.getElementById('fq-n-suv').value, 10)    || 0;
+  const nPickup  = parseInt(document.getElementById('fq-n-pickup').value, 10) || 0;
+  const countNum = nSedan + nSuv + nPickup;
   const vehicles = document.getElementById('fq-vehicles').value.trim();
+  const service  = document.getElementById('fq-service').value;
 
-  if (!name || !company || !phone || !email || !location || !count || !vehicles) {
-    alert('Please fill in all required fields (marked with *) before submitting.');
+  if (!name || !company || !phone || !email || !location || countNum === 0 || !service) {
+    alert('Please fill in all required fields (marked with *), including at least one vehicle count, before submitting.');
     return;
   }
 
   const industry  = document.getElementById('fq-industry').value;
-  const service   = document.getElementById('fq-service').value;
   const frequency = document.getElementById('fq-frequency').value;
   const notes     = document.getElementById('fq-notes').value.trim();
 
@@ -879,11 +985,11 @@ async function submitFleetQuote() {
   btn.textContent = 'Sending…';
   btn.disabled = true;
 
-  // Determine fleet tier based on count
-  const countNum = parseInt(count, 10);
-  let tier = 'Tier A (3–5 vehicles, 10% off)';
-  if (countNum >= 15) tier = 'Tier C (15+ vehicles, 20% off)';
-  else if (countNum >= 6) tier = 'Tier B (6–14 vehicles, 15% off)';
+  const disc = fleetDiscountFor(countNum);
+  const tier = disc.label;
+  const vehicleMix = `${nSedan} Sedan/Car, ${nSuv} SUV/Crossover, ${nPickup} Pickup/Van` + (vehicles ? ` — ${vehicles}` : '');
+  const estimateText = document.getElementById('fleet-estimate-total')?.textContent || 'Not calculated';
+  const estimateRecurring = document.getElementById('fleet-estimate-recurring')?.textContent || '';
 
   // Save to Supabase fleet_quotes table
   try {
@@ -894,7 +1000,7 @@ async function submitFleetQuote() {
       email:           email,
       location:        location,
       vehicle_count:   countNum,
-      vehicle_list:    vehicles,
+      vehicle_list:    vehicleMix,
       industry:        industry || null,
       service_tier:    service || null,
       frequency:       frequency || null,
@@ -916,16 +1022,19 @@ async function submitFleetQuote() {
     'Email: '    + email,
     'Location: ' + location,
     '',
-    'Vehicle Count: ' + count,
+    'Vehicle Count: ' + countNum,
     'Fleet Tier: '    + tier,
-    'Vehicle Mix:',   vehicles,
+    'Vehicle Mix: ' + vehicleMix,
+    '',
+    'Calculator Estimate (per visit): ' + estimateText,
+    estimateRecurring ? estimateRecurring : null,
     '',
     'Industry: '  + (industry  || 'Not specified'),
     'Service: '   + (service   || 'Not specified'),
     'Frequency: ' + (frequency || 'Not specified'),
     '',
     'Notes: ' + (notes || 'None'),
-  ].join('\n');
+  ].filter(Boolean).join('\n');
 
   const emailPromises = [];
 
@@ -935,7 +1044,7 @@ async function submitFleetQuote() {
       to_email:    'extracleancarwash@gmail.com',
       client_name: name + ' — ' + company,
       phone:       phone,
-      service:     'FLEET QUOTE: ' + count + ' vehicles (' + tier + ')',
+      service:     'FLEET QUOTE: ' + countNum + ' vehicles (' + tier + ')',
       date:        new Date().toLocaleDateString('en-JM'),
       time:        'Fleet enquiry',
       address:     location,
@@ -948,7 +1057,7 @@ async function submitFleetQuote() {
     emailjs.send('service_zesixiz', 'template_gya3qb7', {
       to_email:    email,
       client_name: name,
-      service:     'Fleet Quote Request — ' + count + ' vehicles',
+      service:     'Fleet Quote Request — ' + countNum + ' vehicles',
       date:        new Date().toLocaleDateString('en-JM'),
       time:        'Within 24 hours',
       address:     location,
