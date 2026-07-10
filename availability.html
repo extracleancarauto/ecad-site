@@ -132,7 +132,7 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
     <label for="pw">Password</label>
     <input type="password" id="pw" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
     <div class="login-err" id="login-err">Incorrect credentials</div>
-    <button class="btn" onclick="doLogin()">Enter</button>
+    <button class="btn" id="login-btn" onclick="doLogin()">Enter</button>
   </div>
 </div>
 
@@ -216,10 +216,9 @@ body{background-color:#0a0a0a;background-image:url('data:image/jpeg;base64,/9j/4
 const { createClient } = supabase;
 const db = createClient('https://xsyndxqrcnqsvxcrpkqx.supabase.co', 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI');
 
-const USERS = {
-  'hyperion': { password: 'ecad2026', role: 'admin' },
-  'axion':    { password: 'Ax#7291',  role: 'view-only' }
-};
+// Friendly usernames map to real Supabase Auth accounts — same accounts
+// dashboard.html uses. This file no longer stores any password itself.
+const USER_EMAIL = { 'hyperion': { email: 'hyperion@ecadja.com', role: 'admin' }, 'axion': { email: 'axion@ecadja.com', role: 'view-only' } };
 
 let currentRole = null;
 let availData = {};
@@ -229,26 +228,58 @@ let editingDate = null;
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const DAYS = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
+// Restore an existing signed-in session on reload, same as dashboard.html —
+// no need to re-login every visit if already authenticated.
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return;
+  const match = Object.entries(USER_EMAIL).find(([, v]) => v.email === session.user.email);
+  currentRole = match ? match[1].role : 'view-only';
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  const now = new Date();
+  viewYear = now.getFullYear();
+  viewMonth = now.getMonth();
+  init();
+});
+
 // ── AUTH ──────────────────────────────────────────────────────────
-function doLogin() {
+async function doLogin() {
   const un = document.getElementById('un').value.trim().toLowerCase();
   const pw = document.getElementById('pw').value;
-  const user = USERS[un];
-  if (user && user.password === pw) {
-    currentRole = user.role;
-    document.getElementById('login').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    const now = new Date();
-    viewYear = now.getFullYear();
-    viewMonth = now.getMonth();
-    init();
-  } else {
-    const e = document.getElementById('login-err');
-    e.style.display = 'block';
-    setTimeout(() => e.style.display = 'none', 3000);
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-err');
+
+  const user = USER_EMAIL[un];
+  if (!user) {
+    errEl.style.display = 'block';
+    setTimeout(() => errEl.style.display = 'none', 3000);
+    return;
   }
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Authenticating…'; }
+
+  const { data, error } = await db.auth.signInWithPassword({ email: user.email, password: pw });
+
+  if (error || !data.session) {
+    errEl.style.display = 'block';
+    setTimeout(() => errEl.style.display = 'none', 3000);
+    if (btn) { btn.disabled = false; btn.textContent = 'Sign In'; }
+    return;
+  }
+
+  currentRole = user.role;
+  document.getElementById('login').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  const now = new Date();
+  viewYear = now.getFullYear();
+  viewMonth = now.getMonth();
+  init();
 }
+
 function doLogout() {
+  db.auth.signOut();
+  currentRole = null;
   document.getElementById('app').style.display = 'none';
   document.getElementById('login').style.display = 'flex';
   document.getElementById('pw').value = '';
