@@ -39,7 +39,7 @@ body{overflow-x:hidden}
 /* APP */
 #app{display:none;flex-direction:column;min-height:100vh}
 .topbar{background:rgba(10,10,10,.95);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:100}
-.topbar-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:56px}
+.topbar-inner{max-width:900px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 12px;min-height:56px;padding:8px 0}
 .topbar-title{font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--silver-l)}
 .topbar-title span{font-size:9px;font-family:'Sora',sans-serif;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-left:10px}
 .main{max-width:900px;margin:0 auto;padding:28px 20px}
@@ -133,6 +133,15 @@ body{overflow-x:hidden}
   .day-num{font-size:12px}
   .day-label{display:none}
   .legend{gap:10px}
+  .topbar-title span{display:none}
+  .live-clock{display:none}
+  .main{padding:20px 14px}
+}
+@media(min-width:521px) and (max-width:768px){
+  .live-clock{display:none}
+}
+@media(min-width:900px){
+  .main{padding:36px 20px}
 }
 .live-clock{
   font-size:10px;color:var(--silver-d);letter-spacing:.06em;
