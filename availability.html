@@ -394,6 +394,25 @@ async function init() {
   renderCalendar();
   renderUpcoming();
   renderBanner();
+
+  // TEMPORARY DEBUG — find exactly what's forcing the page wider than the viewport
+  setTimeout(() => {
+    const vw = window.innerWidth;
+    const bodyWidth = document.body.scrollWidth;
+    let report = `Viewport width: ${vw}\nBody scrollWidth: ${bodyWidth}\n\n`;
+    if (bodyWidth > vw) {
+      report += 'OVERFLOWING ELEMENTS:\n';
+      document.querySelectorAll('body *').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        if (rect.right > vw + 2) {
+          report += `${el.tagName}.${el.className || '(no class)'} — right edge: ${Math.round(rect.right)}, width: ${Math.round(rect.width)}\n`;
+        }
+      });
+    } else {
+      report += 'No overflow detected at this moment.';
+    }
+    alert(report);
+  }, 1500);
 }
 
 async function loadBookingCounts() {
