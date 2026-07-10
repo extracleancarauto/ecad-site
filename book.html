@@ -862,8 +862,19 @@ async function payWithWiPay() {
     return;
   }
 
+  if (selectedPhotos.length === 0) {
+    document.getElementById('photo-fg').classList.add('field-error');
+    document.getElementById('photo-fg').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showErr('Please attach at least 2 photos of the vehicle (exterior and interior) before paying.');
+    return;
+  }
+
   const btn = document.getElementById('pay-wipay-btn');
   btn.disabled = true;
+  btn.textContent = 'Uploading photos...';
+
+  const photoUrls = await uploadPhotos(phone);
+
   btn.textContent = 'Redirecting to secure payment...';
 
   const ticketNo = document.getElementById('ticket-no').textContent.replace('NO. ', '');
@@ -886,7 +897,8 @@ async function payWithWiPay() {
         name, email, phone,
         svc, addr,
         booking_date: bDate, booking_time: bTime,
-        ticket: ticketNo
+        ticket: ticketNo,
+        photo_urls: photoUrls.length ? photoUrls.join(', ') : null
       })
     });
     const result = await resp.json();
