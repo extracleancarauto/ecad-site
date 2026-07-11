@@ -3971,6 +3971,8 @@ async function loadCommand() {
   renderObjectivesList();
 }
 
+const OBJECTIVE_FUNCTION_URL = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co/functions/v1/manage-objective';
+
 async function addObjective() {
   const textEl = document.getElementById('new-objective-text');
   const catEl = document.getElementById('new-objective-category');
@@ -3979,10 +3981,18 @@ async function addObjective() {
 
   try {
     const maxSort = cachedObjectives.reduce((m, o) => Math.max(m, o.sort_order || 0), 0);
-    const { error } = await db.from('objectives').insert([{
-      text, category: catEl.value, completed: false, sort_order: maxSort + 1
-    }]);
-    if (error) throw error;
+    const resp = await fetch(OBJECTIVE_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        action: 'add',
+        text,
+        category: catEl.value,
+        sort_order: maxSort + 1
+      })
+    });
+    const result = await resp.json();
+    if (result.error) throw new Error(result.error);
     textEl.value = '';
     await loadObjectivesData();
     renderObjectivesList();
@@ -3993,8 +4003,13 @@ async function addObjective() {
 
 async function toggleObjective(id, checked) {
   try {
-    const { error } = await db.from('objectives').update({ completed: checked }).eq('id', id);
-    if (error) throw error;
+    const resp = await fetch(OBJECTIVE_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'toggle', id, completed: checked })
+    });
+    const result = await resp.json();
+    if (result.error) throw new Error(result.error);
     const item = cachedObjectives.find(o => o.id === id);
     if (item) item.completed = checked;
     renderObjectivesList();
@@ -4006,8 +4021,13 @@ async function toggleObjective(id, checked) {
 async function deleteObjective(id) {
   if (!confirm('Remove this objective? This can\'t be undone.')) return;
   try {
-    const { error } = await db.from('objectives').delete().eq('id', id);
-    if (error) throw error;
+    const resp = await fetch(OBJECTIVE_FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'delete', id })
+    });
+    const result = await resp.json();
+    if (result.error) throw new Error(result.error);
     cachedObjectives = cachedObjectives.filter(o => o.id !== id);
     renderObjectivesList();
   } catch (e) {
