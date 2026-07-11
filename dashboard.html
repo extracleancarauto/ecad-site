@@ -1758,6 +1758,19 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
       <select class="minput" id="rm-service"><option value="">Loading…</option></select>
     </div>
     <div class="mfield">
+      <label class="mlabel" for="rm-vtype">Vehicle Type</label>
+      <select class="minput" id="rm-vtype">
+        <option value="">Not specified</option>
+        <option>Sedan / Car</option>
+        <option>SUV / Crossover</option>
+        <option>Pickup / Van</option>
+      </select>
+    </div>
+    <div class="mfield">
+      <label class="mlabel" for="rm-vdetail">Make, Model &amp; Year</label>
+      <input class="minput" id="rm-vdetail" type="text" placeholder="e.g. Nissan Serena 2012">
+    </div>
+    <div class="mfield">
       <label class="mlabel" for="rm-date">Service Date <span style="color:var(--red)">*</span></label>
       <input class="minput" id="rm-date" type="date">
     </div>
@@ -2487,6 +2500,21 @@ function countUp(id, target) {
 // ── INVOICE REDIRECT ──────────────────────────────────────────────
 function goInvoice(el) {
   const info = JSON.parse(decodeURIComponent(el.dataset.inv));
+
+  // Pull the "Vehicle: ..." line out of job_notes into its own field —
+  // same parsing used when editing a booking — so it lands in invoice.html's
+  // dedicated Vehicle line instead of getting dumped into general Notes.
+  const rawNotes = info.notes || '';
+  const vMatch = rawNotes.match(/Vehicle:\s*([^—|]*)—?\s*([^|]*)/);
+  let vehicle = '';
+  let remainingNotes = rawNotes;
+  if (vMatch) {
+    const vType = vMatch[1].trim();
+    const vDetail = vMatch[2].trim();
+    vehicle = [vType, vDetail].filter(Boolean).join(' — ');
+    remainingNotes = rawNotes.replace(/Vehicle:[^|]*\|?\s*/, '').trim();
+  }
+
   const invParams  = new URLSearchParams({
     name:    info.name    || '',
     phone:   info.phone   || '',
@@ -2494,7 +2522,8 @@ function goInvoice(el) {
     date:    info.date    || '',
     time:    info.time    || '',
     address: info.address || '',
-    notes:   info.notes   || '',
+    vehicle: vehicle,
+    notes:   remainingNotes,
     id:      info.id      || ''
   });
   const loadParams = new URLSearchParams({ dest: 'invoice.html', q: invParams.toString() });
@@ -2575,11 +2604,30 @@ async function openRecordModal(el) {
 
       document.getElementById('rm-date').value   = rec.service_date || '';
       document.getElementById('rm-status').value = rec.payment_status || 'Pending';
-      document.getElementById('rm-notes').value  = rec.job_notes || '';
+
+      // Vehicle info is stored as a "Vehicle: Type — Make Model Year" line inside
+      // job_notes. Pull it back out into its own fields, and show only the
+      // remaining notes in the textarea (so editing doesn't duplicate the line).
+      const rawNotes = rec.job_notes || '';
+      const vMatch = rawNotes.match(/Vehicle:\s*([^—|]*)—?\s*([^|]*)/);
+      let remainingNotes = rawNotes;
+      document.getElementById('rm-vtype').value = '';
+      document.getElementById('rm-vdetail').value = '';
+      if (vMatch) {
+        const vType = vMatch[1].trim();
+        const vDetail = vMatch[2].trim();
+        const vTypeOptions = [...document.getElementById('rm-vtype').options].map(o => o.value);
+        if (vTypeOptions.includes(vType)) document.getElementById('rm-vtype').value = vType;
+        document.getElementById('rm-vdetail').value = vDetail;
+        remainingNotes = rawNotes.replace(/Vehicle:[^|]*\|?\s*/, '').trim();
+      }
+      document.getElementById('rm-notes').value = remainingNotes;
     } else {
       document.getElementById('rm-date').value   = new Date().toISOString().slice(0, 10);
       document.getElementById('rm-status').value = 'Confirmed';
       document.getElementById('rm-notes').value  = '';
+      document.getElementById('rm-vtype').value  = '';
+      document.getElementById('rm-vdetail').value = '';
     }
   } catch(e) {
     toast(e.message, 'err');
@@ -2589,9 +2637,11 @@ async function openRecordModal(el) {
 async function saveRecord() {
   const clientId = document.getElementById('rm-client').value;
   let service    = document.getElementById('rm-service').value;
+  const vtype    = document.getElementById('rm-vtype').value;
+  const vdetail  = document.getElementById('rm-vdetail').value.trim();
   const date     = document.getElementById('rm-date').value;
   const status   = document.getElementById('rm-status').value;
-  const notes    = document.getElementById('rm-notes').value.trim();
+  const otherNotes = document.getElementById('rm-notes').value.trim();
 
   if (service === '__custom') {
     service = (prompt('Enter the service / tier name:') || '').trim();
@@ -2600,22 +2650,24 @@ async function saveRecord() {
 
   if (!clientId || !service || !date) { toast('Client, service and date are required', 'err'); return; }
 
+  // Combine vehicle info + free-text notes into job_notes, same "Vehicle: ..."
+  // format used elsewhere so it stays consistent and parses back out cleanly.
+  const vehicleLine = (vtype || vdetail) ? `Vehicle: ${vtype}${vtype && vdetail ? ' — ' : ''}${vdetail}` : '';
+  const notes = [vehicleLine, otherNotes].filter(Boolean).join(' | ') || null;
+
   try {
     let result;
     if (editingRecordId) {
       result = await db.from('service_records').update({
         client_id: clientId, service_tier: service, service_date: date,
-        payment_status: status, job_notes: notes || null
+        payment_status: status, job_notes: notes
       }).eq('id', editingRecordId).select();
     } else {
       result = await db.from('service_records').insert([{
         client_id: clientId, service_tier: service, service_date: date,
-        payment_status: status, job_notes: notes || null
+        payment_status: status, job_notes: notes
       }]).select();
     }
-
-    // TEMPORARY DEBUG — show exactly what Supabase returned
-    alert('DEBUG saveRecord result:\n\n' + JSON.stringify(result, null, 2));
 
     if (result.error) throw result.error;
     toast(editingRecordId ? 'Appointment updated' : 'Appointment booked', 'ok');
