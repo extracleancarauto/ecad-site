@@ -2601,21 +2601,24 @@ async function saveRecord() {
   if (!clientId || !service || !date) { toast('Client, service and date are required', 'err'); return; }
 
   try {
+    let result;
     if (editingRecordId) {
-      const { error } = await db.from('service_records').update({
+      result = await db.from('service_records').update({
         client_id: clientId, service_tier: service, service_date: date,
         payment_status: status, job_notes: notes || null
-      }).eq('id', editingRecordId);
-      if (error) throw error;
-      toast('Appointment updated', 'ok');
+      }).eq('id', editingRecordId).select();
     } else {
-      const { error } = await db.from('service_records').insert([{
+      result = await db.from('service_records').insert([{
         client_id: clientId, service_tier: service, service_date: date,
         payment_status: status, job_notes: notes || null
-      }]);
-      if (error) throw error;
-      toast('Appointment booked', 'ok');
+      }]).select();
     }
+
+    // TEMPORARY DEBUG — show exactly what Supabase returned
+    alert('DEBUG saveRecord result:\n\n' + JSON.stringify(result, null, 2));
+
+    if (result.error) throw result.error;
+    toast(editingRecordId ? 'Appointment updated' : 'Appointment booked', 'ok');
     closeRecordModal();
     loadRecords();
     loadBookings();
