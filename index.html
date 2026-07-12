@@ -352,15 +352,46 @@ textarea { resize: vertical; min-height: 88px; }
 
 
 /* ── GALLERY ───────────────────────────────────────────────────── */
-.gallery-sec { padding:80px 0; background:var(--s1); border-top:1px solid var(--bsoft); position:relative; z-index:1; }
-.gallery-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
-.gcard { border-radius:10px; overflow:hidden; border:1px solid var(--bsoft); position:relative; background:var(--s2); }
-.gcard:hover .gc-after { opacity:1; }
+.gallery-sec { padding:80px 0; background:var(--s1); border-top:1px solid var(--bsoft); position:relative; z-index:1; overflow:hidden; }
+.gallery-carousel-wrap { position:relative; }
+.gallery-carousel {
+  display:flex; gap:20px; overflow-x:auto; scroll-snap-type:x mandatory;
+  scroll-behavior:smooth; -webkit-overflow-scrolling:touch;
+  padding:10px calc((100% - 78%)/2) 26px; scrollbar-width:none;
+}
+.gallery-carousel::-webkit-scrollbar { display:none; }
+.gc-slide {
+  flex:0 0 78%; scroll-snap-align:center; display:flex; gap:12px;
+  transform:scale(.9); opacity:.45; transition:transform .45s ease, opacity .45s ease;
+}
+.gc-slide.active { transform:scale(1); opacity:1; }
+.gcard { flex:1; border-radius:10px; overflow:hidden; border:1px solid var(--bsoft); position:relative; background:var(--s2); min-width:0; }
 .gc-label { position:absolute; top:12px; left:12px; font-size:9px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; padding:4px 10px; border-radius:2px; z-index:3; }
 .gc-label.before { background:rgba(10,10,10,.8); color:var(--muted); border:1px solid var(--bsoft); }
 .gc-label.after  { background:var(--silver); color:#000; }
 .gc-vehicle { position:absolute; bottom:12px; left:12px; font-size:10px; font-weight:500; letter-spacing:.08em; color:var(--silver-l); background:rgba(10,10,10,.75); padding:4px 10px; border-radius:2px; z-index:3; backdrop-filter:blur(4px); }
 .gc-service { position:absolute; bottom:12px; right:12px; font-size:9px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--green); background:rgba(10,10,10,.75); padding:4px 10px; border-radius:2px; z-index:3; backdrop-filter:blur(4px); }
+.gcard img { width:100%; height:340px; object-fit:cover; display:block; transition:transform .5s ease; }
+.gc-slide.active .gcard:hover img { transform:scale(1.03); }
+.gc-nav {
+  position:absolute; top:50%; transform:translateY(-50%); z-index:5;
+  width:40px; height:40px; border-radius:50%; border:1px solid var(--border);
+  background:rgba(10,10,10,.85); color:var(--silver-l); font-size:18px;
+  display:flex; align-items:center; justify-content:center; cursor:pointer;
+  transition:background .2s, border-color .2s; backdrop-filter:blur(6px);
+}
+.gc-nav:hover { background:var(--s2); border-color:var(--silver-d); }
+.gc-prev { left:4px; }
+.gc-next { right:4px; }
+.gc-dots { display:flex; justify-content:center; gap:8px; margin-top:16px; }
+.gc-dot { width:7px; height:7px; border-radius:50%; background:var(--bsoft); border:none; cursor:pointer; padding:0; transition:background .25s, transform .25s; }
+.gc-dot.active { background:var(--silver); transform:scale(1.3); }
+@media(max-width:760px){
+  .gallery-carousel { padding:10px calc((100% - 88%)/2) 26px; gap:14px; }
+  .gc-slide { flex-basis:88%; flex-direction:column; }
+  .gc-nav { width:34px; height:34px; font-size:16px; }
+  .gcard img { height:220px; }
+}
 
 /* ── TESTIMONIALS ───────────────────────────────────────────── */
 .testi-sec { padding:80px 0; background:var(--s0); border-top:1px solid var(--bsoft); position:relative; z-index:1; }
@@ -371,10 +402,6 @@ textarea { resize: vertical; min-height: 88px; }
 .testi-name { font-size:12px; font-weight:600; color:var(--silver-l); }
 .testi-meta { font-size:10px; color:var(--silver-d); letter-spacing:.04em; }
 @media(max-width:760px){ .testi-grid{ grid-template-columns:1fr; } }
-.gcard img { width:100%; height:340px; object-fit:cover; display:block; transition:transform .5s ease; }
-.gcard:hover img { transform:scale(1.03); }
-.gc-pair { display:contents; }
-.pair-label { grid-column:1/-1; font-size:10px; font-weight:600; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); padding:8px 0 2px; }
 
 /* ── HOW IT WORKS ──────────────────────────────────────────────── */
 .hiw-sec { padding:80px 0; position:relative; z-index:1; }
@@ -447,7 +474,6 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
   .mplan-prices { flex-direction: column; }
   .hiw-steps { grid-template-columns:1fr 1fr; }
   .area-inner { grid-template-columns:1fr; }
-  .gallery-grid { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -527,41 +553,67 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       <h2>Before &amp; <span class="silver">After</span></h2>
       <p>Real results on real vehicles, in Jamaica. Every job photographed before and after — no filters, no staging.</p>
     </div>
-    <div class="gallery-grid fade">
-      <div class="gcard">
-        <span class="gc-label before">Before</span>
-        <span class="gc-vehicle">BMW 5 Series</span>
-        <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/bmw_before.jpg" alt="BMW 5 Series before detailing" loading="lazy">
+  </div>
+  <div class="gallery-carousel-wrap fade">
+    <button class="gc-nav gc-prev" onclick="gcMove(-1)" aria-label="Previous vehicle">&#8249;</button>
+    <div class="gallery-carousel" id="galleryCarousel">
+      <div class="gc-slide">
+        <div class="gcard">
+          <span class="gc-label before">Before</span>
+          <span class="gc-vehicle">BMW 5 Series</span>
+          <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/bmw_before.jpg" alt="BMW 5 Series before detailing" loading="lazy">
+        </div>
+        <div class="gcard">
+          <span class="gc-label after">After</span>
+          <span class="gc-vehicle">BMW 5 Series</span>
+          <span class="gc-service">Full Clean</span>
+          <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/bmw-final.png" alt="BMW 5 Series after detailing" loading="lazy">
+        </div>
       </div>
-      <div class="gcard">
-        <span class="gc-label after">After</span>
-        <span class="gc-vehicle">BMW 5 Series</span>
-        <span class="gc-service">Full Clean</span>
-        <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/bmw-final.png" alt="BMW 5 Series after detailing" loading="lazy">
+      <div class="gc-slide">
+        <div class="gcard">
+          <span class="gc-label before">Before</span>
+          <span class="gc-vehicle">Nissan Sport</span>
+          <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/nissan_before.jpg" alt="Nissan before detailing" loading="lazy">
+        </div>
+        <div class="gcard">
+          <span class="gc-label after">After</span>
+          <span class="gc-vehicle">Nissan Sport</span>
+          <span class="gc-service">Full Clean</span>
+          <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/nissan_after.jpg" alt="Nissan after detailing" loading="lazy">
+        </div>
       </div>
-      <div class="gcard">
-        <span class="gc-label before">Before</span>
-        <span class="gc-vehicle">Nissan Sport</span>
-        <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/nissan_before.jpg" alt="Nissan before detailing" loading="lazy">
+      <div class="gc-slide">
+        <div class="gcard">
+          <span class="gc-label before">Before</span>
+          <span class="gc-vehicle">AD Wagon</span>
+          <img src="gallery-adwagon-before.jpg" alt="AD Wagon interior before detailing" loading="lazy">
+        </div>
+        <div class="gcard">
+          <span class="gc-label after">After</span>
+          <span class="gc-vehicle">AD Wagon</span>
+          <span class="gc-service">Interior Detail</span>
+          <img src="gallery-adwagon-after.jpg" alt="AD Wagon interior after detailing" loading="lazy">
+        </div>
       </div>
-      <div class="gcard">
-        <span class="gc-label after">After</span>
-        <span class="gc-vehicle">Nissan Sport</span>
-        <span class="gc-service">Full Clean</span>
-        <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/nissan_after.jpg" alt="Nissan after detailing" loading="lazy">
-      </div>
-      <div class="gcard">
-        <span class="gc-label before">Before</span>
-        <span class="gc-vehicle">AD Wagon</span>
-        <img src="gallery-adwagon-before.jpg" alt="AD Wagon interior before detailing" loading="lazy">
-      </div>
-      <div class="gcard">
-        <span class="gc-label after">After</span>
-        <span class="gc-vehicle">AD Wagon</span>
-        <span class="gc-service">Interior Detail</span>
-        <img src="gallery-adwagon-after.jpg" alt="AD Wagon interior after detailing" loading="lazy">
+      <div class="gc-slide">
+        <div class="gcard">
+          <span class="gc-label before">Before</span>
+          <span class="gc-vehicle">Hyundai</span>
+          <img src="gallery-hyundai-before.jpg" alt="Hyundai interior before detailing" loading="lazy">
+        </div>
+        <div class="gcard">
+          <span class="gc-label after">After</span>
+          <span class="gc-vehicle">Hyundai</span>
+          <span class="gc-service">Interior Detail</span>
+          <img src="gallery-hyundai-after.jpg" alt="Hyundai interior after detailing" loading="lazy">
+        </div>
       </div>
     </div>
+    <button class="gc-nav gc-next" onclick="gcMove(1)" aria-label="Next vehicle">&#8250;</button>
+  </div>
+  <div class="wrap">
+    <div class="gc-dots" id="galleryDots"></div>
   </div>
 </section>
 <section id="testimonials" class="testi-sec">
@@ -577,14 +629,6 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <p class="testi-quote">"The service provided was Job well done. The transformation was amazing clean and beautiful."</p>
         <div>
           <div class="testi-name">Aaron Thomas</div>
-          <div class="testi-meta">Google Review</div>
-        </div>
-      </div>
-      <div class="testi-card">
-        <div class="testi-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p class="testi-quote">"Excellent service from start to finish! The team was professional, arrived on time, and did a thorough job. They paid attention to the details. Great quality work at a fair price. I would definitely recommend them and will use their services again."</p>
-        <div>
-          <div class="testi-name">Giovanni Green</div>
           <div class="testi-meta">Google Review</div>
         </div>
       </div>
@@ -624,7 +668,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="hiw-num">01</div>
         <div class="hiw-icon">&#128203;</div>
         <div class="hiw-title">Book Online or WhatsApp</div>
-        <div class="hiw-body">Fill in the booking form or message us directly. We confirm your slot and pricing within a few hours — no upfront payment required.</div>
+        <div class="hiw-body">Fill in the booking form or message us directly. We confirm your slot and pricing within a few hours, then secure it with a deposit based on your vehicle's condition.</div>
       </div>
       <div class="hiw-step">
         <div class="hiw-num">02</div>
@@ -642,7 +686,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="hiw-num">04</div>
         <div class="hiw-icon">&#9989;</div>
         <div class="hiw-title">You Approve &amp; Pay</div>
-        <div class="hiw-body">Final walk-around with you before we collect payment. Cash, bank transfer, or mobile payment — all accepted on completion.</div>
+        <div class="hiw-body">Final walk-around with you before we collect the remaining balance. Cash, bank transfer, or card — all accepted on completion.</div>
       </div>
     </div>
   </div>
@@ -1065,7 +1109,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
     <div class="notes-grid fade">
       <div class="ni"><div class="ni-icon">&#9888;&#65039;</div><div class="ni-title">Vehicle Condition</div><div class="ni-body">Heavily soiled or neglected vehicles may attract a surcharge of JMD 2,000&ndash;5,000. Always communicated and agreed before work begins.</div></div>
       <div class="ni"><div class="ni-icon">&#128205;</div><div class="ni-title">Travel Surcharge</div><div class="ni-body">A travel fee applies for locations beyond our standard service radius. Confirmed at booking &mdash; never a surprise on the day.</div></div>
-      <div class="ni"><div class="ni-icon">&#128179;</div><div class="ni-title">Payment Methods</div><div class="ni-body">Cash, bank transfer, and approved mobile payment platforms accepted. Payment due in full upon service completion.</div></div>
+      <div class="ni"><div class="ni-icon">&#128179;</div><div class="ni-title">Payment Methods</div><div class="ni-body">A deposit secures your booking, based on your vehicle's condition. Remaining balance due on completion — cash, bank transfer, or card all accepted.</div></div>
       <div class="ni"><div class="ni-icon">&#128247;</div><div class="ni-title">Before &amp; After Docs</div><div class="ni-body">Every job is photographed before and after. Pre-existing damage is always noted and communicated before work begins.</div></div>
     </div>
   </div>
@@ -1171,6 +1215,43 @@ const obs = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.07 });
 document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+
+// Gallery carousel — peek preview with smooth center-snap
+(function initGalleryCarousel() {
+  const track = document.getElementById('galleryCarousel');
+  const dotsWrap = document.getElementById('galleryDots');
+  if (!track || !dotsWrap) return;
+  const slides = Array.from(track.querySelectorAll('.gc-slide'));
+
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'gc-dot';
+    dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+    dot.addEventListener('click', () => slides[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }));
+    dotsWrap.appendChild(dot);
+  });
+  const dots = Array.from(dotsWrap.querySelectorAll('.gc-dot'));
+
+  const gcObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const i = slides.indexOf(e.target);
+      if (e.intersectionRatio > 0.6) {
+        e.target.classList.add('active');
+        dots.forEach(d => d.classList.remove('active'));
+        if (dots[i]) dots[i].classList.add('active');
+      } else {
+        e.target.classList.remove('active');
+      }
+    });
+  }, { root: track, threshold: [0, 0.6, 1] });
+  slides.forEach(s => gcObs.observe(s));
+
+  window.gcMove = function (dir) {
+    const activeIdx = slides.findIndex(s => s.classList.contains('active'));
+    const nextIdx = Math.max(0, Math.min(slides.length - 1, (activeIdx === -1 ? 0 : activeIdx) + dir));
+    slides[nextIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  };
+})();
 
 // Min booking date = tomorrow
 const d = document.getElementById('f-date');
