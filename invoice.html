@@ -101,6 +101,7 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
   .inv-footer{flex-direction:column;gap:8px}
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>emailjs.init('v8hsDP3tvGl5hTKRPOA7f');</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -247,20 +248,55 @@ body{background:#0a0a0a;color:var(--text);font-family:'Sora',sans-serif;font-wei
 </div><!-- /wrap -->
 <script>
 // ── LOGIN GATE ───────────────────────────────────────────────────
-const INV_USERS = { 'Hyperion': 'ecad2026', 'Axion': 'Ax#7291' };
-function invLogin() {
+// Friendly usernames map to real Supabase Auth accounts.
+// Created under Supabase → Authentication → Users — this file no longer stores any password.
+const SB_URL = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co';
+const SB_KEY = 'sb_publishable_X0ondV6wpIgPzEQCoA2hWw_egVUDRxI';
+const USER_EMAIL = { 'Hyperion': 'hyperion@ecadja.com', 'Axion': 'axion@ecadja.com' };
+const { createClient } = supabase;
+const db = createClient(SB_URL, SB_KEY);
+
+window.addEventListener('DOMContentLoaded', async () => {
+  const { data: { session } } = await db.auth.getSession();
+  if (!session) return;
+  document.getElementById('inv-login').style.display = 'none';
+  document.getElementById('inv-main').style.display  = 'block';
+  initInvoice();
+});
+
+async function invLogin() {
   const user = document.getElementById('il-user').value.trim();
   const pass = document.getElementById('il-pass').value;
   const err  = document.getElementById('il-err');
-  if (INV_USERS[user] && INV_USERS[user] === pass) {
-    document.getElementById('inv-login').style.display = 'none';
-    document.getElementById('inv-main').style.display  = 'block';
-    initInvoice();
-  } else {
+  const btn  = document.querySelector('.il-btn');
+
+  err.textContent = '';
+
+  const email = USER_EMAIL[user];
+  if (!email) {
     err.textContent = 'Invalid credentials.';
     document.getElementById('il-pass').value = '';
     document.getElementById('il-pass').focus();
+    return;
   }
+
+  btn.textContent = 'Authenticating…';
+  btn.disabled = true;
+
+  const { data, error } = await db.auth.signInWithPassword({ email, password: pass });
+
+  if (error || !data.session) {
+    err.textContent = 'Invalid credentials.';
+    document.getElementById('il-pass').value = '';
+    document.getElementById('il-pass').focus();
+    btn.textContent = 'Access Invoice';
+    btn.disabled = false;
+    return;
+  }
+
+  document.getElementById('inv-login').style.display = 'none';
+  document.getElementById('inv-main').style.display  = 'block';
+  initInvoice();
 }
 document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('il-pass').addEventListener('keydown', function(e) { if (e.key === 'Enter') invLogin(); });
