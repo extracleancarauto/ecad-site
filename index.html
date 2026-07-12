@@ -356,13 +356,14 @@ textarea { resize: vertical; min-height: 88px; }
 .gallery-carousel-wrap { position:relative; }
 .gallery-carousel {
   display:flex; gap:20px; overflow-x:auto; scroll-snap-type:x mandatory;
-  scroll-behavior:smooth; -webkit-overflow-scrolling:touch;
+  -webkit-overflow-scrolling:touch;
   padding:10px calc((100% - 78%)/2) 26px; scrollbar-width:none;
 }
 .gallery-carousel::-webkit-scrollbar { display:none; }
 .gc-slide {
   flex:0 0 78%; scroll-snap-align:center; display:flex; gap:12px;
-  transform:scale(.9); opacity:.45; transition:transform .45s ease, opacity .45s ease;
+  transform:scale(.96); opacity:.6; transition:transform .6s cubic-bezier(.4,0,.2,1), opacity .6s cubic-bezier(.4,0,.2,1);
+  will-change:transform, opacity;
 }
 .gc-slide.active { transform:scale(1); opacity:1; }
 .gcard { flex:1; border-radius:10px; overflow:hidden; border:1px solid var(--bsoft); position:relative; background:var(--s2); min-width:0; }
@@ -668,7 +669,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="hiw-num">01</div>
         <div class="hiw-icon">&#128203;</div>
         <div class="hiw-title">Book Online or WhatsApp</div>
-        <div class="hiw-body">Fill in the booking form or message us directly. We confirm your slot and pricing within a few hours, then secure it with a deposit based on your vehicle's condition.</div>
+        <div class="hiw-body">Fill in the booking form or message us on WhatsApp. Either way, your slot is confirmed once your deposit clears through the website — fast, instant confirmation, no bank transfer delays.</div>
       </div>
       <div class="hiw-step">
         <div class="hiw-num">02</div>
@@ -1223,11 +1224,30 @@ document.querySelectorAll('.fade').forEach(el => obs.observe(el));
   if (!track || !dotsWrap) return;
   const slides = Array.from(track.querySelectorAll('.gc-slide'));
 
+  // Custom-eased scroll — matches the .6s CSS transition so scroll motion
+  // and the fade/scale animation move in sync instead of the browser's
+  // native smooth-scroll (which snaps faster and out of step with the CSS)
+  function easedScrollTo(target, duration) {
+    const start = track.scrollLeft;
+    const startTime = performance.now();
+    function easeInOutCubic(t) { return t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2; }
+    function step(now) {
+      const elapsed = Math.min((now - startTime) / duration, 1);
+      track.scrollLeft = start + (target - start) * easeInOutCubic(elapsed);
+      if (elapsed < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function goToSlide(el) {
+    const target = el.offsetLeft - (track.clientWidth - el.clientWidth) / 2;
+    easedScrollTo(target, 600);
+  }
+
   slides.forEach((_, i) => {
     const dot = document.createElement('button');
     dot.className = 'gc-dot';
     dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-    dot.addEventListener('click', () => slides[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' }));
+    dot.addEventListener('click', () => goToSlide(slides[i]));
     dotsWrap.appendChild(dot);
   });
   const dots = Array.from(dotsWrap.querySelectorAll('.gc-dot'));
@@ -1249,7 +1269,7 @@ document.querySelectorAll('.fade').forEach(el => obs.observe(el));
   window.gcMove = function (dir) {
     const activeIdx = slides.findIndex(s => s.classList.contains('active'));
     const nextIdx = Math.max(0, Math.min(slides.length - 1, (activeIdx === -1 ? 0 : activeIdx) + dir));
-    slides[nextIdx].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    goToSlide(slides[nextIdx]);
   };
 })();
 
