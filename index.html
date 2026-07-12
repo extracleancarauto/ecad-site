@@ -348,7 +348,11 @@ textarea { resize: vertical; min-height: 88px; }
 .wa-pulse { position:absolute; width:54px; height:54px; border-radius:50%; background:rgba(37,211,102,.35); animation:waPulse 2.2s ease-out infinite; }
 @keyframes waPulse { 0%{transform:scale(1);opacity:.7} 100%{transform:scale(1.9);opacity:0} }
 .wa-label { background:rgba(10,10,10,.92); border:1px solid rgba(184,200,214,.15); color:#b8c8d6; font-size:10px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; padding:6px 12px; border-radius:4px; white-space:nowrap; opacity:0; transform:translateX(10px); transition:opacity .2s,transform .2s; pointer-events:none; }
-.wa-float:hover .wa-label { opacity:1; transform:translateX(0); }
+.float-row { display:flex; align-items:center; gap:10px; }
+.float-row:hover .wa-label { opacity:1; transform:translateX(0); }
+.ig-btn { width:48px; height:48px; border-radius:50%; background:radial-gradient(circle at 30% 110%, #fdf497 0%, #fdf497 5%, #fd5949 45%,#d6249f 60%,#285AEB 90%); display:flex; align-items:center; justify-content:center; box-shadow:0 4px 18px rgba(214,36,159,.4); text-decoration:none; transition:transform .2s,box-shadow .2s; flex-shrink:0; }
+.ig-btn:hover { transform:scale(1.1); box-shadow:0 6px 24px rgba(214,36,159,.55); }
+.ig-btn svg { width:23px; height:23px; }
 
 
 /* ── GALLERY ───────────────────────────────────────────────────── */
@@ -362,7 +366,7 @@ textarea { resize: vertical; min-height: 88px; }
 .gallery-carousel::-webkit-scrollbar { display:none; }
 .gc-slide {
   flex:0 0 78%; scroll-snap-align:center; display:flex; gap:12px;
-  transform:scale(.96); opacity:.6; transition:transform .6s cubic-bezier(.4,0,.2,1), opacity .6s cubic-bezier(.4,0,.2,1);
+  transform:scale(.94); opacity:.35; transition:transform .6s cubic-bezier(.4,0,.2,1), opacity .6s cubic-bezier(.4,0,.2,1);
   will-change:transform, opacity;
 }
 .gc-slide.active { transform:scale(1); opacity:1; }
@@ -675,7 +679,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="hiw-num">02</div>
         <div class="hiw-icon">&#128205;</div>
         <div class="hiw-title">We Come to You</div>
-        <div class="hiw-body">We arrive at your location fully equipped — own water supply, own power, own products. You don't need to arrange anything.</div>
+        <div class="hiw-body">We arrive fully equipped with our own products and backup water. One thing we do need from you: access to a standard power outlet on-site for our equipment.</div>
       </div>
       <div class="hiw-step">
         <div class="hiw-num">03</div>
@@ -986,8 +990,8 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       </div>
       <div class="area-cta-block">
         <div class="big">Mobile</div>
-        <div class="sm">Fully self-contained</div>
-        <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.7;">Fully equipped &middot; Professional grade<br>Products &middot; We come to you</div>
+        <div class="sm">We Come to You</div>
+        <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.7;">Own products &amp; backup water &middot; Professional grade<br>Standard power outlet needed on-site</div>
       </div>
     </div>
   </div>
@@ -1093,7 +1097,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       <div class="fb">
         <div class="fb-icon">&#128205;</div>
         <div class="fb-title">On-Site at Your Location</div>
-        <div class="fb-body">We come to you &mdash; office carpark, compound, or lot. Fully equipped and professional grade. No disruption to your workflow.</div>
+        <div class="fb-body">We come to you &mdash; office carpark, compound, or lot. Fully equipped and professional grade, with no disruption to your workflow. We do need access to a standard power outlet on-site, confirmed with your facilities contact beforehand.</div>
       </div>
     </div>
 
@@ -1112,6 +1116,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       <div class="ni"><div class="ni-icon">&#128205;</div><div class="ni-title">Travel Surcharge</div><div class="ni-body">A travel fee applies for locations beyond our standard service radius. Confirmed at booking &mdash; never a surprise on the day.</div></div>
       <div class="ni"><div class="ni-icon">&#128179;</div><div class="ni-title">Payment Methods</div><div class="ni-body">A deposit secures your booking, based on your vehicle's condition. Remaining balance due on completion — cash, bank transfer, or card all accepted.</div></div>
       <div class="ni"><div class="ni-icon">&#128247;</div><div class="ni-title">Before &amp; After Docs</div><div class="ni-body">Every job is photographed before and after. Pre-existing damage is always noted and communicated before work begins.</div></div>
+      <div class="ni"><div class="ni-icon">&#9889;</div><div class="ni-title">Power Access</div><div class="ni-body">We need access to a standard power outlet on-site for our equipment. We carry backup water, but confirm outlet access when you book.</div></div>
     </div>
   </div>
 </section>
@@ -1125,7 +1130,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
     </div>
     <div class="contact-grid fade">
       <a class="cc-card" href="https://wa.me/18768176193" target="_blank" rel="noopener noreferrer">
-        <div class="cc-icon">&#128172;</div>
+        <div class="cc-icon" style="background:rgba(37,211,102,.12);"><svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#25D366" d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path fill="#25D366" d="M12 0C5.373 0 0 5.373 0 12c0 2.122.549 4.112 1.51 5.845L.057 23.887c-.067.234.004.485.18.651a.638.638 0 00.666.138l6.288-2.064A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.754 9.754 0 01-5.062-1.41l-.362-.214-3.737 1.226 1.248-3.624-.236-.373A9.755 9.755 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg></div>
         <div>
           <div class="cc-label">WhatsApp &mdash; Fastest Response</div>
           <div class="cc-val">(876) 817-6193</div>
@@ -1141,7 +1146,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         </div>
       </a>
       <a class="cc-card" href="mailto:extracleancarwash@gmail.com">
-        <div class="cc-icon">&#9993;&#65039;</div>
+        <div class="cc-icon" style="background:rgba(234,67,53,.10);"><svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#EA4335" d="M24 5.457v13.086a1.457 1.457 0 01-1.457 1.457h-3.643V11.91L12 16.64l-6.9-4.73v8.09H1.457A1.457 1.457 0 010 18.543V5.457a1.457 1.457 0 011.457-1.457h.6L12 11.184l9.943-7.184h.6A1.457 1.457 0 0124 5.457z"/><path fill="#EA4335" d="M0 5.457c0-.805.652-1.457 1.457-1.457h.6L12 11.184V16.64L0 8.09z"/></svg></div>
         <div>
           <div class="cc-label">Email</div>
           <div class="cc-val">extracleancarwash@gmail.com</div>
@@ -1149,11 +1154,19 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         </div>
       </a>
       <a class="cc-card" href="https://instagram.com/extracleanautoja" target="_blank" rel="noopener noreferrer">
-        <div class="cc-icon">&#128247;</div>
+        <div class="cc-icon" style="background:rgba(214,72,151,.10);"><svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="igGrad" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#FFDC80"/><stop offset="30%" stop-color="#FCAF45"/><stop offset="55%" stop-color="#E1306C"/><stop offset="80%" stop-color="#C13584"/><stop offset="100%" stop-color="#833AB4"/></linearGradient></defs><path fill="url(#igGrad)" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></div>
         <div>
           <div class="cc-label">Instagram</div>
           <div class="cc-val">@extracleanautoja</div>
           <div class="cc-sub">Before &amp; after results, service updates and availability</div>
+        </div>
+      </a>
+      <a class="cc-card" href="https://tiktok.com/@extra.clean.auto" target="_blank" rel="noopener noreferrer">
+        <div class="cc-icon" style="background:rgba(255,255,255,.08);"><svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><path fill="#ffffff" d="M16.6 5.82c-1.03-.9-1.68-2.19-1.75-3.62h-3.4v13.9c0 1.68-1.37 3.05-3.05 3.05a3.05 3.05 0 01-3.05-3.05 3.05 3.05 0 013.05-3.05c.28 0 .55.04.8.11V9.68a6.53 6.53 0 00-.8-.05A6.47 6.47 0 002.93 16.1 6.47 6.47 0 009.4 22.57a6.47 6.47 0 006.47-6.47V9.01a9.32 9.32 0 005.44 1.75V7.35a6.05 6.05 0 01-4.71-1.53z"/></svg></div>
+        <div>
+          <div class="cc-label">TikTok</div>
+          <div class="cc-val">@extra.clean.auto</div>
+          <div class="cc-sub">Quick clips of the process, tips, and finished results</div>
         </div>
       </a>
     </div>
@@ -1193,16 +1206,24 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
     <a href="#contact">Contact</a>
     <a href="#booking">Book Now</a>
   </div>
-  <div class="foot-copy">All prices quoted in Jamaican Dollars (JMD) &middot; Subject to change with 30 days notice &middot; Vehicle condition surcharges apply where applicable<br>(876) 817-6193 &middot; extracleancarwash@gmail.com &middot; @extracleanautoja &middot; @extra.clean.auto &middot; ecadja.com</div>
+  <div class="foot-copy">All prices quoted in Jamaican Dollars (JMD) &middot; Subject to change with 30 days notice &middot; Vehicle condition surcharges apply where applicable<br>(876) 817-6193 &middot; extracleancarwash@gmail.com &middot; Instagram @extracleanautoja &middot; TikTok @extra.clean.auto &middot; ecadja.com</div>
 </footer>
 
-<!-- WhatsApp Float -->
+<!-- WhatsApp + Instagram Float -->
 <div class="wa-float">
-  <span class="wa-label">Chat on WhatsApp</span>
-  <a class="wa-btn" href="https://wa.me/18768176193" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
-    <div class="wa-pulse"></div>
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.549 4.112 1.51 5.845L.057 23.887c-.067.234.004.485.18.651a.638.638 0 00.666.138l6.288-2.064A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.754 9.754 0 01-5.062-1.41l-.362-.214-3.737 1.226 1.248-3.624-.236-.373A9.755 9.755 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
-  </a>
+  <div class="float-row">
+    <span class="wa-label">Chat on WhatsApp</span>
+    <a class="wa-btn" href="https://wa.me/18768176193" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp">
+      <div class="wa-pulse"></div>
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.122.549 4.112 1.51 5.845L.057 23.887c-.067.234.004.485.18.651a.638.638 0 00.666.138l6.288-2.064A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.754 9.754 0 01-5.062-1.41l-.362-.214-3.737 1.226 1.248-3.624-.236-.373A9.755 9.755 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+    </a>
+  </div>
+  <div class="float-row">
+    <span class="wa-label">Follow on Instagram</span>
+    <a class="ig-btn" href="https://instagram.com/extracleanautoja" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+    </a>
+  </div>
 </div>
 
 <script>
