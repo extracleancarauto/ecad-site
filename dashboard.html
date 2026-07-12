@@ -1007,13 +1007,6 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
     width: 220px;
   }
   .sidebar.open { transform: translateX(0); }
-  .sidebar-backdrop {
-    display: none; position: fixed; inset: 0;
-    top: var(--topbar-h);
-    background: rgba(0,0,0,.55);
-    z-index: 140;
-  }
-  .sidebar-backdrop.open { display: block; }
   .main { padding: 24px 18px; }
   .burger-btn { display: flex; }
   .topbar-label { display: none; }
@@ -1155,8 +1148,6 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 
   <div class="dash-body">
 
-    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
-
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
 
@@ -1296,16 +1287,6 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
             <div class="stat-lbl">This Month</div>
             <div class="stat-val" id="s-month">—</div>
             <div class="stat-sub">Services logged</div>
-          </div>
-        </div>
-
-        <div class="section-card">
-          <div class="sc-head">
-            <span class="sc-title">What's Next</span>
-            <button class="btn-ghost" onclick="goTo('command')">Manage All →</button>
-          </div>
-          <div id="next-goals-wrap" style="padding:18px 22px;">
-            <div class="loading">Loading</div>
           </div>
         </div>
 
@@ -1454,18 +1435,24 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
             <div class="cmd-card">
               <div class="cmd-card-head">
                 <span class="cmd-card-title">Priority Actions</span>
-                <span class="cmd-card-sub">Tap to check off — tap × to remove</span>
+                <span class="cmd-card-sub">Tap to check off</span>
               </div>
-              <div id="objectives-list"><div class="loading">Loading</div></div>
-              <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
-                <input type="text" id="new-objective-text" placeholder="New objective..." style="flex:2;min-width:140px;background:#181818;border:1px solid var(--bsoft);border-radius:6px;padding:9px 12px;color:var(--silver-l);font-size:12px;">
-                <select id="new-objective-category" style="flex:1;min-width:110px;background:#181818;border:1px solid var(--bsoft);border-radius:6px;padding:9px 8px;color:var(--silver-l);font-size:11px;">
-                  <option value="immediate">🔴 Immediate</option>
-                  <option value="this_month">🟠 This Month</option>
-                  <option value="planned" selected>⚪ Planned</option>
-                </select>
-                <button class="btn-primary" onclick="addObjective()" style="padding:9px 16px;font-size:11px;">Add</button>
-              </div>
+              <span class="cmd-group-label">🔴 Immediate</span>
+              <label class="cmd-task" id="ct-subaru"><input type="checkbox" onchange="saveTask('ct-subaru',this.checked)"><span class="cmd-task-text">Close Subaru client on maintenance plan — specific date, in person</span><span class="cmd-task-badge badge-now">Now</span></label>
+              <label class="cmd-task" id="ct-post"><input type="checkbox" onchange="saveTask('ct-post',this.checked)"><span class="cmd-task-text">Post Subaru before/after content — exterior transformation is ready</span><span class="cmd-task-badge badge-now">Now</span></label>
+              <label class="cmd-task" id="ct-trn"><input type="checkbox" onchange="saveTask('ct-trn',this.checked)"><span class="cmd-task-text">Business TRN confirmed — TAJ e-services active ✓</span><span class="cmd-task-badge badge-now">Now</span></label>
+              <span class="cmd-group-label">🟠 This Month</span>
+              <label class="cmd-task" id="ct-tax"><input type="checkbox" onchange="saveTask('ct-tax',this.checked)"><span class="cmd-task-text">TCC submitted — await issuance from TAJ ✓</span><span class="cmd-task-badge badge-soon">Soon</span></label>
+              <label class="cmd-task" id="ct-nis"><input type="checkbox" onchange="saveTask('ct-nis',this.checked)"><span class="cmd-task-text">Clear remaining NIS balance — unlocks full compliance</span><span class="cmd-task-badge badge-soon">Soon</span></label>
+              <label class="cmd-task" id="ct-bank"><input type="checkbox" onchange="saveTask('ct-bank',this.checked)"><span class="cmd-task-text">Open CIBC business account — bring TRN, registration cert, in-house financial statements</span><span class="cmd-task-badge badge-soon">Soon</span></label>
+              <label class="cmd-task" id="ct-insurance"><input type="checkbox" onchange="saveTask('ct-insurance',this.checked)"><span class="cmd-task-text">Convert insurance to commercial — JMD 19,000 outstanding</span><span class="cmd-task-badge badge-soon">Soon</span></label>
+              <label class="cmd-task" id="ct-outreach"><input type="checkbox" onchange="saveTask('ct-outreach',this.checked)"><span class="cmd-task-text">10 direct personal outreaches — lead with work, not price</span><span class="cmd-task-badge badge-soon">Soon</span></label>
+              <label class="cmd-task" id="ct-headlight"><input type="checkbox" onchange="saveTask('ct-headlight',this.checked)"><span class="cmd-task-text">Source headlight restoration kit — drill method practice on Serena</span><span class="cmd-task-badge badge-soon">Soon</span></label>
+              <span class="cmd-group-label">⚪ Planned</span>
+              <label class="cmd-task" id="ct-plates"><input type="checkbox" onchange="saveTask('ct-plates',this.checked)"><span class="cmd-task-text">Green plates — Transport Authority, after insurance conversion</span><span class="cmd-task-badge badge-plan">Planned</span></label>
+              <label class="cmd-task" id="ct-tablet"><input type="checkbox" onchange="saveTask('ct-tablet',this.checked)"><span class="cmd-task-text">Acquire tablet — digital client signatures in the field</span><span class="cmd-task-badge badge-plan">Planned</span></label>
+              <label class="cmd-task" id="ct-polisher"><input type="checkbox" onchange="saveTask('ct-polisher',this.checked)"><span class="cmd-task-text">Source DA polisher — gateway to paint correction and ceramic prep</span><span class="cmd-task-badge badge-plan">Planned</span></label>
+              <label class="cmd-task" id="ct-wipay"><input type="checkbox" onchange="saveTask('ct-wipay',this.checked)"><span class="cmd-task-text">WiPay JMD configuration — contact support to resolve TTD/JMD issue</span><span class="cmd-task-badge badge-plan">Planned</span></label>
             </div>
             <div class="cmd-card">
               <div class="cmd-card-head"><span class="cmd-card-title">Infrastructure</span><span class="cmd-card-sub">Legal &amp; Financial</span></div>
@@ -1473,7 +1460,7 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
                 <div class="cmd-seq-item seq-active-item"><div class="cmd-seq-num seq-active">1</div><div class="cmd-seq-body"><div class="cmd-seq-name">Business TRN</div><div class="cmd-seq-note">TAJ — confirmed ✓</div></div></div>
                 <div class="cmd-seq-item seq-active-item"><div class="cmd-seq-num seq-active">2</div><div class="cmd-seq-body"><div class="cmd-seq-name">NHT &amp; NIS Clearance</div><div class="cmd-seq-note">Both obtained — NIS balance partially cleared</div></div></div>
                 <div class="cmd-seq-item seq-active-item"><div class="cmd-seq-num seq-active">3</div><div class="cmd-seq-body"><div class="cmd-seq-name">Tax Compliance Certificate</div><div class="cmd-seq-note">Submitted to TAJ — awaiting issuance</div></div></div>
-                <div class="cmd-seq-item seq-active-item"><div class="cmd-seq-num seq-active">4</div><div class="cmd-seq-body"><div class="cmd-seq-name">JMMB Business Account</div><div class="cmd-seq-note">Smart Business Chequing — confirmed ✓, WiPay-partnered</div></div></div>
+                <div class="cmd-seq-item"><div class="cmd-seq-num seq-next">4</div><div class="cmd-seq-body"><div class="cmd-seq-name">CIBC Business Account</div><div class="cmd-seq-note">TRN + registration + in-house statements</div></div></div>
                 <div class="cmd-seq-item"><div class="cmd-seq-num seq-next">5</div><div class="cmd-seq-body"><div class="cmd-seq-name">Commercial Insurance</div><div class="cmd-seq-note">JMD 19,000 to convert existing policy</div></div></div>
                 <div class="cmd-seq-item"><div class="cmd-seq-num seq-future">6</div><div class="cmd-seq-body"><div class="cmd-seq-name">Green Plates</div><div class="cmd-seq-note">Transport Authority — after insurance sorted</div></div></div>
               </div>
@@ -1767,19 +1754,6 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
       <select class="minput" id="rm-service"><option value="">Loading…</option></select>
     </div>
     <div class="mfield">
-      <label class="mlabel" for="rm-vtype">Vehicle Type</label>
-      <select class="minput" id="rm-vtype">
-        <option value="">Not specified</option>
-        <option>Sedan / Car</option>
-        <option>SUV / Crossover</option>
-        <option>Pickup / Van</option>
-      </select>
-    </div>
-    <div class="mfield">
-      <label class="mlabel" for="rm-vdetail">Make, Model &amp; Year</label>
-      <input class="minput" id="rm-vdetail" type="text" placeholder="e.g. Nissan Serena 2012">
-    </div>
-    <div class="mfield">
       <label class="mlabel" for="rm-date">Service Date <span style="color:var(--red)">*</span></label>
       <input class="minput" id="rm-date" type="date">
     </div>
@@ -1965,7 +1939,7 @@ function goTo(name) {
   document.getElementById('v-' + name).classList.add('active');
   document.getElementById('nb-' + name).classList.add('active');
 
-  if (name === 'overview')    { loadOverview(); loadWeather(); loadObjectivesData().then(renderNextGoals); }
+  if (name === 'overview')    { loadOverview(); loadWeather(); }
   if (name === 'pending')     loadPending();
   if (name === 'bookings')    loadBookings();
   if (name === 'clients')     loadClients();
@@ -2009,12 +1983,10 @@ function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   sidebarOpen = !sidebarOpen;
   sb.classList.toggle('open', sidebarOpen);
-  document.getElementById('sidebarBackdrop').classList.toggle('open', sidebarOpen);
 }
 function closeSidebar() {
   sidebarOpen = false;
   document.getElementById('sidebar').classList.remove('open');
-  document.getElementById('sidebarBackdrop').classList.remove('open');
 }
 
 // ── BOOT ─────────────────────────────────────────────────────────
@@ -2426,7 +2398,7 @@ async function loadRecords() {
              <button class="btn-act btn-edit" data-rec="${recData}" onclick="openRecordModal(this)">Edit</button>
              <button class="btn-act btn-inv" data-inv="${encodeURIComponent(JSON.stringify({name:r.clients?.full_name||'',phone:r.clients?.phone||'',service:r.service_tier||'',date:r.service_date||'',notes:r.job_notes||'',id:r.id}))}" onclick="goInvoice(this)">Invoice →</button>
              ${(r.payment_status||'').toLowerCase() !== 'paid' && (r.payment_status||'').toLowerCase() !== 'completed'
-               ? `<button class="btn-act btn-approve" onclick="markComplete('${r.id}')">✓ Complete</button>`
+               ? `<button class="btn-act btn-approve" data-content="${recData}" onclick="markComplete('${r.id}', this)">✓ Complete</button>`
                : '<span class="badge b-approved" style="align-self:center;">Done</span>'}
            </div>`
         ];
@@ -2511,21 +2483,6 @@ function countUp(id, target) {
 // ── INVOICE REDIRECT ──────────────────────────────────────────────
 function goInvoice(el) {
   const info = JSON.parse(decodeURIComponent(el.dataset.inv));
-
-  // Pull the "Vehicle: ..." line out of job_notes into its own field —
-  // same parsing used when editing a booking — so it lands in invoice.html's
-  // dedicated Vehicle line instead of getting dumped into general Notes.
-  const rawNotes = info.notes || '';
-  const vMatch = rawNotes.match(/Vehicle:\s*([^—|]*)—?\s*([^|]*)/);
-  let vehicle = '';
-  let remainingNotes = rawNotes;
-  if (vMatch) {
-    const vType = vMatch[1].trim();
-    const vDetail = vMatch[2].trim();
-    vehicle = [vType, vDetail].filter(Boolean).join(' — ');
-    remainingNotes = rawNotes.replace(/Vehicle:[^|]*\|?\s*/, '').trim();
-  }
-
   const invParams  = new URLSearchParams({
     name:    info.name    || '',
     phone:   info.phone   || '',
@@ -2533,8 +2490,7 @@ function goInvoice(el) {
     date:    info.date    || '',
     time:    info.time    || '',
     address: info.address || '',
-    vehicle: vehicle,
-    notes:   remainingNotes,
+    notes:   info.notes   || '',
     id:      info.id      || ''
   });
   const loadParams = new URLSearchParams({ dest: 'invoice.html', q: invParams.toString() });
@@ -2542,13 +2498,29 @@ function goInvoice(el) {
 }
 
 // ── MARK COMPLETE ─────────────────────────────────────────────────
-async function markComplete(id) {
+async function markComplete(id, btn) {
   try {
     const { error } = await db.from('service_records')
       .update({ payment_status: 'Paid' })
       .eq('id', id);
     if (error) throw error;
     toast('Job marked as complete', 'ok');
+
+    let recData = {};
+    try { recData = JSON.parse(decodeURIComponent(btn?.dataset?.content || '{}')); } catch(_) {}
+
+    const params = new URLSearchParams({
+      id:      id,
+      client:  recData.client_name  || '',
+      vehicle: recData.job_notes    || '',
+      tier:    recData.service_tier || '',
+      date:    recData.service_date || ''
+    });
+
+    if (confirm('Job marked complete.\n\nOpen the content checklist now — confirm balance collected, photos captured, watermarked, and uploaded before moving to the next job?')) {
+      window.open('content-checklist.html?' + params.toString(), '_blank');
+    }
+
     loadRecords();
   } catch(e) { toast(e.message, 'err'); }
 }
@@ -2615,30 +2587,11 @@ async function openRecordModal(el) {
 
       document.getElementById('rm-date').value   = rec.service_date || '';
       document.getElementById('rm-status').value = rec.payment_status || 'Pending';
-
-      // Vehicle info is stored as a "Vehicle: Type — Make Model Year" line inside
-      // job_notes. Pull it back out into its own fields, and show only the
-      // remaining notes in the textarea (so editing doesn't duplicate the line).
-      const rawNotes = rec.job_notes || '';
-      const vMatch = rawNotes.match(/Vehicle:\s*([^—|]*)—?\s*([^|]*)/);
-      let remainingNotes = rawNotes;
-      document.getElementById('rm-vtype').value = '';
-      document.getElementById('rm-vdetail').value = '';
-      if (vMatch) {
-        const vType = vMatch[1].trim();
-        const vDetail = vMatch[2].trim();
-        const vTypeOptions = [...document.getElementById('rm-vtype').options].map(o => o.value);
-        if (vTypeOptions.includes(vType)) document.getElementById('rm-vtype').value = vType;
-        document.getElementById('rm-vdetail').value = vDetail;
-        remainingNotes = rawNotes.replace(/Vehicle:[^|]*\|?\s*/, '').trim();
-      }
-      document.getElementById('rm-notes').value = remainingNotes;
+      document.getElementById('rm-notes').value  = rec.job_notes || '';
     } else {
       document.getElementById('rm-date').value   = new Date().toISOString().slice(0, 10);
       document.getElementById('rm-status').value = 'Confirmed';
       document.getElementById('rm-notes').value  = '';
-      document.getElementById('rm-vtype').value  = '';
-      document.getElementById('rm-vdetail').value = '';
     }
   } catch(e) {
     toast(e.message, 'err');
@@ -2648,11 +2601,9 @@ async function openRecordModal(el) {
 async function saveRecord() {
   const clientId = document.getElementById('rm-client').value;
   let service    = document.getElementById('rm-service').value;
-  const vtype    = document.getElementById('rm-vtype').value;
-  const vdetail  = document.getElementById('rm-vdetail').value.trim();
   const date     = document.getElementById('rm-date').value;
   const status   = document.getElementById('rm-status').value;
-  const otherNotes = document.getElementById('rm-notes').value.trim();
+  const notes    = document.getElementById('rm-notes').value.trim();
 
   if (service === '__custom') {
     service = (prompt('Enter the service / tier name:') || '').trim();
@@ -2661,27 +2612,22 @@ async function saveRecord() {
 
   if (!clientId || !service || !date) { toast('Client, service and date are required', 'err'); return; }
 
-  // Combine vehicle info + free-text notes into job_notes, same "Vehicle: ..."
-  // format used elsewhere so it stays consistent and parses back out cleanly.
-  const vehicleLine = (vtype || vdetail) ? `Vehicle: ${vtype}${vtype && vdetail ? ' — ' : ''}${vdetail}` : '';
-  const notes = [vehicleLine, otherNotes].filter(Boolean).join(' | ') || null;
-
   try {
-    let result;
     if (editingRecordId) {
-      result = await db.from('service_records').update({
+      const { error } = await db.from('service_records').update({
         client_id: clientId, service_tier: service, service_date: date,
-        payment_status: status, job_notes: notes
-      }).eq('id', editingRecordId).select();
+        payment_status: status, job_notes: notes || null
+      }).eq('id', editingRecordId);
+      if (error) throw error;
+      toast('Appointment updated', 'ok');
     } else {
-      result = await db.from('service_records').insert([{
+      const { error } = await db.from('service_records').insert([{
         client_id: clientId, service_tier: service, service_date: date,
-        payment_status: status, job_notes: notes
-      }]).select();
+        payment_status: status, job_notes: notes || null
+      }]);
+      if (error) throw error;
+      toast('Appointment booked', 'ok');
     }
-
-    if (result.error) throw result.error;
-    toast(editingRecordId ? 'Appointment updated' : 'Appointment booked', 'ok');
     closeRecordModal();
     loadRecords();
     loadBookings();
@@ -3911,139 +3857,23 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 // ── COMMAND CENTRE ───────────────────────────────────────────────
-const OBJ_CATEGORY_META = {
-  immediate:  { label: '🔴 Immediate',  badge: 'badge-now',  badgeText: 'Now'  },
-  this_month: { label: '🟠 This Month', badge: 'badge-soon', badgeText: 'Soon' },
-  planned:    { label: '⚪ Planned',    badge: 'badge-plan', badgeText: 'Planned' }
-};
-let cachedObjectives = [];
-
-async function loadObjectivesData() {
-  try {
-    const { data, error } = await db.from('objectives').select('*').order('category').order('sort_order');
-    if (error) throw error;
-    cachedObjectives = data || [];
-  } catch (e) {
-    console.log('loadObjectivesData error:', e);
-    cachedObjectives = [];
-  }
-}
-
-function renderObjectivesList() {
-  const wrap = document.getElementById('objectives-list');
-  if (!wrap) return;
-  if (!cachedObjectives.length) {
-    wrap.innerHTML = '<div style="font-size:12px;color:var(--dim);padding:8px 0;">No objectives yet — add one below.</div>';
-    return;
-  }
-  let html = '';
-  ['immediate', 'this_month', 'planned'].forEach(cat => {
-    const items = cachedObjectives.filter(o => o.category === cat);
-    if (!items.length) return;
-    const meta = OBJ_CATEGORY_META[cat];
-    html += `<span class="cmd-group-label">${meta.label}</span>`;
-    items.forEach(o => {
-      html += `<label class="cmd-task${o.completed ? ' done' : ''}" style="display:flex;align-items:center;gap:8px;">
-        <input type="checkbox" ${o.completed ? 'checked' : ''} onchange="toggleObjective('${o.id}', this.checked)">
-        <span class="cmd-task-text" style="flex:1;">${o.text}</span>
-        <span class="cmd-task-badge ${meta.badge}">${meta.badgeText}</span>
-        <span onclick="deleteObjective('${o.id}')" style="cursor:pointer;color:var(--dim);padding:2px 6px;font-size:14px;" title="Remove">&times;</span>
-      </label>`;
-    });
+function loadCommand() {
+  const tasks = ['ct-subaru','ct-post','ct-trn','ct-tax','ct-nis','ct-bank',
+                 'ct-insurance','ct-outreach','ct-headlight','ct-plates',
+                 'ct-tablet','ct-polisher','ct-wipay'];
+  tasks.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const cb   = el.querySelector('input[type=checkbox]');
+    const done = localStorage.getItem('ecad_task_' + id) === '1';
+    if (cb) cb.checked = done;
+    el.classList.toggle('done', done);
   });
-  wrap.innerHTML = html;
 }
-
-function renderNextGoals() {
-  const wrap = document.getElementById('next-goals-wrap');
-  if (!wrap) return;
-  const order = { immediate: 0, this_month: 1, planned: 2 };
-  const upcoming = cachedObjectives
-    .filter(o => !o.completed)
-    .sort((a, b) => (order[a.category] - order[b.category]) || (a.sort_order - b.sort_order))
-    .slice(0, 4);
-
-  if (!upcoming.length) {
-    wrap.innerHTML = '<div style="font-size:12px;color:var(--dim);">Nothing outstanding right now — add new objectives from the Command Centre.</div>';
-    return;
-  }
-
-  wrap.innerHTML = upcoming.map(o => {
-    const meta = OBJ_CATEGORY_META[o.category];
-    return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--bsoft);font-size:12px;">
-      <span style="flex-shrink:0;">${meta.label.split(' ')[0]}</span>
-      <span style="flex:1;color:var(--silver-l);">${o.text}</span>
-    </div>`;
-  }).join('');
-}
-
-async function loadCommand() {
-  await loadObjectivesData();
-  renderObjectivesList();
-}
-
-const OBJECTIVE_FUNCTION_URL = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co/functions/v1/manage-objective';
-
-async function addObjective() {
-  const textEl = document.getElementById('new-objective-text');
-  const catEl = document.getElementById('new-objective-category');
-  const text = textEl.value.trim();
-  if (!text) return;
-
-  try {
-    const maxSort = cachedObjectives.reduce((m, o) => Math.max(m, o.sort_order || 0), 0);
-    const resp = await fetch(OBJECTIVE_FUNCTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        action: 'add',
-        text,
-        category: catEl.value,
-        sort_order: maxSort + 1
-      })
-    });
-    const result = await resp.json();
-    if (result.error) throw new Error(result.error);
-    textEl.value = '';
-    await loadObjectivesData();
-    renderObjectivesList();
-  } catch (e) {
-    alert('Could not add objective: ' + (e.message || e));
-  }
-}
-
-async function toggleObjective(id, checked) {
-  try {
-    const resp = await fetch(OBJECTIVE_FUNCTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'toggle', id, completed: checked })
-    });
-    const result = await resp.json();
-    if (result.error) throw new Error(result.error);
-    const item = cachedObjectives.find(o => o.id === id);
-    if (item) item.completed = checked;
-    renderObjectivesList();
-  } catch (e) {
-    alert('Could not update: ' + (e.message || e));
-  }
-}
-
-async function deleteObjective(id) {
-  if (!confirm('Remove this objective? This can\'t be undone.')) return;
-  try {
-    const resp = await fetch(OBJECTIVE_FUNCTION_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'delete', id })
-    });
-    const result = await resp.json();
-    if (result.error) throw new Error(result.error);
-    cachedObjectives = cachedObjectives.filter(o => o.id !== id);
-    renderObjectivesList();
-  } catch (e) {
-    alert('Could not remove: ' + (e.message || e));
-  }
+function saveTask(id, checked) {
+  localStorage.setItem('ecad_task_' + id, checked ? '1' : '0');
+  const el = document.getElementById(id);
+  if (el) el.classList.toggle('done', checked);
 }
 
 // ── LIVE CLOCK ───────────────────────────────────────────────────

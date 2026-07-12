@@ -3,38 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Content Checklist · Extra Clean Auto Detailing</title>
+<title>Job Wrap-Up Checklist · Extra Clean Auto Detailing</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600&family=Sora:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:300;min-height:100vh;padding:32px 20px}
+html{overflow-x:hidden}
+body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:300;min-height:100vh;padding:32px 20px;overflow-x:hidden}
 :root{
   --silver:#b8c8d6;--silver-l:#d4e2ec;--silver-d:#586878;
   --s1:#111;--s2:#181818;--s3:#1e1e1e;
   --border:rgba(184,200,214,0.22);--bsoft:rgba(255,255,255,0.06);
   --text:#f0ede6;--muted:#8a8378;--dim:#5a574f;
-  --green:#4caf82;--copper:#c9783c;--copper-l:#e8a46a;
+  --green:#4caf82;--copper:#c9783c;--copper-l:#e8a46a;--red:#d16a5a;
 }
 .wrap{max-width:480px;margin:0 auto}
-.header{text-align:center;margin-bottom:32px}
-.header h1{font-family:'Cormorant Garamond',serif;font-size:36px;font-weight:300;color:var(--silver-l);margin-bottom:6px}
+.header{text-align:center;margin-bottom:20px}
+.header h1{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:300;color:var(--silver-l);margin-bottom:6px}
 .header p{font-size:11px;letter-spacing:.15em;text-transform:uppercase;color:var(--dim)}
+.context-card{display:none;background:var(--s1);border:1px solid var(--border);border-radius:8px;padding:16px 18px;margin-bottom:20px}
+.context-card.vis{display:block}
+.context-row{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+.context-label{color:var(--dim);letter-spacing:.06em;text-transform:uppercase;font-size:10px}
+.context-val{color:var(--silver-l);font-weight:500;text-align:right}
+.tip-banner{background:rgba(91,142,207,.08);border:1px solid rgba(91,142,207,.2);border-radius:6px;padding:12px 14px;margin-bottom:20px;font-size:11px;color:#9db8d6;line-height:1.6}
+.tip-banner strong{color:#bcd4ec}
 .phase{margin-bottom:24px}
 .phase-title{font-size:9px;font-weight:600;letter-spacing:.25em;text-transform:uppercase;padding:10px 16px;border-radius:4px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
 .phase-title.before{background:rgba(91,142,207,.12);color:#7aaee8;border:1px solid rgba(91,142,207,.2)}
 .phase-title.during{background:rgba(201,120,60,.12);color:var(--copper-l);border:1px solid rgba(201,120,60,.22)}
 .phase-title.after{background:rgba(76,175,130,.12);color:var(--green);border:1px solid rgba(76,175,130,.25)}
+.phase-title.leave{background:rgba(209,106,90,.12);color:#e08c7c;border:1px solid rgba(209,106,90,.25)}
 .phase-title.post{background:rgba(155,110,200,.12);color:#b88ee0;border:1px solid rgba(155,110,200,.22)}
 .item{display:flex;align-items:flex-start;gap:14px;background:var(--s1);border:1px solid var(--bsoft);border-radius:6px;padding:13px 16px;margin-bottom:4px;cursor:pointer;transition:border-color .2s,background .2s;user-select:none}
 .item.checked{background:rgba(76,175,130,.06);border-color:rgba(76,175,130,.25)}
 .item.checked .item-text{color:var(--dim);text-decoration:line-through}
+.item.critical{border-color:rgba(209,106,90,.3)}
 .checkbox{width:20px;height:20px;border:1.5px solid var(--silver-d);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s;margin-top:1px}
 .item.checked .checkbox{background:var(--green);border-color:var(--green)}
 .checkmark{display:none;color:#000;font-size:12px;font-weight:700}
 .item.checked .checkmark{display:block}
 .item-text{font-size:13px;color:var(--text);line-height:1.45}
 .item-sub{font-size:11px;color:var(--muted);margin-top:3px}
-.progress-wrap{background:var(--s1);border:1px solid var(--bsoft);border-radius:8px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.progress-wrap{background:var(--s1);border:1px solid var(--bsoft);border-radius:8px;padding:16px 20px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px;position:sticky;top:12px;z-index:5}
 .progress-bar-wrap{flex:1;background:var(--s3);border-radius:100px;height:6px;overflow:hidden}
 .progress-bar{height:100%;background:var(--green);border-radius:100px;transition:width .3s ease;width:0%}
 .progress-text{font-size:12px;color:var(--muted);flex-shrink:0}
@@ -47,13 +57,24 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
 <body>
 <div class="wrap">
   <div class="header">
-    <h1>Content Checklist</h1>
-    <p>Extra Clean Auto Detailing &middot; Every Job</p>
+    <h1>Job Wrap-Up</h1>
+    <p>Extra Clean Auto Detailing &middot; Every Job, Every Time</p>
+  </div>
+
+  <div class="context-card" id="context-card">
+    <div class="context-row"><span class="context-label">Client</span><span class="context-val" id="ctx-client">—</span></div>
+    <div class="context-row"><span class="context-label">Vehicle</span><span class="context-val" id="ctx-vehicle">—</span></div>
+    <div class="context-row"><span class="context-label">Tier</span><span class="context-val" id="ctx-tier">—</span></div>
+    <div class="context-row"><span class="context-label">Date</span><span class="context-val" id="ctx-date">—</span></div>
   </div>
 
   <div class="progress-wrap">
     <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
-    <div class="progress-text" id="progress-text">0 / 16</div>
+    <div class="progress-text" id="progress-text">0 / 23</div>
+  </div>
+
+  <div class="tip-banner">
+    <strong>Shooting reminder:</strong> landscape orientation for interior shots — seat, footwell, and dash in one frame, no cropping needed later. CPL filter on for outdoor exterior shots to cut glare, roughly 90&deg; to the sun.
   </div>
 
   <!-- BEFORE -->
@@ -62,7 +83,7 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Full exterior — driver side</div><div class="item-sub">Wide shot showing whole car from the side</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Full exterior — front angle</div><div class="item-sub">45-degree corner shot</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Wheels &amp; tyres close-up</div><div class="item-sub">Show the grime, brake dust, discoloration</div></div></div>
-    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Interior — front seats &amp; footwells</div><div class="item-sub">From the door opening looking in</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Interior — seat &amp; footwell, landscape</div><div class="item-sub">From the open door, phone sideways — this is the shot that needs the mat/seat visible</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Dashboard &amp; console</div><div class="item-sub">Dust, grime, fingerprints — show the reality</div></div></div>
   </div>
 
@@ -72,7 +93,7 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Foam or product application</div><div class="item-sub">Short video — satisfying to watch</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Extraction water (if deep clean)</div><div class="item-sub">The dirty water coming out = powerful proof</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Wheel or tyre detail close-up</div><div class="item-sub">Brush work, before and mid-clean</div></div></div>
-    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">One detail shot of your products</div><div class="item-sub">Cerakote, Turtle Wax — brand credibility</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">One detail shot of your products</div><div class="item-sub">Green Star bottle, Cerakote, Turtle Wax — brand credibility</div></div></div>
   </div>
 
   <!-- AFTER -->
@@ -80,29 +101,60 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
     <div class="phase-title after">&#10024; After — The Money Shots</div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Full exterior — same angle as before</div><div class="item-sub">Match the before shot exactly for comparison</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Wheels &amp; dressed tyres close-up</div><div class="item-sub">Shine on the tyre, clean rim — dramatic</div></div></div>
-    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Interior — seats &amp; footwells after</div><div class="item-sub">Match the before shot</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Interior — seat &amp; footwell, same landscape framing</div><div class="item-sub">Match the before shot exactly — same angle, same orientation</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Dashboard reflection shot</div><div class="item-sub">Clean dash reflecting light — always looks premium</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Thank you card in windshield corner</div><div class="item-sub">Your content branding shot — post with every job</div></div></div>
   </div>
 
+  <!-- BEFORE YOU LEAVE — NON-NEGOTIABLES -->
+  <div class="phase">
+    <div class="phase-title leave">&#128737; Before You Leave — Non-Negotiables</div>
+    <div class="item critical" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Full remaining balance actually collected</div><div class="item-sub">Confirmed received — not promised, not "sent." Cash counted, transfer verified landed, or card charge confirmed. Every job, no exceptions.</div></div></div>
+    <div class="item critical" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Walked the finished result with the client</div><div class="item-sub">Together, before you pack up — not from the driveway</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Power outlet access — no issues to flag</div><div class="item-sub">If it was a problem this visit, note it for next time</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Pre-existing damage acknowledged with client</div><div class="item-sub">Pointed out and confirmed before leaving, not after</div></div></div>
+  </div>
+
   <!-- POST -->
   <div class="phase">
-    <div class="phase-title post">&#128640; Post — Before You Leave</div>
-    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Update client record in dashboard</div><div class="item-sub">Service tier, amount, next due date</div></div></div>
-    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Save best before &amp; after to camera roll</div><div class="item-sub">Ready to post on Instagram and TikTok</div></div></div>
+    <div class="phase-title post">&#128640; Post — Content &amp; Records</div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Update client record in dashboard</div><div class="item-sub">Service tier, amount, payment status</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Watermark before &amp; after photos</div><div class="item-sub">EXIF orientation corrected, logo bottom-right ~20% width, dark rounded badge backing</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Upload before/after pair to gallery</div><div class="item-sub">Naming: gallery-[vehicle]-before.jpg / gallery-[vehicle]-after.jpg — matches index.html</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">If maintenance-eligible: anchored next visit date</div><div class="item-sub">Specific date agreed with client now — not "we'll schedule later"</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Save best shots to camera roll</div><div class="item-sub">Ready to post on Instagram and TikTok</div></div></div>
   </div>
 
   <div class="complete-msg" id="complete-msg">
-    <p>&#10003; Job documented. Go post it.</p>
+    <p>&#10003; Job fully wrapped. Go post it.</p>
   </div>
   <button class="reset-btn" onclick="resetAll()">Reset Checklist</button>
 </div>
 
 <script>
-const TOTAL = 16;
+const TOTAL = 23;
+const params = new URLSearchParams(window.location.search);
+const bookingId = params.get('id') || '';
+const STORE_KEY = bookingId ? ('ecad-checklist-' + bookingId) : null;
+
+(function initContext() {
+  const client  = params.get('client')  || '';
+  const vehicle = params.get('vehicle') || '';
+  const tier    = params.get('tier')    || '';
+  const date    = params.get('date')    || '';
+  if (!client && !vehicle && !tier && !date) return;
+
+  document.getElementById('context-card').classList.add('vis');
+  document.getElementById('ctx-client').textContent  = client  || '—';
+  document.getElementById('ctx-vehicle').textContent = vehicle || '—';
+  document.getElementById('ctx-tier').textContent    = tier    || '—';
+  document.getElementById('ctx-date').textContent    = date    || '—';
+})();
+
 function toggle(el) {
   el.classList.toggle('checked');
   updateProgress();
+  saveState();
 }
 function updateProgress() {
   const done = document.querySelectorAll('.item.checked').length;
@@ -114,7 +166,26 @@ function updateProgress() {
 function resetAll() {
   document.querySelectorAll('.item').forEach(el => el.classList.remove('checked'));
   updateProgress();
+  if (STORE_KEY) localStorage.removeItem(STORE_KEY);
 }
+function saveState() {
+  if (!STORE_KEY) return;
+  const items = Array.from(document.querySelectorAll('.item'));
+  const state = items.map(el => el.classList.contains('checked'));
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(_) {}
+}
+function loadState() {
+  if (!STORE_KEY) return;
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    const items = Array.from(document.querySelectorAll('.item'));
+    items.forEach((el, i) => { if (state[i]) el.classList.add('checked'); });
+    updateProgress();
+  } catch(_) {}
+}
+loadState();
 </script>
 </body>
 </html>
