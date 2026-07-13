@@ -1887,6 +1887,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('uname-display').textContent = activeUser;
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('dashboard').style.display   = 'block';
+  applyRoleRestrictions();
   bootData();
 });
 
@@ -1925,6 +1926,7 @@ async function doLogin() {
   document.getElementById('uname-display').textContent = user;
   document.getElementById('login-screen').style.display = 'none';
   document.getElementById('dashboard').style.display   = 'block';
+  applyRoleRestrictions();
 
   playChime();
   bootData();
@@ -1932,6 +1934,17 @@ async function doLogin() {
 
 document.getElementById('l-pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 document.getElementById('l-user').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('l-pass').focus(); });
+
+// ── ROLE RESTRICTIONS ────────────────────────────────────────────
+// Pricing (and by extension the WiPay card-payment toggle, which lives
+// inside it) is Hyperion-only. Hiding the nav button is the visible part;
+// the actual block lives in goTo() so it can't be bypassed by anything
+// other than logging in as Hyperion.
+function applyRoleRestrictions() {
+  const pricingNav = document.getElementById('nb-pricing');
+  if (!pricingNav) return;
+  pricingNav.style.display = activeUser === 'Hyperion' ? '' : 'none';
+}
 
 function doLogout() {
   db.auth.signOut();
@@ -1970,6 +1983,10 @@ function playChime() {
 const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'training', 'academy', 'command', 'pricing', 'documents'];
 
 function goTo(name) {
+  if (name === 'pricing' && activeUser !== 'Hyperion') {
+    toast('Pricing access is restricted', 'err');
+    return;
+  }
   VIEWS.forEach(v => {
     document.getElementById('v-' + v).classList.remove('active');
     document.getElementById('nb-' + v).classList.remove('active');
@@ -2822,9 +2839,13 @@ async function toggleCardPayment(turnOn) {
   status.textContent = 'Saving…';
 
   try {
+    const { data: { session } } = await db.auth.getSession();
     const resp = await fetch(TOGGLE_FUNCTION_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.access_token || ''}`
+      },
       body: JSON.stringify({ key: 'card_payment_enabled', value: turnOn ? 'true' : 'false' })
     });
     const result = await resp.json();
