@@ -1503,6 +1503,13 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
                 </div>
               </div>
             </div>
+            <div class="cmd-card" style="border-color:rgba(155,110,200,.25);">
+              <div class="cmd-card-head"><span class="cmd-card-title">🕊️ Reflection Journal</span><span class="cmd-card-sub">Private — just for you</span></div>
+              <div style="font-size:11px;color:var(--dim);margin-bottom:14px;line-height:1.6;">Not graded, not client-facing, not part of the Academy. A place to log where you actually are — with the business, with rest, with the journey Stage 6 is about.</div>
+              <textarea id="journal-entry-text" class="minput" rows="4" style="width:100%;resize:vertical;margin-bottom:10px;" placeholder="What's on your mind today?"></textarea>
+              <button class="btn sm" onclick="saveJournalEntry()" style="width:100%;margin-bottom:16px;">Save Entry</button>
+              <div id="journal-entries-list" style="max-height:280px;overflow-y:auto;"><div class="loading">Loading</div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -4233,7 +4240,7 @@ document.addEventListener('DOMContentLoaded',()=>{
 });
 
 // ── COMMAND CENTRE ───────────────────────────────────────────────
-function loadCommand() {
+async function loadCommand() {
   const tasks = ['ct-subaru','ct-post','ct-trn','ct-tax','ct-nis','ct-bank',
                  'ct-insurance','ct-outreach','ct-headlight','ct-plates',
                  'ct-tablet','ct-polisher','ct-wipay'];
@@ -4245,11 +4252,49 @@ function loadCommand() {
     if (cb) cb.checked = done;
     el.classList.toggle('done', done);
   });
+  loadJournalEntries();
 }
 function saveTask(id, checked) {
   localStorage.setItem('ecad_task_' + id, checked ? '1' : '0');
   const el = document.getElementById(id);
   if (el) el.classList.toggle('done', checked);
+}
+
+// ── REFLECTION JOURNAL ──────────────────────────────────────────────
+// Private, staff-only, not client-facing. No grading, no completion
+// tracking — a personal log distinct from the Academy's graded modules.
+async function loadJournalEntries() {
+  const wrap = document.getElementById('journal-entries-list');
+  if (!wrap) return;
+  try {
+    const { data, error } = await db.from('journal_entries')
+      .select('*').order('created_at', { ascending: false }).limit(20);
+    if (error) throw error;
+    if (!data || !data.length) {
+      wrap.innerHTML = '<div style="font-size:11px;color:var(--dim);text-align:center;padding:20px 0;">No entries yet.</div>';
+      return;
+    }
+    wrap.innerHTML = data.map(e => `
+      <div style="padding:10px 0;border-bottom:1px solid var(--bsoft);">
+        <div style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">${fd(e.entry_date)}</div>
+        <div style="font-size:12px;color:var(--text);line-height:1.5;white-space:pre-wrap;">${x(e.content)}</div>
+      </div>
+    `).join('');
+  } catch(e) {
+    wrap.innerHTML = '<div style="font-size:11px;color:var(--red);">Could not load entries.</div>';
+  }
+}
+async function saveJournalEntry() {
+  const textEl = document.getElementById('journal-entry-text');
+  const content = textEl.value.trim();
+  if (!content) return;
+  try {
+    const { error } = await db.from('journal_entries').insert([{ content }]);
+    if (error) throw error;
+    textEl.value = '';
+    loadJournalEntries();
+    toast('Entry saved', 'ok');
+  } catch(e) { toast(e.message, 'err'); }
 }
 
 // ── LIVE CLOCK ───────────────────────────────────────────────────
