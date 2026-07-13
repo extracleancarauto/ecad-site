@@ -1007,6 +1007,13 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
     width: 220px;
   }
   .sidebar.open { transform: translateX(0); }
+  .sidebar-backdrop {
+    display: none; position: fixed; inset: 0;
+    top: var(--topbar-h);
+    background: rgba(0,0,0,.55);
+    z-index: 140;
+  }
+  .sidebar-backdrop.open { display: block; }
   .main { padding: 24px 18px; }
   .burger-btn { display: flex; }
   .topbar-label { display: none; }
@@ -1147,6 +1154,8 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
   </header>
 
   <div class="dash-body">
+
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
 
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
@@ -2008,10 +2017,12 @@ function toggleSidebar() {
   const sb = document.getElementById('sidebar');
   sidebarOpen = !sidebarOpen;
   sb.classList.toggle('open', sidebarOpen);
+  document.getElementById('sidebarBackdrop').classList.toggle('open', sidebarOpen);
 }
 function closeSidebar() {
   sidebarOpen = false;
   document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
 }
 
 // ── BOOT ─────────────────────────────────────────────────────────
