@@ -70,7 +70,7 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
 
   <div class="progress-wrap">
     <div class="progress-bar-wrap"><div class="progress-bar" id="progress-bar"></div></div>
-    <div class="progress-text" id="progress-text">0 / 23</div>
+    <div class="progress-text" id="progress-text">0 / 24</div>
   </div>
 
   <div class="tip-banner">
@@ -85,6 +85,7 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Wheels &amp; tyres close-up</div><div class="item-sub">Show the grime, brake dust, discoloration</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Interior — seat &amp; footwell, landscape</div><div class="item-sub">From the open door, phone sideways — this is the shot that needs the mat/seat visible</div></div></div>
     <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Dashboard &amp; console</div><div class="item-sub">Dust, grime, fingerprints — show the reality</div></div></div>
+    <div class="item" onclick="toggle(this)"><div class="checkbox"><span class="checkmark">&#10003;</span></div><div><div class="item-text">Check for prior bodywork or respray</div><div class="item-sub">Jamb/trunk edge color match, texture at panel edges, overspray on seals — ask the client directly if suspected</div></div></div>
   </div>
 
   <!-- DURING -->
@@ -132,7 +133,7 @@ body{background:#0a0a0a;color:#f0ede6;font-family:'Sora',sans-serif;font-weight:
 </div>
 
 <script>
-const TOTAL = 23;
+const TOTAL = 24;
 const params = new URLSearchParams(window.location.search);
 const bookingId = params.get('id') || '';
 const STORE_KEY = bookingId ? ('ecad-checklist-' + bookingId) : null;
