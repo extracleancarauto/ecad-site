@@ -636,6 +636,46 @@ const MODULES = [
     ]
   },
 
+  track: 'Craft & Technique',
+  id: 'rag-care',
+  stage: 'Foundational',
+  ico: '🧺',
+  title: 'Microfiber & Rag Care Protocol',
+  desc: 'The laundering system that protects every job after this one — how contamination hiding in a towel becomes a scratch on a client\'s paint.',
+  pills: ['practice', 'quiz'],
+  content: `
+    <div class="section-lbl">Why This Is Not Housekeeping — It's Quality Control</div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Every principle you already follow during the wash applies again in the laundry.</strong> You never let a wheel brush touch paint because wheel contamination is abrasive. That same abrasive grit does not disappear when the towel goes in the wash — it just waits for the next load to cross-contaminate a different towel.</div></div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>The client never sees the cause.</strong> A swirl mark from bad laundering looks identical to one from bad wash technique. It shows up two days later under sunlight, with no way to trace it back to a load of mixed towels. This makes it more dangerous than a technique error — you can't self-correct what you can't see happening.</div></div>
+
+    <div class="section-lbl">The Three-Load Rule</div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Load 1 — Wheels, tires, tar.</strong> Heaviest and most abrasive contamination (brake dust, road tar, grit). These towels never enter the same wash as anything that touches paint or interior.</div></div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Load 2 — Exterior paint.</strong> Wash mitts and drying microfibers. Kept separate from wheel towels for the same reason a wheel brush never touches a body panel.</div></div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Load 3 — Interior & glass.</strong> APC cloths, leather cloths, glass microfibers. These are the towels most likely to end up back against a client's skin, dashboard, or seat — the highest standard applies here.</div></div>
+    <div class="tip">💡 Color-code each load with a dedicated towel color (e.g. dark grey for wheels, silver for paint, white for interior/glass). This removes guesswork entirely — including for a future hire who doesn't yet have your judgment for what's "probably fine."</div>
+
+    <div class="section-lbl">Detergent & Wash Settings</div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Use a dedicated microfiber detergent</strong> — P&S Rags to Riches or equivalent. General laundry detergent leaves surfactant residue in the fibers that transfers back onto paint as streaking on the next job.</div></div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Warm water, every load, no exceptions.</strong> Cold water will not break down embedded wax, sealant, and polymer residue. The detergent is formulated to work at warm temperatures — running it cold means you're not getting what you paid for.</div></div>
+    <div class="warn">⚠ Never use fabric softener or dryer sheets on any detailing towel. Both coat the fiber with a waxy residue that kills absorbency — the exact opposite of what the towel is for. A "soft" towel that doesn't absorb water is a useless towel that still looks fine in the bag.</div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Never wash microfiber with cotton or other fabric types.</strong> Lint and fibers from cotton shed into the wash and embed in the microfiber, creating the exact kind of trapped grit you're trying to eliminate.</div></div>
+
+    <div class="section-lbl">Drying</div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Air dry / hang dry is the standard — and the correct one.</strong> If a dryer is ever used, low heat only, and never with a dryer sheet in the drum.</div></div>
+    <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Dry away from dust and open work areas.</strong> A clean towel hung in a garage where you're mixing chemicals or sweeping defeats the purpose of laundering it in the first place.</div></div>
+
+    <div class="callout">The two-bucket method exists so contamination never travels backward onto clean paint during the job. The three-load rule exists so it never travels forward into the next job. Same principle, different stage of the process.</div>
+  `,
+  practice: [
+    { q: 'A new hire asks why you have three different colored bins for dirty towels instead of just tossing them all in one hamper. Explain it in a way that would make sense to someone who has never detailed a car.', a: 'Each color represents a different level of contamination — wheel towels pick up brake dust and grit, paint towels touch the clearcoat, and interior towels touch things the client sits on and breathes near. If they all wash together, the grit from the wheel towels gets carried in the water and can embed itself in the paint or interior towels. The next time you use that "clean" towel, you\'re actually dragging that grit across a surface — which is exactly how scratches get created without you doing anything wrong during the job itself.' },
+    { q: 'You\'re almost out of dedicated microfiber detergent and have regular laundry detergent at home. Should you substitute it for tonight\'s load? Explain your reasoning.', a: 'No. Regular detergent isn\'t formulated to fully rinse out of microfiber\'s dense fiber structure — it leaves surfactant residue behind. That residue transfers onto the next vehicle\'s paint as streaking, which undoes the polish or sealant work and creates a visible defect the client will notice. It\'s better to skip washing that load until proper detergent is available than to risk contaminating every towel in it.' }
+  ],
+  quiz: [
+    { q: 'Why should wheel/tar towels never be washed in the same load as paint or interior towels?', opts: ['It just takes longer to sort them', 'Abrasive contamination from wheels can transfer in the wash and embed in towels that later touch paint or interior surfaces', 'Wheel towels need hotter water than paint towels', 'There is no real difference — this is just a preference'], correct: 1, feedback: ['Sorting time is irrelevant compared to the actual risk.', 'Correct. This is the same cross-contamination principle as never using a wheel brush on paint — just applied at the laundry stage instead of the job stage.', 'Water temperature should be consistent (warm) across all detailing loads, not split by towel type.', 'This is a quality-control principle with a direct mechanism, not a stylistic preference.'] },
+    { q: 'What does fabric softener do to a microfiber towel?', opts: ['Nothing — it is safe and recommended for microfiber', 'It coats the fibers with residue that kills absorbency', 'It only affects color, not performance', 'It is required to restore softness after multiple washes'], correct: 1, feedback: ['Fabric softener is specifically warned against by every microfiber detergent manufacturer for a reason.', 'Correct. A "soft-feeling" towel that has lost its absorbency is now a worse tool than a rough one that still performs — softness is not the goal, function is.', 'The damage is functional, not just cosmetic.', 'Dedicated microfiber detergent restores softness without this trade-off — softener is never the answer.'] },
+    { q: 'Why is warm water specified instead of cold for washing detailing towels?', opts: ['Warm water is just a general laundry default', 'Cold water will not break down embedded wax, sealant, and polymer residue the way the detergent is formulated to work', 'Warm water prevents shrinkage', 'It makes no measurable difference'], correct: 1, feedback: ['This is a specific formulation requirement, not a default habit.', 'Correct. Running a warm-water-formulated detergent on cold means the residues the detergent is designed to strip out simply stay in the towel.', 'Shrinkage is not the relevant concern for microfiber blends here.', 'The difference shows up directly as reduced absorbency and residue carryover on the next job.'] }
+  ]
+},
   // ══════════════════════════════════════════
   // TRACK: BUSINESS OPERATIONS
   // ══════════════════════════════════════════
