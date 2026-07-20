@@ -1516,6 +1516,22 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
                 </div>
               </div>
             </div>
+            <div class="cmd-card" id="training-progress-card">
+              <div class="cmd-card-head">
+                <span class="cmd-card-title">Advanced Training Centre</span>
+                <span class="cmd-card-sub" id="training-progress-sub">Loading…</span>
+              </div>
+              <div style="padding:4px 0 14px;">
+                <div style="background:var(--s3);border-radius:6px;height:8px;overflow:hidden;">
+                  <div id="training-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg, var(--silver-d), var(--silver-l));border-radius:6px;transition:width .5s ease;"></div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--dim);">
+                  <span id="training-progress-count">0 / 0 modules</span>
+                  <span id="training-progress-pct">0%</span>
+                </div>
+              </div>
+              <a href="training-advanced.html" class="btn sm ghost" style="width:100%;text-align:center;display:block;">Continue Training</a>
+            </div>
             <div class="cmd-card" style="border-color:rgba(155,110,200,.25);">
               <div class="cmd-card-head"><span class="cmd-card-title">🕊️ Reflection Journal</span><span class="cmd-card-sub">Private — just for you</span></div>
               <div style="font-size:11px;color:var(--dim);margin-bottom:14px;line-height:1.6;">Not graded, not client-facing, not part of the Academy. A place to log where you actually are — with the business, with rest, with the journey Stage 6 is about.</div>
@@ -2000,7 +2016,7 @@ function goTo(name) {
   if (name === 'clients')     loadClients();
   if (name === 'records')     loadRecords();
   if (name === 'maintenance') loadMaintenance();
-  if (name === 'command')     loadCommand();
+  if (name === 'command')     { loadCommand(); loadTrainingProgress(); }
   if (name === 'pricing')     { loadPricing(); loadCardPaymentToggle(); }
 
   // Close sidebar on mobile
@@ -2008,6 +2024,39 @@ function goTo(name) {
 }
 
 // ── DOCUMENT READER ──────────────────────────────────────────────
+// ── TRAINING CENTRE PROGRESS CARD ────────────────────────────────
+function loadTrainingProgress() {
+  const subEl   = document.getElementById('training-progress-sub');
+  const barEl   = document.getElementById('training-progress-bar');
+  const countEl = document.getElementById('training-progress-count');
+  const pctEl   = document.getElementById('training-progress-pct');
+  if (!subEl) return;
+
+  fetch('training-advanced.html')
+    .then(r => { if (!r.ok) throw new Error('not found'); return r.text(); })
+    .then(html => {
+      const matches = html.match(/id:\s*'[^']+'/g) || [];
+      const total = matches.length;
+
+      let completed = 0;
+      try {
+        const stored = JSON.parse(localStorage.getItem('ecad_adv_completed_v1')) || [];
+        completed = Array.isArray(stored) ? stored.length : 0;
+      } catch (e) { completed = 0; }
+
+      const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
+      subEl.textContent = pct === 100 ? 'All modules complete' : 'Skills Development Programme';
+      barEl.style.width = pct + '%';
+      countEl.textContent = `${completed} / ${total} modules`;
+      pctEl.textContent = pct + '%';
+    })
+    .catch(() => {
+      subEl.textContent = 'Unable to load progress';
+      countEl.textContent = '—';
+      pctEl.textContent = '';
+    });
+}
+
 const docCache = {};
 function openDoc(key, title) {
   document.getElementById('reader-title').textContent = title;
@@ -3414,6 +3463,35 @@ const ACAD_STAGES = [
           { q: 'Why should you always prime a new foam pad with product before it touches a client\'s paint?', opts: ['It breaks in the pad material for a softer feel', 'A dry pad on dry paint creates excessive friction heat and can burn through clearcoat very quickly', 'It\'s a cosmetic step with no functional purpose', 'Priming is only necessary for finishing pads, not cutting pads'], correct: 1, feedback: ['Priming is a functional safety step, not a comfort or break-in step.', 'Correct. Dry-on-dry contact generates heat and friction fast enough to damage clearcoat before you\'d even notice a problem developing.', 'This step directly prevents paint damage — it has a real functional purpose.', 'This applies to every pad type, regardless of cut level.'] },
           { q: 'What does it mean if compound or polish starts drying and dusting before it has visibly broken down on the panel?', opts: ['The product is working correctly and ready to be wiped off', 'You\'re moving too fast, using too little product, or the panel is too hot — one or more needs correcting before continuing', 'This is normal and can be worked through without adjustment', 'It means the pad needs to be replaced entirely'], correct: 1, feedback: ['Dusting before breakdown means the product hasn\'t completed its cutting cycle — it\'s not a sign of readiness.', 'Correct. This is direct feedback from the product itself — stop and diagnose which factor (speed, product amount, heat) is causing it.', 'Working through dusted, dry product creates fine marring instead of correcting the surface.', 'This is a technique and condition issue, not necessarily a pad issue.'] },
           { q: 'Fine, circular scratches visible mainly in direct sunlight appear after a correction job. What most likely caused this, and where in the process does the fix belong?', opts: ['The client\'s own future washing habits — nothing to do with the correction process', 'Holograms from finishing with too aggressive a pad-product combination or insufficient finishing passes — the fix belongs in the correction sequence itself, ending on a proper polish stage', 'Normal paint aging — unrelated to any polishing work', 'Excess wax application after the polish stage'], correct: 1, feedback: ['This defect is specifically introduced by machine polishing technique, not future care.', 'Correct. Holograms are a self-created defect from the correction process — proper sequencing and finishing technique prevents them from the start.', 'This is a technique-created defect with a clear, identifiable cause.', 'Wax residue causes different issues — hazing or streaking, not the circular hologram pattern.'] }
+        ]
+      },
+      {
+        id: 'a-rag-care', ico: '🧺', num: 'S0·M3', title: 'Microfiber & Rag Care Protocol',
+        desc: 'The laundering system that protects every future job — how contamination hiding in a towel becomes a scratch on a client\'s paint.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">Why This Is Quality Control, Not Housekeeping</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Every principle you already follow during the wash applies again in the laundry.</strong> You never let a wheel brush touch paint because wheel contamination is abrasive. That same abrasive grit does not disappear when the towel goes in the wash — it just waits for the next load to cross-contaminate a different towel.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>The client never sees the cause.</strong> A swirl mark from bad laundering looks identical to one from bad wash technique. It shows up two days later under sunlight, with no way to trace it back to a load of mixed towels — which makes it more dangerous than a technique error, since you can't self-correct what you can't see happening.</div></div>
+          <div class="trn-section-lbl">The Three-Load Rule</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Load 1 — Wheels, tires, tar.</strong> Heaviest and most abrasive contamination (brake dust, road tar, grit). These towels never enter the same wash as anything that touches paint or interior.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Load 2 — Exterior paint.</strong> Wash mitts and drying microfibers. Kept separate from wheel towels for the same reason a wheel brush never touches a body panel.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Load 3 — Interior & glass.</strong> APC cloths, leather cloths, glass microfibers. These are the towels most likely to end up back against a client's skin, dashboard, or seat — the highest standard applies here.</div></div>
+          <div class="trn-callout">💡 Color-code each load with a dedicated towel color (e.g. dark grey for wheels, silver for paint, white for interior/glass). This removes guesswork entirely — including for a future hire who doesn't yet have your judgment for what's "probably fine."</div>
+          <div class="trn-section-lbl">Detergent & Wash Settings</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Use a dedicated microfiber detergent</strong> — P&S Rags to Riches or equivalent. General laundry detergent leaves surfactant residue in the fibers that transfers back onto paint as streaking on the next job.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Warm water, every load, no exceptions.</strong> Cold water will not break down embedded wax, sealant, and polymer residue. The detergent is formulated to work at warm temperatures — running it cold means you're not getting what you paid for.</div></div>
+          <div class="trn-warn">⚠ Never use fabric softener or dryer sheets on any detailing towel. Both coat the fiber with a waxy residue that kills absorbency — the exact opposite of what the towel is for. A "soft" towel that doesn't absorb water is a useless towel that still looks fine in the bag.</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Never wash microfiber with cotton or other fabric types.</strong> Lint and fibers from cotton shed into the wash and embed in the microfiber, creating the exact kind of trapped grit you're trying to eliminate.</div></div>
+          <div class="trn-section-lbl">Drying</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Air dry / hang dry is the standard.</strong> If a dryer is ever used, low heat only, and never with a dryer sheet in the drum.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Dry away from dust and open work areas.</strong> A clean towel hung in a garage where you're mixing chemicals or sweeping defeats the purpose of laundering it in the first place.</div></div>
+          <div class="trn-callout">The two-bucket method exists so contamination never travels backward onto clean paint during the job. The three-load rule exists so it never travels forward into the next job. Same principle, different stage of the process.</div>
+        `,
+        quiz: [
+          { q: 'Why should wheel/tar towels never be washed in the same load as paint or interior towels?', opts: ['It just takes longer to sort them', 'Abrasive contamination from wheels can transfer in the wash and embed in towels that later touch paint or interior surfaces', 'Wheel towels need hotter water than paint towels', 'There is no real difference — this is just a preference'], correct: 1, feedback: ['Sorting time is irrelevant compared to the actual risk.', 'Correct. This is the same cross-contamination principle as never using a wheel brush on paint — just applied at the laundry stage instead of the job stage.', 'Water temperature should be consistent (warm) across all detailing loads, not split by towel type.', 'This is a quality-control principle with a direct mechanism, not a stylistic preference.'] },
+          { q: 'What does fabric softener do to a microfiber towel?', opts: ['Nothing — it is safe and recommended for microfiber', 'It coats the fibers with residue that kills absorbency', 'It only affects color, not performance', 'It is required to restore softness after multiple washes'], correct: 1, feedback: ['Fabric softener is specifically warned against by every microfiber detergent manufacturer for a reason.', 'Correct. A "soft-feeling" towel that has lost its absorbency is now a worse tool than a rough one that still performs — softness is not the goal, function is.', 'The damage is functional, not just cosmetic.', 'Dedicated microfiber detergent restores softness without this trade-off — softener is never the answer.'] },
+          { q: 'Why is warm water specified instead of cold for washing detailing towels?', opts: ['Warm water is just a general laundry default', 'Cold water will not break down embedded wax, sealant, and polymer residue the way the detergent is formulated to work', 'Warm water prevents shrinkage', 'It makes no measurable difference'], correct: 1, feedback: ['This is a specific formulation requirement, not a default habit.', 'Correct. Running a warm-water-formulated detergent on cold means the residues the detergent is designed to strip out simply stay in the towel.', 'Shrinkage is not the relevant concern for microfiber blends here.', 'The difference shows up directly as reduced absorbency and residue carryover on the next job.'] }
         ]
       }
     ]
