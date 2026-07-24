@@ -1478,6 +1478,22 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
                 <div class="cmd-seq-item"><div class="cmd-seq-num seq-future">6</div><div class="cmd-seq-body"><div class="cmd-seq-name">Green Plates</div><div class="cmd-seq-note">Transport Authority — after insurance sorted</div></div></div>
               </div>
             </div>
+            <div class="cmd-card">
+              <div class="cmd-card-head"><span class="cmd-card-title">Review Follow-Ups</span><span class="cmd-card-sub">Ask → Day 3 → Day 10</span></div>
+              <div id="review-followups-list"><div class="loading">Loading</div></div>
+              <div style="display:flex;gap:8px;margin-top:14px;">
+                <input type="text" id="new-followup-name" class="minput" placeholder="Client name…" style="flex:1;">
+                <select id="new-followup-tier" class="minput" style="flex-shrink:0;width:auto;">
+                  <option value="">Tier —</option>
+                  <option value="Tier 0">Tier 0</option>
+                  <option value="Tier 1">Tier 1</option>
+                  <option value="Tier 2">Tier 2</option>
+                  <option value="Tier 3">Tier 3</option>
+                  <option value="Maintenance">Maintenance</option>
+                </select>
+                <button class="btn sm" onclick="addReviewFollowup()">Add</button>
+              </div>
+            </div>
           </div>
           <div class="cmd-col">
             <div class="cmd-card">
@@ -2016,7 +2032,7 @@ function goTo(name) {
   if (name === 'clients')     loadClients();
   if (name === 'records')     loadRecords();
   if (name === 'maintenance') loadMaintenance();
-  if (name === 'command')     { loadCommand(); loadTrainingProgress(); }
+  if (name === 'command')     { loadCommand(); loadTrainingProgress(); loadReviewFollowups(); }
   if (name === 'pricing')     { loadPricing(); loadCardPaymentToggle(); }
 
   // Close sidebar on mobile
@@ -2055,6 +2071,96 @@ function loadTrainingProgress() {
       countEl.textContent = '—';
       pctEl.textContent = '';
     });
+}
+
+// ── REVIEW FOLLOW-UPS ─────────────────────────────────────────────
+const REVIEW_FOLLOWUP_FN = 'https://xsyndxqrcnqsvxcrpkqx.supabase.co/functions/v1/review-followups';
+
+async function loadReviewFollowups() {
+  const el = document.getElementById('review-followups-list');
+  if (!el) return;
+  el.innerHTML = '<div class="loading">Loading</div>';
+
+  const { data, error } = await db
+    .from('review_followups')
+    .select('*')
+    .eq('review_left', false)
+    .order('date_asked', { ascending: true });
+
+  if (error) {
+    el.innerHTML = '<div class="cmd-card-sub">Could not load — check connection.</div>';
+    console.log('loadReviewFollowups error:', error);
+    return;
+  }
+  renderReviewFollowups(data || []);
+}
+
+function daysSince(dateStr) {
+  const asked = new Date(dateStr + 'T00:00:00');
+  const now = new Date();
+  return Math.floor((now - asked) / (1000 * 60 * 60 * 24));
+}
+
+function renderReviewFollowups(rows) {
+  const el = document.getElementById('review-followups-list');
+  if (!rows.length) {
+    el.innerHTML = '<div class="cmd-card-sub">No open follow-ups — all caught up.</div>';
+    return;
+  }
+
+  el.innerHTML = rows.map(r => {
+    const d = daysSince(r.date_asked);
+    return `
+      <div style="padding:10px 0;border-bottom:1px solid var(--bsoft);">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div>
+            <div style="font-size:13px;font-weight:600;">${r.client_name}</div>
+            <div style="font-size:10px;color:var(--dim);">${r.service_tier || 'No tier logged'} · Asked ${d} day${d === 1 ? '' : 's'} ago</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+          <button class="btn sm ${r.day3_done ? '' : 'ghost'}" style="font-size:10px;" onclick="markFollowup('${r.id}','day3_done',${!r.day3_done})">${r.day3_done ? '✓ Day 3' : 'Mark Day 3'}</button>
+          <button class="btn sm ${r.day10_done ? '' : 'ghost'}" style="font-size:10px;" onclick="markFollowup('${r.id}','day10_done',${!r.day10_done})">${r.day10_done ? '✓ Day 10' : 'Mark Day 10'}</button>
+          <button class="btn sm" style="font-size:10px;background:rgba(120,200,150,.25);" onclick="markFollowup('${r.id}','review_left',true)">Review Left ✓</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function addReviewFollowup() {
+  const nameInput = document.getElementById('new-followup-name');
+  const tierSelect = document.getElementById('new-followup-tier');
+  const name = nameInput.value.trim();
+  if (!name) return;
+
+  const { data: { session } } = await db.auth.getSession();
+  await fetch(REVIEW_FOLLOWUP_FN, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token || ''}` },
+    body: JSON.stringify({ action: 'create', client_name: name, service_tier: tierSelect.value || null })
+  });
+
+  nameInput.value = '';
+  tierSelect.value = '';
+  loadReviewFollowups();
+}
+
+async function markFollowup(id, field, value) {
+  const { data: { session } } = await db.auth.getSession();
+  const body = { action: 'update', id, [field]: value };
+  // Stamp a timestamp alongside the boolean so it's auditable later.
+  if (field === 'day3_done' && value) body.day3_completed_at = new Date().toISOString();
+  if (field === 'day10_done' && value) body.day10_completed_at = new Date().toISOString();
+  if (field === 'review_left' && value) body.review_left_at = new Date().toISOString();
+
+  await fetch(REVIEW_FOLLOWUP_FN, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token || ''}` },
+    body: JSON.stringify(body)
+  });
+
+  loadReviewFollowups();
 }
 
 const docCache = {};
