@@ -3387,6 +3387,31 @@ const TRN_MODULES = [
       { q: 'The Auto Stop/Start (ISG) light is flashing on your Serena. What does this relate to?', opts: ['The air conditioning compressor', 'The hybrid-specific system handling idle stop/start, running off its own belt and tensioner', 'The infotainment system', 'The power steering pump'], correct: 1, feedback: ['AC issues do not trigger this indicator.', 'Correct. This is often the earliest sign of a belt or tensioner problem.', 'Infotainment faults do not use this indicator.', 'Power steering faults use a different symbol.'] },
       { q: 'A mechanic quotes an ISG belt job but cannot confirm they have the S-Hybrid tensioner tool. What do you do?', opts: ['Proceed anyway — a belt is a belt', 'Treat it as a red flag — wrong tensioning can disable hybrid function entirely, so confirm the tool or find a shop that has it', 'Ask for a discount instead', 'Only worry about it if the belt visibly looks worn'], correct: 1, feedback: ['This belt is not interchangeable with a standard job — the tool matters.', 'Correct. Price is not the deciding factor here — correct fitment is, given what is at stake.', 'A discount does not fix the underlying risk.', 'Visual wear and correct tensioning are two separate issues.'] }
     ]
+  },
+  {
+    id: 'misfire-diagnosis-p0300',
+    stage: 'Applied Case',
+    ico: '🧩',
+    title: 'Misfire Diagnosis: Coil vs Plug vs Injector vs Vacuum Leak',
+    desc: 'Built from a real P0300 code on the Serena — the single most useful skill is knowing what a code narrows down, and what it does not.',
+    pills: ['quiz'],
+    content: `
+      <div class="trn-section-lbl">Read the Code Number First</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>P0301–P0304</strong> names one specific cylinder — points to a single failed part on that cylinder (its coil, plug, or injector).</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>P0300</strong> is random/multiple, not tied to one cylinder — points toward something affecting all cylinders at once: a vacuum leak, worn plugs generally, or low fuel pressure.</div></div>
+      <div class="trn-warn">⚠ If someone quotes a specific part (coil pack, an injector) off a P0300 code alone, ask what test confirmed it. A single failed part almost always shows a cylinder-specific code — a guess that skips this logic is still a guess.</div>
+      <div class="trn-section-lbl">Correct Diagnostic Order — Cheapest and Most Likely First</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>1. Vacuum leak check</strong> — the single most common cause of P0300 on Nissan engines specifically. Cracked hoses, a bad PCV valve, or a leaking intake gasket. Cheap and fast to test.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>2. Spark plug inspection</strong> — Nissan engines are known to be sensitive to worn or non-OEM plugs. Visible without special tools.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>3. Coil swap test</strong> — move a coil to another cylinder. If the misfire follows it, that coil is confirmed bad.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>4. Fuel system last</strong> — injectors and fuel pressure are real possibilities but more expensive to test, and usually pair with a lean code (P0171) when they're the actual cause.</div></div>
+      <div class="trn-callout">Coil packs and injectors are the two most expensive items on this list. You don't need to run these tests yourself — you need to know the order well enough to ask "did you check for a vacuum leak first?" before approving any part.</div>
+    `,
+    quiz: [
+      { q: 'Your scan returns P0300. What does this specifically tell you?', opts: ['Cylinder 3 has a confirmed bad coil', 'The misfire is random/multiple, not tied to one cylinder', 'The fuel injectors must be replaced', 'New spark plugs are needed immediately, no further testing required'], correct: 1, feedback: ['A cylinder-specific code would read P0303, not P0300.', 'Correct. P0300 does not name one cylinder or one part.', 'Injectors are only one of several possible causes, not confirmed by this code alone.', 'Plugs are a likely early check, not an automatic conclusion.'] },
+      { q: 'Which of these would normally produce a cylinder-specific code rather than P0300?', opts: ['A vacuum leak in the intake manifold gasket', 'A single failed coil on one cylinder', 'Worn spark plugs across all cylinders', 'A weak fuel pump reducing pressure engine-wide'], correct: 1, feedback: ['A vacuum leak affects the whole engine, producing a random code.', 'Correct. A single coil failing only affects its own cylinder.', 'Plugs worn across the board tend toward a random code.', 'Fuel pressure issues are engine-wide, not isolated to one cylinder.'] },
+      { q: 'A mechanic recommends replacing fuel injectors before checking for a vacuum leak or inspecting plugs. What should you do?', opts: ['Approve it immediately', 'Ask why the cheaper, more common causes were skipped first', 'Insist on a coil pack instead with no testing', 'Refuse all further work, assuming dishonesty'], correct: 1, feedback: ['Injectors are neither the cheapest nor the most common cause — this skips the standard order.', 'Correct. A fair, direct question before approving the more expensive item.', 'Swapping one unverified guess for another does not solve anything.', 'One skipped step is a reason to ask a question, not necessarily to walk away — but it is a real flag.'] }
+    ]
   }
 ];
 
