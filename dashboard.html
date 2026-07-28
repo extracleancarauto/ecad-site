@@ -3360,6 +3360,33 @@ const TRN_MODULES = [
       { q: 'When is the best time to ask a satisfied client for a Google review?', opts: ['In a WhatsApp message the following day', 'While they are standing in front of the completed vehicle — link sent immediately', 'At the start of the job before any work', 'On your Instagram story tagging them'], correct: 1, feedback: ['Delayed requests lose momentum. The emotional response is strongest at the moment of reveal.', 'Correct. Peak satisfaction plus immediate friction removal equals highest conversion rate.', 'There is no result to reference yet — no emotional basis for a review.', 'Public tagging without consent is unprofessional. Always ask before tagging clients.'] },
       { q: 'Why does process content outperform promotional content on social media for ECAD?', opts: ['It is easier and cheaper to produce', 'It educates the audience about what is involved, justifying the price before they ever ask', 'People prefer videos over photos', 'Promotional content is blocked by the Instagram algorithm'], correct: 1, feedback: ['Ease of production is a practical benefit — not the strategic reason.', 'Correct. Education pre-handles objections. When a prospect understands the process, price resistance drops significantly.', 'Format matters less than content. Process content works in both photo and video.', 'Algorithm preference varies — the real advantage is engagement driven by genuine curiosity.'] }
     ]
+  },
+  {
+    id: 'vehicle-literacy-serena',
+    stage: 'Foundational',
+    ico: '🔧',
+    title: 'Reading Your Vehicle: Warning Lights & the S-Hybrid System',
+    desc: 'The Serena is a single point of failure for the business. Learn to read what it is telling you before it strands you.',
+    pills: ['quiz'],
+    content: `
+      <div class="trn-section-lbl">Warning Light Colour System</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Red = stop.</strong> Oil pressure, brake system, engine temperature. Pull over safely and shut down — continuing risks turning a repair into a replacement.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Amber/yellow = address soon.</strong> Check engine, ABS, TPMS, the Auto Stop/Start (ISG) light. Finish the immediate task, but get it diagnosed within days.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Flashing vs steady matters as much as colour.</strong> A flashing check engine light usually means an active misfire — stop driving, it can damage the catalytic converter within minutes. Steady just means a fault was logged.</div></div>
+      <div class="trn-section-lbl">The S-Hybrid System — What You Actually Have</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>ISG (Integrated Starter Generator)</strong> handles auto stop/start at idle and runs off a dedicated belt with its own tensioner. This is the part that makes "S-Hybrid" different from a normal Serena.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Auto Stop/Start light flashing</strong> means the system detected a fault and disabled itself — most commonly a slipping belt, worn tensioner, or low 12V battery. This is often your earliest warning of belt trouble.</div></div>
+      <div class="trn-warn">⚠ The ISG belt needs a specific tensioner tool (JTC6601 or equivalent) for the MR20DD engine. A mechanic without it can fit the belt "close enough" to run — incorrectly — and a mis-fitted belt can disable hybrid function entirely. Always ask: "Do you have the S-Hybrid tensioner tool, and have you done this on a Serena or X-Trail before?"</div>
+      <div class="trn-section-lbl">OBD Codes & DIY vs Specialist</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Get the code read before any repair is quoted.</strong> "Check engine light is on" tells you nothing. "P0300" tells you where to look. Never let anyone guess a repair without pulling the code first.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Safe to check yourself:</strong> tyre pressure/tread, visible fluid levels, visual belt condition (cracking/fraying). <strong>Leave to a specialist:</strong> anything involving the ISG belt/tensioner, hybrid battery, or engine electronics — the cost of getting this wrong on a hybrid system is too high.</div></div>
+      <div class="trn-callout">The goal is triage, not repair. You should never again be surprised by a light you don't understand, or pay full price for a diagnosis you could have narrowed down yourself in five minutes.</div>
+    `,
+    quiz: [
+      { q: 'Your check engine light is flashing, not steady. What does this most likely mean?', opts: ['A minor sensor issue, no urgency', 'An active engine misfire that can damage the catalytic converter if you keep driving', 'The fuel cap is loose', 'Routine maintenance is due'], correct: 1, feedback: ['A flashing light signals a more urgent condition than steady.', 'Correct. Flashing means an active misfire. Stop driving and address it.', 'A loose fuel cap typically triggers a steady light after a delay.', 'Maintenance reminders do not use the check engine light.'] },
+      { q: 'The Auto Stop/Start (ISG) light is flashing on your Serena. What does this relate to?', opts: ['The air conditioning compressor', 'The hybrid-specific system handling idle stop/start, running off its own belt and tensioner', 'The infotainment system', 'The power steering pump'], correct: 1, feedback: ['AC issues do not trigger this indicator.', 'Correct. This is often the earliest sign of a belt or tensioner problem.', 'Infotainment faults do not use this indicator.', 'Power steering faults use a different symbol.'] },
+      { q: 'A mechanic quotes an ISG belt job but cannot confirm they have the S-Hybrid tensioner tool. What do you do?', opts: ['Proceed anyway — a belt is a belt', 'Treat it as a red flag — wrong tensioning can disable hybrid function entirely, so confirm the tool or find a shop that has it', 'Ask for a discount instead', 'Only worry about it if the belt visibly looks worn'], correct: 1, feedback: ['This belt is not interchangeable with a standard job — the tool matters.', 'Correct. Price is not the deciding factor here — correct fitment is, given what is at stake.', 'A discount does not fix the underlying risk.', 'Visual wear and correct tensioning are two separate issues.'] }
+    ]
   }
 ];
 
