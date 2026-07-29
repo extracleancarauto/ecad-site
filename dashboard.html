@@ -1254,6 +1254,13 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
           </svg>
           Pricing
         </button>
+        <button class="nav-btn" id="nb-vehiclelog" onclick="goTo('vehiclelog')">
+          <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/>
+            <circle cx="6.5" cy="16.5" r="2.5"/><circle cx="16.5" cy="16.5" r="2.5"/>
+          </svg>
+          My Vehicle
+        </button>
         <button class="nav-btn" id="nb-documents" onclick="goTo('documents')">
           <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -1555,6 +1562,66 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
               <button class="btn sm" onclick="saveJournalEntry()" style="width:100%;margin-bottom:16px;">Save Entry</button>
               <div id="journal-entries-list" style="max-height:280px;overflow-y:auto;"><div class="loading">Loading</div></div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── MY VEHICLE (personal maintenance log, Hyperion-only) ── -->
+      <div class="view" id="v-vehiclelog">
+        <div class="view-head">
+          <span class="view-eyebrow">Personal — Not Client-Facing</span>
+          <h2>My Vehicle</h2>
+          <p class="view-sub">Serena maintenance log. Separate from client service_records — this is your own cost tracking, for your eyes only.</p>
+        </div>
+        <div class="cmd-grid">
+          <div class="cmd-card">
+            <div class="cmd-card-head"><span class="cmd-card-title">🔧 Log an Entry</span></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div>
+                <label style="font-size:11px;color:var(--dim);">Date</label>
+                <input type="date" id="vl-date" class="minput" style="width:100%;">
+              </div>
+              <div>
+                <label style="font-size:11px;color:var(--dim);">Mileage (km)</label>
+                <input type="number" id="vl-mileage" class="minput" style="width:100%;" placeholder="e.g. 142000">
+              </div>
+            </div>
+            <label style="font-size:11px;color:var(--dim);">Task / Service</label>
+            <input type="text" id="vl-task" class="minput" style="width:100%;margin-bottom:10px;" placeholder="e.g. Oil change, ISG belt tensioner check">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div>
+                <label style="font-size:11px;color:var(--dim);">Category</label>
+                <select id="vl-category" class="minput" style="width:100%;">
+                  <option value="DIY">DIY</option>
+                  <option value="Specialist">Specialist</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size:11px;color:var(--dim);">Cost (JMD)</label>
+                <input type="number" id="vl-cost" class="minput" style="width:100%;" placeholder="0">
+              </div>
+            </div>
+            <label style="font-size:11px;color:var(--dim);">Vendor / Shop (if specialist)</label>
+            <input type="text" id="vl-vendor" class="minput" style="width:100%;margin-bottom:10px;" placeholder="e.g. Kipling Hybrid">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+              <div>
+                <label style="font-size:11px;color:var(--dim);">Next Due — Mileage</label>
+                <input type="number" id="vl-next-mileage" class="minput" style="width:100%;" placeholder="Optional">
+              </div>
+              <div>
+                <label style="font-size:11px;color:var(--dim);">Next Due — Date</label>
+                <input type="date" id="vl-next-date" class="minput" style="width:100%;">
+              </div>
+            </div>
+            <label style="font-size:11px;color:var(--dim);">Notes</label>
+            <textarea id="vl-notes" class="minput" rows="3" style="width:100%;resize:vertical;margin-bottom:12px;" placeholder="Anything worth remembering — symptoms, part numbers, who recommended what"></textarea>
+            <button class="btn sm" onclick="saveVehicleLogEntry()" style="width:100%;">Save Entry</button>
+          </div>
+          <div class="cmd-card">
+            <div class="cmd-card-head"><span class="cmd-card-title">📊 Summary</span></div>
+            <div id="vl-summary" style="font-size:12px;color:var(--dim);margin-bottom:16px;">Loading</div>
+            <div class="cmd-card-head" style="margin-top:4px;"><span class="cmd-card-title">History</span></div>
+            <div id="vl-entries-list" style="max-height:420px;overflow-y:auto;"><div class="loading">Loading</div></div>
           </div>
         </div>
       </div>
@@ -1974,8 +2041,9 @@ document.getElementById('l-user').addEventListener('keydown', e => { if (e.key =
 // other than logging in as Hyperion.
 function applyRoleRestrictions() {
   const pricingNav = document.getElementById('nb-pricing');
-  if (!pricingNav) return;
-  pricingNav.style.display = activeUser === 'Hyperion' ? '' : 'none';
+  if (pricingNav) pricingNav.style.display = activeUser === 'Hyperion' ? '' : 'none';
+  const vehicleLogNav = document.getElementById('nb-vehiclelog');
+  if (vehicleLogNav) vehicleLogNav.style.display = activeUser === 'Hyperion' ? '' : 'none';
 }
 
 function doLogout() {
@@ -2012,13 +2080,18 @@ function playChime() {
 }
 
 // ── NAVIGATION ───────────────────────────────────────────────────
-const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'training', 'academy', 'command', 'pricing', 'documents'];
+const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'training', 'academy', 'command', 'pricing', 'documents', 'vehiclelog'];
 
 function goTo(name) {
   if (name === 'pricing' && activeUser !== 'Hyperion') {
     toast('Pricing access is restricted', 'err');
     return;
   }
+  if (name === 'vehiclelog' && activeUser !== 'Hyperion') {
+    toast('This is a personal log — restricted', 'err');
+    return;
+  }
+  if (name === 'vehiclelog') loadVehicleLog();
   VIEWS.forEach(v => {
     document.getElementById('v-' + v).classList.remove('active');
     document.getElementById('nb-' + v).classList.remove('active');
@@ -4807,6 +4880,98 @@ async function saveJournalEntry() {
     textEl.value = '';
     loadJournalEntries();
     toast('Entry saved', 'ok');
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+// ── MY VEHICLE (personal maintenance log) ─────────────────────────
+function fmtJMD(n) {
+  if (n === null || n === undefined || n === '') return '—';
+  return 'J$' + Number(n).toLocaleString('en-JM', { maximumFractionDigits: 0 });
+}
+
+async function loadVehicleLog() {
+  const summaryWrap = document.getElementById('vl-summary');
+  const listWrap = document.getElementById('vl-entries-list');
+  if (!listWrap) return;
+  try {
+    const { data, error } = await db.from('vehicle_maintenance_log')
+      .select('*').order('entry_date', { ascending: false }).order('created_at', { ascending: false });
+    if (error) throw error;
+
+    if (!data || !data.length) {
+      summaryWrap.innerHTML = 'No entries logged yet.';
+      listWrap.innerHTML = '<div style="font-size:11px;color:var(--dim);text-align:center;padding:20px 0;">No entries yet — log your first one.</div>';
+      return;
+    }
+
+    const diyTotal = data.filter(e => e.category === 'DIY').reduce((s, e) => s + (Number(e.cost_jmd) || 0), 0);
+    const specTotal = data.filter(e => e.category === 'Specialist').reduce((s, e) => s + (Number(e.cost_jmd) || 0), 0);
+    const diyCount = data.filter(e => e.category === 'DIY').length;
+    const specCount = data.filter(e => e.category === 'Specialist').length;
+    const latestMileage = data.reduce((m, e) => e.mileage && e.mileage > m ? e.mileage : m, 0);
+
+    summaryWrap.innerHTML = `
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bsoft);"><span>DIY spend (${diyCount} ${diyCount===1?'job':'jobs'})</span><strong style="color:var(--text);">${fmtJMD(diyTotal)}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bsoft);"><span>Specialist spend (${specCount} ${specCount===1?'job':'jobs'})</span><strong style="color:var(--text);">${fmtJMD(specTotal)}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;"><span>Latest recorded mileage</span><strong style="color:var(--text);">${latestMileage ? latestMileage.toLocaleString() + ' km' : '—'}</strong></div>
+    `;
+
+    listWrap.innerHTML = data.map(e => {
+      const catColor = e.category === 'DIY' ? 'var(--green,#4a9)' : 'var(--copper,#b87)';
+      const nextDue = e.next_due_date || e.next_due_mileage
+        ? `<div style="font-size:10px;color:var(--dim);margin-top:4px;">Next due: ${e.next_due_date ? fd(e.next_due_date) : ''}${e.next_due_date && e.next_due_mileage ? ' / ' : ''}${e.next_due_mileage ? e.next_due_mileage.toLocaleString() + ' km' : ''}</div>`
+        : '';
+      return `
+      <div style="padding:10px 0;border-bottom:1px solid var(--bsoft);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;">
+          <span style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;">${fd(e.entry_date)}${e.mileage ? ' · ' + e.mileage.toLocaleString() + ' km' : ''}</span>
+          <span style="font-size:9px;color:${catColor};text-transform:uppercase;letter-spacing:.05em;">${x(e.category)}</span>
+        </div>
+        <div style="font-size:12px;color:var(--text);margin-top:4px;">${x(e.task)}</div>
+        ${e.vendor ? `<div style="font-size:11px;color:var(--dim);margin-top:2px;">${x(e.vendor)}</div>` : ''}
+        ${e.cost_jmd ? `<div style="font-size:11px;color:var(--dim);margin-top:2px;">${fmtJMD(e.cost_jmd)}</div>` : ''}
+        ${e.notes ? `<div style="font-size:11px;color:var(--dim);margin-top:4px;white-space:pre-wrap;">${x(e.notes)}</div>` : ''}
+        ${nextDue}
+      </div>`;
+    }).join('');
+  } catch(e) {
+    if (summaryWrap) summaryWrap.innerHTML = '<span style="color:var(--red);">Could not load summary.</span>';
+    listWrap.innerHTML = '<div style="font-size:11px;color:var(--red);">Could not load entries.</div>';
+  }
+}
+
+async function saveVehicleLogEntry() {
+  const dateEl = document.getElementById('vl-date');
+  const mileageEl = document.getElementById('vl-mileage');
+  const taskEl = document.getElementById('vl-task');
+  const categoryEl = document.getElementById('vl-category');
+  const costEl = document.getElementById('vl-cost');
+  const vendorEl = document.getElementById('vl-vendor');
+  const nextMileageEl = document.getElementById('vl-next-mileage');
+  const nextDateEl = document.getElementById('vl-next-date');
+  const notesEl = document.getElementById('vl-notes');
+
+  const task = taskEl.value.trim();
+  if (!task) { toast('Enter what the task was', 'err'); return; }
+
+  try {
+    const { error } = await db.from('vehicle_maintenance_log').insert([{
+      entry_date: dateEl.value || new Date().toISOString().slice(0,10),
+      mileage: mileageEl.value ? parseInt(mileageEl.value, 10) : null,
+      task,
+      category: categoryEl.value,
+      cost_jmd: costEl.value ? parseFloat(costEl.value) : null,
+      vendor: vendorEl.value.trim() || null,
+      next_due_mileage: nextMileageEl.value ? parseInt(nextMileageEl.value, 10) : null,
+      next_due_date: nextDateEl.value || null,
+      notes: notesEl.value.trim() || null
+    }]);
+    if (error) throw error;
+
+    [dateEl, mileageEl, taskEl, costEl, vendorEl, nextMileageEl, nextDateEl, notesEl].forEach(el => el.value = '');
+    categoryEl.value = 'DIY';
+    loadVehicleLog();
+    toast('Entry logged', 'ok');
   } catch(e) { toast(e.message, 'err'); }
 }
 
