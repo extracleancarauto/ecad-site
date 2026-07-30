@@ -3485,6 +3485,56 @@ const TRN_MODULES = [
       { q: 'Which of these would normally produce a cylinder-specific code rather than P0300?', opts: ['A vacuum leak in the intake manifold gasket', 'A single failed coil on one cylinder', 'Worn spark plugs across all cylinders', 'A weak fuel pump reducing pressure engine-wide'], correct: 1, feedback: ['A vacuum leak affects the whole engine, producing a random code.', 'Correct. A single coil failing only affects its own cylinder.', 'Plugs worn across the board tend toward a random code.', 'Fuel pressure issues are engine-wide, not isolated to one cylinder.'] },
       { q: 'A mechanic recommends replacing fuel injectors before checking for a vacuum leak or inspecting plugs. What should you do?', opts: ['Approve it immediately', 'Ask why the cheaper, more common causes were skipped first', 'Insist on a coil pack instead with no testing', 'Refuse all further work, assuming dishonesty'], correct: 1, feedback: ['Injectors are neither the cheapest nor the most common cause — this skips the standard order.', 'Correct. A fair, direct question before approving the more expensive item.', 'Swapping one unverified guess for another does not solve anything.', 'One skipped step is a reason to ask a question, not necessarily to walk away — but it is a real flag.'] }
     ]
+  },
+  {
+    id: 'matte-satin-care',
+    stage: 'Core Skill',
+    ico: '⬛',
+    title: 'Matte & Satin Finish Care',
+    desc: 'On a matte car you cannot polish out a scratch. Doing so is how the finish gets permanently ruined.',
+    pills: ['quiz'],
+    content: `
+      <div class="trn-section-lbl">The Rule That Changes Everything</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Matte clearcoat is physically different from gloss</strong> — it's manufactured with a textured, light-scattering finish. Polishing or compounding it doesn't restore anything; it smooths that texture, and a smoothed matte panel reflects light like gloss paint. That's a permanent glossy patch, not a fix.</div></div>
+      <div class="trn-warn">⚠ The entire gloss correction hierarchy (light polish, compound then polish, wet sand) does not apply to matte at all. There is no "light" safe version — any of it creates an irreversible defect on contact.</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">If a matte scratch catches a fingernail, the honest answer is a panel respray — not detailing correction. Set this expectation at assessment, before any work begins.</div></div>
+      <div class="trn-section-lbl">Washing & Product Selection</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Two-bucket method and pH-neutral shampoo still apply — matte paint isn't exempt from swirls, it's just unable to have them corrected afterward.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Never use wax, gloss-enhancing sealant, or standard ceramic coating</strong> not explicitly labelled matte-safe. Assume unsafe until confirmed otherwise.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Dry with microfiber only, never chamois — chamois leaves a slight shine that shows as an obvious patch on matte.</div></div>
+      <div class="trn-section-lbl">The Overspray Risk</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Tyre dressing or trim restorer overspray landing on an adjacent matte panel is difficult to remove and highly visible. Mask or work with deliberate care near matte sections — this applies to matte/satin wheel finishes too.</div></div>
+      <div class="trn-callout">The skill here isn't a new technique — it's recognising a matte finish immediately and removing "polish" and "compound" from your options before you even open your kit.</div>
+    `,
+    quiz: [
+      { q: 'Why can a scratch on a matte-finish panel not be polished out the way it could on gloss paint?', opts: ['Matte paint is too thin to polish', 'Polishing smooths the manufactured texture that creates the matte look, leaving a permanent glossy patch', 'It requires a special polish not available locally', 'It actually can be polished out the same way as gloss'], correct: 1, feedback: ['Thickness isn\'t the relevant factor — texture is.', 'Correct. Smoothing that texture creates gloss exactly where you polished.', 'No product resolves this — the issue is mechanical.', 'This is the core mistake this module exists to prevent.'] },
+      { q: 'Which product is safe to apply to a matte vehicle without checking first?', opts: ['Any wax or gloss sealant already in your kit', 'A product explicitly labelled matte-safe or formulated for matte/satin finishes', 'Standard Cerakote ceramic sealant', 'Chamois leather'], correct: 1, feedback: ['Standard waxes are designed to add exactly the reflection matte finishes avoid.', 'Correct. Assume unsafe until confirmed matte/satin compatible.', 'Your standard sealant is formulated for gloss enhancement.', 'Chamois leaves shine that reads as a defect on matte.'] },
+      { q: 'A client\'s matte vehicle has a scratch deep enough to catch a fingernail. What\'s the professional response?', opts: ['Try a light polish first to see if it helps', 'Explain this requires a panel respray, since no technique corrects it on this finish', 'Apply extra sealant to hide it', 'Use a rubbing compound'], correct: 1, feedback: ['There\'s no safe "light" attempt — any polishing creates a permanent glossy patch.', 'Correct. This is the honest answer, given at assessment, not discovered mid-job.', 'Sealant doesn\'t fill a scratch this deep on any finish.', 'Compound is a gloss-clearcoat tool, unsafe on matte at any severity.'] }
+    ]
+  },
+  {
+    id: 'wheel-rim-types',
+    stage: 'Foundational',
+    ico: '⚙️',
+    title: 'Wheel & Rim Types: Materials, Finishes & Risk',
+    desc: 'Not every rim takes the same cleaner. Knowing the finish before you touch it separates a safe clean from an expensive mistake.',
+    pills: ['quiz'],
+    content: `
+      <div class="trn-section-lbl">Common Rim Types</div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Clear-coated alloy</strong> — the most common modern wheel, essentially a mini paint job. pH-balanced cleaner only, no abrasive pads. Acid-based cleaners degrade this clearcoat over repeated use.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Painted steel/alloy</strong> — vulnerable to chipping and abrasive pad damage. Same pH-safe cleaner logic applies.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Polished/chrome</strong> — vulnerable to pitting and corrosion from harsh acid cleaners, cumulative over many washes even if one exposure shows no visible damage.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Diamond-cut / machined-face</strong> — a lathe-cut bare aluminum face with only a very thin clearcoat. The most fragile finish you'll regularly see. Breaking through shows as white, chalky corrosion that cannot be polished away — only professionally refinished.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Powder-coated</strong> — durable and chemical-resistant, but matte/satin powder-coat carries the same gloss-overspray risk as matte paint.</div></div>
+      <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Plastic wheel covers</strong> — look like alloy but scratch and crack more easily; clips can be damaged by aggressive brush agitation.</div></div>
+      <div class="trn-warn">⚠ If you can't confidently identify the finish, default to your safest, most pH-neutral option. A wrong guess with an acid-based cleaner is not something you can undo.</div>
+      <div class="trn-callout">Your existing Wheel Prep → Wheel Sealant → Tyre Coat sequence is already the safe approach across nearly all these types. The skill here is recognising which finishes — chrome and diamond-cut especially — punish a wrong guess the most.</div>
+    `,
+    quiz: [
+      { q: 'Which wheel type has the LEAST tolerance for abrasive pads or harsh acid cleaners?', opts: ['Painted steel wheels', 'Diamond-cut / machined-face wheels', 'Powder-coated wheels', 'Plastic wheel covers'], correct: 1, feedback: ['Painted steel chips, but isn\'t as fragile as a machined face.', 'Correct. The thin clearcoat over bare aluminum is the most fragile finish here — a breakthrough can\'t be polished out.', 'Powder-coat is actually one of the more chemical-resistant finishes.', 'Wheel covers are vulnerable to cracking, not primarily chemical attack.'] },
+      { q: 'Why is an acid-based wheel cleaner risky as a universal default?', opts: ['It\'s always too weak to clean effectively', 'It can strip clearcoat and pit chrome over repeated use, even if one use shows no visible damage', 'It only works on plastic covers', 'There\'s no real risk on any finish'], correct: 1, feedback: ['Acid cleaners are strong, not weak — that\'s the risk.', 'Correct. The damage is often cumulative — fine once, damaged after repeated exposure.', 'Plastic covers have no special relationship to acid suitability.', 'This is exactly the assumption this module corrects.'] },
+      { q: 'You can\'t confidently identify a wheel\'s finish. What\'s the correct move?', opts: ['Use the strongest cleaner to be thorough', 'Default to your safest, most pH-neutral option', 'Skip cleaning the wheels entirely', 'Ask the client to identify it first'], correct: 1, feedback: ['The strongest option is exactly wrong under uncertainty.', 'Correct. Gentler protects the wheel at the cost of a slightly less aggressive clean.', 'Skipping isn\'t a real option for a paid service.', 'Most clients won\'t know this level of detail — the call is yours.'] }
+    ]
   }
 ];
 
