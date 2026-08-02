@@ -3521,6 +3521,83 @@ const TRN_MODULES = [
     pills: ['quiz'],
     content: `
       <div class="trn-section-lbl">Common Rim Types</div>
+          <div style="margin:18px 0;padding:14px;background:#111111;border:1px solid rgba(184,200,214,0.15);border-radius:8px;overflow-x:auto;">
+        <div style="min-width:640px;"><svg viewBox="0 0 940 300" xmlns="http://www.w3.org/2000/svg" font-family="Sora, sans-serif">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a949e"/>
+      <stop offset="100%" stop-color="#5a6470"/>
+    </linearGradient>
+  </defs>
+  <rect width="940" height="300" fill="#0a0a0a"/>
+
+  <!-- Column template repeated 6x: base metal block + top coating layer + labels -->
+  <!-- 1. Clear-coated alloy -->
+  <g transform="translate(20,30)">
+    <rect x="0" y="60" width="130" height="70" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="52" width="130" height="8" fill="#b8c8d6" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Clear-Coated Alloy</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Thin clearcoat over cast alloy</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">pH-neutral only</text>
+  </g>
+
+  <!-- 2. Painted steel/alloy -->
+  <g transform="translate(170,30)">
+    <rect x="0" y="55" width="130" height="75" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="45" width="130" height="12" fill="#586878" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Painted Steel/Alloy</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Solid paint layer, chip-prone</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">pH-neutral only</text>
+  </g>
+
+  <!-- 3. Polished/chrome -->
+  <g transform="translate(320,30)">
+    <rect x="0" y="62" width="130" height="68" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="58" width="130" height="4" fill="#d4e2ec" rx="1"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Polished / Chrome</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Plated surface, pits cumulatively</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">No repeated acid cleaner</text>
+  </g>
+
+  <!-- 4. Diamond-cut / machined face — the fragile one, exaggerated thin line -->
+  <g transform="translate(470,30)">
+    <rect x="0" y="65" width="130" height="65" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="63" width="130" height="2" fill="#e8a46a"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Diamond-Cut</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Bare aluminum, hairline clearcoat</text>
+    <text x="65" y="184" fill="#e8a46a" font-size="9" text-anchor="middle" font-weight="600">Most fragile — no abrasives</text>
+  </g>
+
+  <!-- 5. Powder-coated -->
+  <g transform="translate(620,30)">
+    <rect x="0" y="50" width="130" height="80" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="38" width="130" height="14" fill="#7a9ebf" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Powder-Coated</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Thick baked-on layer, durable</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">Matte = overspray risk</text>
+  </g>
+
+  <!-- 6. Plastic wheel cover -->
+  <g transform="translate(770,30)">
+    <rect x="20" y="55" width="90" height="75" fill="#3a3a3a" rx="4"/>
+    <circle cx="65" cy="92" r="10" fill="#1a1a1a"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Plastic Cover</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Steel wheel hidden beneath</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">Clips damage easily</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(20,220)">
+    <rect x="0" y="0" width="16" height="8" fill="url(#metal)" rx="1"/>
+    <text x="24" y="8" fill="#8a8378" font-size="10">Base metal (aluminum/steel)</text>
+    <rect x="220" y="0" width="16" height="8" fill="#e8a46a" rx="1"/>
+    <text x="244" y="8" fill="#8a8378" font-size="10">Protective layer — thickness shown to scale of real fragility</text>
+  </g>
+
+  <text x="20" y="260" fill="#5a574f" font-size="10" font-style="italic">Diagram for training reference only — layer thickness exaggerated for clarity, not to physical scale.</text>
+</svg></div>
+        <div style="font-size:10px;color:#5a574f;margin-top:8px;font-style:italic;">Reference diagram only — field photo examples of each finish type to be added here as real jobs are documented.</div>
+      </div>
       <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Clear-coated alloy</strong> — the most common modern wheel, essentially a mini paint job. pH-balanced cleaner only, no abrasive pads. Acid-based cleaners degrade this clearcoat over repeated use.</div></div>
       <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Painted steel/alloy</strong> — vulnerable to chipping and abrasive pad damage. Same pH-safe cleaner logic applies.</div></div>
       <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Polished/chrome</strong> — vulnerable to pitting and corrosion from harsh acid cleaners, cumulative over many washes even if one exposure shows no visible damage.</div></div>
@@ -3985,6 +4062,125 @@ const ACAD_STAGES = [
           { q: 'You find yourself retrieving tools from your vehicle 3 times mid-job. What is the systemic fix?', opts: ['Park closer to the client\'s vehicle', 'Build a pre-job equipment layout step into the sequence — all tools out before starting', 'Purchase a tool belt', 'It is unavoidable as a solo operator'], correct: 1, feedback: ['Proximity helps but does not eliminate the problem.', 'Correct. Repeated mid-job retrieval means setup was skipped or incomplete. The fix is procedural.', 'A tool belt helps for small items but does not replace systematic pre-job layout.', 'Solo operators with strong process management eliminate mid-job retrieval entirely.'] },
           { q: 'A Toyota Fortuner is booked as Tier 2, client described "a bit of interior staining." You arrive and find all seats, carpet, and headliner are heavily soiled. Your estimate was 5 hours. How do you handle this?', opts: ['Complete what you can in 5 hours and leave the rest', 'Proceed as quoted — renegotiating is unprofessional', 'Stop, document the actual condition, and have an honest pricing conversation before continuing', 'Rush to complete everything within the quoted time'], correct: 2, feedback: ['Partial completion of a Tier 2 is not a Tier 2 — it is a failed job.', 'Professional obligations run both directions. The client provided incomplete information — renegotiation is appropriate.', 'Correct. Honesty before continuing is both the professional and ethical standard.', 'Rushing compromises quality — a client who paid full price for a rushed job is not satisfied.'] },
           { q: 'Why must protection products always be applied last in the job sequence?', opts: ['They need maximum time to cure before handover', 'Any cleaning activity after protection application removes or degrades the protection layer', 'Protection products are most effective on warm surfaces from prior work', 'Client preference — they want to see the cleaned vehicle before discussing protection'], correct: 1, feedback: ['Curing time is a factor but not the primary sequencing reason.', 'Correct. All chemical cleaning activity degrades or removes freshly applied protection. Protection is always final.', 'Cool surfaces in shade are preferred in Jamaica\'s climate — heat is the enemy, not the asset.', 'Client communication happens before the job. Sequencing is a technical decision.'] }
+        ]
+      },
+      {
+        id: 'a-matte-satin-care', ico: '⬛', num: 'S2·M4', title: 'Matte & Satin Finish Care',
+        desc: 'On a matte car you cannot polish out a scratch. Doing so is how the finish gets permanently ruined.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">The Rule That Changes Everything</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Matte clearcoat is physically different from gloss</strong> — it's manufactured with a textured, light-scattering finish. Polishing or compounding it doesn't restore anything; it smooths that texture, and a smoothed matte panel reflects light like gloss paint. That's a permanent glossy patch, not a fix.</div></div>
+          <div class="trn-warn">⚠ The entire gloss correction hierarchy (light polish, compound then polish, wet sand) does not apply to matte at all. There is no "light" safe version — any of it creates an irreversible defect on contact.</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">If a matte scratch catches a fingernail, the honest answer is a panel respray — not detailing correction. Set this expectation at assessment, before any work begins.</div></div>
+          <div class="trn-section-lbl">Washing & Product Selection</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Two-bucket method and pH-neutral shampoo still apply — matte paint isn't exempt from swirls, it's just unable to have them corrected afterward.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Never use wax, gloss-enhancing sealant, or standard ceramic coating</strong> not explicitly labelled matte-safe. Assume unsafe until confirmed otherwise.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Dry with microfiber only, never chamois — chamois leaves a slight shine that shows as an obvious patch on matte.</div></div>
+          <div class="trn-section-lbl">The Overspray Risk</div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text">Tyre dressing or trim restorer overspray landing on an adjacent matte panel is difficult to remove and highly visible. Mask or work with deliberate care near matte sections — this applies to matte/satin wheel finishes too.</div></div>
+          <div class="trn-callout">The skill here isn't a new technique — it's recognising a matte finish immediately and removing "polish" and "compound" from your options before you even open your kit. The client's trust depends on you knowing this before they do.</div>`,
+        quiz: [
+          { q: 'Why can a scratch on a matte-finish panel not be polished out the way it could on gloss paint?', opts: ['Matte paint is too thin to polish', 'Polishing smooths the manufactured texture that creates the matte look, leaving a permanent glossy patch', 'It requires a special polish not available locally', 'It actually can be polished out the same way as gloss'], correct: 1, feedback: ['Thickness isn\'t the relevant factor — texture is.', 'Correct. Smoothing that texture creates gloss exactly where you polished.', 'No product resolves this — the issue is mechanical.', 'This is the core mistake this module exists to prevent.'] },
+          { q: 'Which product is safe to apply to a matte vehicle without checking first?', opts: ['Any wax or gloss sealant already in your kit', 'A product explicitly labelled matte-safe or formulated for matte/satin finishes', 'Standard Cerakote ceramic sealant', 'Chamois leather'], correct: 1, feedback: ['Standard waxes are designed to add exactly the reflection matte finishes avoid.', 'Correct. Assume unsafe until confirmed matte/satin compatible.', 'Your standard sealant is formulated for gloss enhancement.', 'Chamois leaves shine that reads as a defect on matte.'] },
+          { q: 'A client\'s matte vehicle has a scratch deep enough to catch a fingernail. What\'s the professional response?', opts: ['Try a light polish first to see if it helps', 'Explain this requires a panel respray, since no technique corrects it on this finish', 'Apply extra sealant to hide it', 'Use a rubbing compound'], correct: 1, feedback: ['There\'s no safe "light" attempt — any polishing creates a permanent glossy patch.', 'Correct. This is the honest answer, given at assessment, not discovered mid-job.', 'Sealant doesn\'t fill a scratch this deep on any finish.', 'Compound is a gloss-clearcoat tool, unsafe on matte at any severity.'] }
+        ]
+      },
+      {
+        id: 'a-wheel-rim-types', ico: '⚙️', num: 'S2·M5', title: 'Wheel & Rim Types: Materials, Finishes & Risk',
+        desc: 'Not every rim takes the same cleaner. Knowing the finish before you touch it separates a safe clean from an expensive mistake.',
+        pills: ['theory','quiz'],
+        content: `
+          <div class="trn-section-lbl">Common Rim Types</div>
+          <div style="margin:18px 0;padding:14px;background:#111111;border:1px solid rgba(184,200,214,0.15);border-radius:8px;overflow-x:auto;">
+        <div style="min-width:640px;"><svg viewBox="0 0 940 300" xmlns="http://www.w3.org/2000/svg" font-family="Sora, sans-serif">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a949e"/>
+      <stop offset="100%" stop-color="#5a6470"/>
+    </linearGradient>
+  </defs>
+  <rect width="940" height="300" fill="#0a0a0a"/>
+
+  <!-- Column template repeated 6x: base metal block + top coating layer + labels -->
+  <!-- 1. Clear-coated alloy -->
+  <g transform="translate(20,30)">
+    <rect x="0" y="60" width="130" height="70" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="52" width="130" height="8" fill="#b8c8d6" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Clear-Coated Alloy</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Thin clearcoat over cast alloy</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">pH-neutral only</text>
+  </g>
+
+  <!-- 2. Painted steel/alloy -->
+  <g transform="translate(170,30)">
+    <rect x="0" y="55" width="130" height="75" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="45" width="130" height="12" fill="#586878" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Painted Steel/Alloy</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Solid paint layer, chip-prone</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">pH-neutral only</text>
+  </g>
+
+  <!-- 3. Polished/chrome -->
+  <g transform="translate(320,30)">
+    <rect x="0" y="62" width="130" height="68" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="58" width="130" height="4" fill="#d4e2ec" rx="1"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Polished / Chrome</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Plated surface, pits cumulatively</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">No repeated acid cleaner</text>
+  </g>
+
+  <!-- 4. Diamond-cut / machined face — the fragile one, exaggerated thin line -->
+  <g transform="translate(470,30)">
+    <rect x="0" y="65" width="130" height="65" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="63" width="130" height="2" fill="#e8a46a"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Diamond-Cut</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Bare aluminum, hairline clearcoat</text>
+    <text x="65" y="184" fill="#e8a46a" font-size="9" text-anchor="middle" font-weight="600">Most fragile — no abrasives</text>
+  </g>
+
+  <!-- 5. Powder-coated -->
+  <g transform="translate(620,30)">
+    <rect x="0" y="50" width="130" height="80" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="38" width="130" height="14" fill="#7a9ebf" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Powder-Coated</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Thick baked-on layer, durable</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">Matte = overspray risk</text>
+  </g>
+
+  <!-- 6. Plastic wheel cover -->
+  <g transform="translate(770,30)">
+    <rect x="20" y="55" width="90" height="75" fill="#3a3a3a" rx="4"/>
+    <circle cx="65" cy="92" r="10" fill="#1a1a1a"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Plastic Cover</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Steel wheel hidden beneath</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">Clips damage easily</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(20,220)">
+    <rect x="0" y="0" width="16" height="8" fill="url(#metal)" rx="1"/>
+    <text x="24" y="8" fill="#8a8378" font-size="10">Base metal (aluminum/steel)</text>
+    <rect x="220" y="0" width="16" height="8" fill="#e8a46a" rx="1"/>
+    <text x="244" y="8" fill="#8a8378" font-size="10">Protective layer — thickness shown to scale of real fragility</text>
+  </g>
+
+  <text x="20" y="260" fill="#5a574f" font-size="10" font-style="italic">Diagram for training reference only — layer thickness exaggerated for clarity, not to physical scale.</text>
+</svg></div>
+        <div style="font-size:10px;color:#5a574f;margin-top:8px;font-style:italic;">Reference diagram only — field photo examples of each finish type to be added here as real jobs are documented.</div>
+      </div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Clear-coated alloy</strong> — the most common modern wheel, essentially a mini paint job. pH-balanced cleaner only, no abrasive pads. Acid-based cleaners degrade this clearcoat over repeated use.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Painted steel/alloy</strong> — vulnerable to chipping and abrasive pad damage. Same pH-safe cleaner logic applies.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Polished/chrome</strong> — vulnerable to pitting and corrosion from harsh acid cleaners, cumulative over many washes even if one exposure shows no visible damage.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Diamond-cut / machined-face</strong> — a lathe-cut bare aluminum face with only a very thin clearcoat. The most fragile finish you'll regularly see. Breaking through shows as white, chalky corrosion that cannot be polished away — only professionally refinished.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Powder-coated</strong> — durable and chemical-resistant, but matte/satin powder-coat carries the same gloss-overspray risk as matte paint.</div></div>
+          <div class="trn-point"><div class="trn-point-dot"></div><div class="trn-point-text"><strong>Plastic wheel covers</strong> — look like alloy but scratch and crack more easily; clips can be damaged by aggressive brush agitation.</div></div>
+          <div class="trn-warn">⚠ If you can't confidently identify the finish, default to your safest, most pH-neutral option. A wrong guess with an acid-based cleaner is not something you can undo.</div>
+          <div class="trn-callout">Your existing Wheel Prep → Wheel Sealant → Tyre Coat sequence is already the safe approach across nearly all these types. The skill here is recognising which finishes — chrome and diamond-cut especially — punish a wrong guess the most.</div>`,
+        quiz: [
+          { q: 'Which wheel type has the LEAST tolerance for abrasive pads or harsh acid cleaners?', opts: ['Painted steel wheels', 'Diamond-cut / machined-face wheels', 'Powder-coated wheels', 'Plastic wheel covers'], correct: 1, feedback: ['Painted steel chips, but isn\'t as fragile as a machined face.', 'Correct. The thin clearcoat over bare aluminum is the most fragile finish here — a breakthrough can\'t be polished out.', 'Powder-coat is actually one of the more chemical-resistant finishes.', 'Wheel covers are vulnerable to cracking, not primarily chemical attack.'] },
+          { q: 'Why is an acid-based wheel cleaner risky as a universal default?', opts: ['It\'s always too weak to clean effectively', 'It can strip clearcoat and pit chrome over repeated use, even if one use shows no visible damage', 'It only works on plastic covers', 'There\'s no real risk on any finish'], correct: 1, feedback: ['Acid cleaners are strong, not weak — that\'s the risk.', 'Correct. The damage is often cumulative — fine once, damaged after repeated exposure.', 'Plastic covers have no special relationship to acid suitability.', 'This is exactly the assumption this module corrects.'] },
+          { q: 'You can\'t confidently identify a wheel\'s finish. What\'s the correct move?', opts: ['Use the strongest cleaner to be thorough', 'Default to your safest, most pH-neutral option', 'Skip cleaning the wheels entirely', 'Ask the client to identify it first'], correct: 1, feedback: ['The strongest option is exactly wrong under uncertainty.', 'Correct. Gentler protects the wheel at the cost of a slightly less aggressive clean.', 'Skipping isn\'t a real option for a paid service.', 'Most clients won\'t know this level of detail — the call is yours.'] }
         ]
       }
     ]
@@ -4576,7 +4772,10 @@ const FINAL_EXAM = [
   { q: 'A client\'s bonnet has severe swirl marks and mild oxidation. You have a DA polisher. What is the correct correction sequence?', opts: ['Light polish only — oxidation is mild so no compound needed', 'Compound to remove swirls and oxidation, then polish to remove compound marring', 'Wet sand first, then compound, then polish — any oxidation requires wet sanding', 'Apply sealant — it fills swirls and oxidation visually'], correct: 1, feedback: ['Light polish does not cut deep enough to remove heavy swirl marks or lift oxidation.', 'Correct. Compound handles both heavy swirls and mild oxidation. Polish removes compound marring and restores gloss. Two-stage is the correct call here.', 'Wet sanding is reserved for severe orange peel or heavy scratches — mild oxidation does not require it.', 'Sealant does not correct defects — it amplifies them by adding clarity.'] },
   { q: 'You rinse your wash mitt in the wash bucket by mistake during a job. What is the most accurate description of the risk this creates?', opts: ['The wash solution becomes too diluted to clean effectively', 'Contamination removed from the paint is reloaded onto the mitt and reapplied to the clearcoat, creating micro-scratches', 'The mitt becomes saturated and must be replaced', 'Shampoo chemistry neutralises any abrasive particles — no real risk'], correct: 1, feedback: ['Dilution reduces cleaning effectiveness — but the primary risk is abrasive recontamination, not dilution.', 'Correct. This is the exact mechanism of swirl mark creation during washing. The two-bucket method exists entirely to break this cycle.', 'Saturation is a performance issue — abrasive recontamination is a paint damage issue.', 'Shampoo lubricates but does not neutralise abrasive particles — grit remains grit regardless of the surrounding solution.'] },
   { q: 'Your fixed monthly costs are $25,000. Average gross margin per job is $6,500. How many jobs must you complete before generating any profit?', opts: ['3 jobs', '4 jobs', '5 jobs', '8 jobs'], correct: 1, feedback: ['3 × $6,500 = $19,500 — below fixed costs. Still at a loss.', 'Correct. 4 × $6,500 = $26,000 — crosses the $25,000 break-even. Job 4 generates $1,000 of profit; job 5 onward is fully profitable.', '5 jobs is profitable but not the break-even point — break-even occurs midway through job 4.', '8 jobs generates strong profit but is well past break-even.'] },
-  { q: 'A prospect contacts you via Instagram after seeing a before/after post. They ask "how much for a full detail?" before you have seen the vehicle. What is your correct response?', opts: ['Quote your standard Tier 2 rate immediately to avoid losing the lead', 'Explain that pricing requires a brief assessment, and offer two or three times this week to come and see the vehicle', 'Ask them to describe the vehicle\'s condition and quote from there', 'Send a price list covering all tiers and let them self-select'], correct: 1, feedback: ['A blind quote invites negotiation and risks underpricing a heavily soiled vehicle or overpricing a straightforward one.', 'Correct. The assessment is the professional standard — and offering specific times immediately demonstrates that the business is organised and ready. It moves the enquiry toward a committed next step.', 'Client self-reported condition is unreliable — "a little dirty" has preceded some of the most heavily soiled vehicles. An in-person assessment is not replaceable by description.', 'A price list is useful background material but does not substitute for an assessment or advance the booking.'] }
+  { q: 'A prospect contacts you via Instagram after seeing a before/after post. They ask "how much for a full detail?" before you have seen the vehicle. What is your correct response?', opts: ['Quote your standard Tier 2 rate immediately to avoid losing the lead', 'Explain that pricing requires a brief assessment, and offer two or three times this week to come and see the vehicle', 'Ask them to describe the vehicle\'s condition and quote from there', 'Send a price list covering all tiers and let them self-select'], correct: 1, feedback: ['A blind quote invites negotiation and risks underpricing a heavily soiled vehicle or overpricing a straightforward one.', 'Correct. The assessment is the professional standard — and offering specific times immediately demonstrates that the business is organised and ready. It moves the enquiry toward a committed next step.', 'Client self-reported condition is unreliable — "a little dirty" has preceded some of the most heavily soiled vehicles. An in-person assessment is not replaceable by description.', 'A price list is useful background material but does not substitute for an assessment or advance the booking.'] },
+  { q: 'A client with a matte-grey vehicle asks you to "buff out" a light scratch on the door. What is the correct response?', opts: ['Attempt a light polish — if it doesn\'t work, stop and explain the finish', 'Explain up front that matte clearcoat cannot be polished without creating a permanent glossy patch, and that a scratch this deep needs a respray', 'Use a rubbing compound since the paint is already scratched', 'Apply ceramic coating over the scratch to seal it'], correct: 1, feedback: ['There is no safe "light attempt" on matte — any polishing action creates the permanent glossy patch immediately, not just if it "doesn\'t work."', 'Correct. Matte clearcoat achieves its look through texture, not gloss. Smoothing that texture is instant and irreversible — this must be explained before any tool touches the panel.', 'Compound is a gloss-correction tool. On matte it causes the exact permanent defect this module warns against.', 'Coating locks in defects rather than correcting them, and does nothing to address a scratch of this depth.'] },
+  { q: 'You are not certain whether a client\'s wheels are bare polished aluminum or clear-coated alloy. What is the correct approach to cleaning them?', opts: ['Use a strong acid-based cleaner to ensure a thorough clean regardless of finish', 'Default to your safest, most pH-neutral cleaning option until the finish is confirmed', 'Skip the wheels this visit and ask the client what finish they have', 'Use a stiff abrasive pad — it is safe on all wheel finishes'], correct: 1, feedback: ['This is exactly backwards — acid-based cleaners are the highest-risk choice under uncertainty, capable of stripping clearcoat or pitting chrome.', 'Correct. When identification is uncertain, the safer, gentler option protects the client\'s wheels at the cost of a slightly less aggressive clean — the correct trade-off every time.', 'Skipping wheels is not a viable option in a paid detailing service.', 'Abrasive pads are unsafe on multiple finish types, including painted and plastic-covered wheels.'] },
+  { q: 'After buffing a ceramic coating application, the towel used feels stiff and slightly gritty. What is the correct next step?', opts: ['Wash it with the rest of that day\'s microfibre load and reuse it', 'Retire it — cured ceramic embedded in the fibres cannot be laundered out and risks scratching future paint', 'Soak it in acidic wheel cleaner to dissolve the residue', 'Use it only on wheels going forward, since it is already contaminated'], correct: 1, feedback: ['Mixing a ceramic-contaminated towel into general laundry risks spreading cured, hardened particles into towels used on other clients\' paint.', 'Correct. Once ceramic cures in a towel, it is a hard polymer, not residue that washing dissolves. Retiring it is the cheap side of the trade against scratching a future job.', 'Acidic cleaner does not dissolve cured ceramic and introduces its own contamination risk to a paint-contact towel.', 'A stiff, gritty towel is abrasive on any surface, including wheels — repurposing does not remove the risk, it just relocates it.'] }
 ];
 
 const ACAD_EXAM_PASS = 80;
@@ -4625,7 +4824,7 @@ function renderAcademy() {
     <div class="acad-module-grid">
       <div class="acad-card exam-card ${examLocked?'locked':''} ${examDone?'completed':''}" onclick="${examLocked?"toast('Complete all modules first','err')":'openFinalExam()'}">
         <div class="acad-card-ico">📋</div>
-        <div class="acad-card-num">20 Questions · Pass Mark 80%</div>
+        <div class="acad-card-num">22 Questions · Pass Mark 80%</div>
         <div class="acad-card-title">Final Exam</div>
         <div class="acad-card-desc">${examLocked?'Complete all Stage 0–5 modules to unlock.':examDone?'Exam completed. Retake anytime.':'All modules complete. You are ready.'}</div>
         <div class="acad-card-foot"><span class="trn-pill" style="background:var(--amber-d);color:var(--amber);border-color:rgba(212,168,67,.25)">Final Exam</span></div>
@@ -4691,7 +4890,7 @@ function openFinalExam() {
   document.getElementById('trn-l-ico').textContent='📋';
   document.getElementById('trn-l-stage').textContent='Final Assessment';
   document.getElementById('trn-l-title').textContent='Professional Certification Exam';
-  let body=`<div class="trn-callout" style="margin-bottom:20px">20 questions drawn from all six stages. Pass mark: 80% (16/20 correct). Retake as many times as needed — the goal is genuine mastery.</div><div class="trn-quiz-wrap">
+  let body=`<div class="trn-callout" style="margin-bottom:20px">22 questions drawn from all six stages. Pass mark: 80% (18/22 correct). Retake as many times as needed — the goal is genuine mastery.</div><div class="trn-quiz-wrap">
     ${FINAL_EXAM.map((q,qi)=>`<div class="trn-q" id="eq-${qi}"><div class="trn-q-text">${qi+1}. ${q.q}</div>${q.opts.map((o,oi)=>`<div class="trn-opt" id="eopt-${qi}-${oi}" onclick="examSelect(${qi},${oi})"><div class="trn-opt-dot"></div><span>${o}</span></div>`).join('')}<div class="trn-q-feedback" id="efb-${qi}"></div></div>`).join('')}
     <div class="trn-quiz-actions"><button class="btn-primary" onclick="submitFinalExam()">Submit Exam</button><span class="trn-score-display" id="escore-disp"></span></div>
     <div class="trn-result" id="exam-result">
@@ -4715,7 +4914,7 @@ function examSelect(qi,oi){
 
 function submitFinalExam(){
   if(examSubmitted)return;
-  if(FINAL_EXAM.some((_,i)=>examAnswers[i]===undefined)){toast('Answer all 20 questions first','err');return;}
+  if(FINAL_EXAM.some((_,i)=>examAnswers[i]===undefined)){toast('Answer all 22 questions first','err');return;}
   examSubmitted=true; let correct=0;
   FINAL_EXAM.forEach((qItem,qi)=>{
     const chosen=examAnswers[qi]; if(chosen===qItem.correct)correct++;
@@ -4726,10 +4925,10 @@ function submitFinalExam(){
   const passed=pct>=ACAD_EXAM_PASS;
   const scoreEl=document.getElementById('exam-rscore');
   scoreEl.textContent=pct+'%'; scoreEl.style.color=passed?'var(--green)':'var(--red)';
-  document.getElementById('exam-rlabel').textContent=passed?`${correct}/15 — Passed.`:`${correct}/15 — Not yet. Review and retake.`;
+  document.getElementById('exam-rlabel').textContent=passed?`${correct}/${FINAL_EXAM.length} — Passed.`:`${correct}/${FINAL_EXAM.length} — Not yet. Review and retake.`;
   document.getElementById('exam-rmsg').textContent=passed?'You have demonstrated professional-level understanding across all four stages. This is the standard every client receives.':'Review the highlighted answers carefully. The questions you missed identify the specific areas requiring attention.';
   document.getElementById('exam-result').classList.add('show');
-  document.getElementById('escore-disp').textContent=`${correct}/15`;
+  document.getElementById('escore-disp').textContent=`${correct}/${FINAL_EXAM.length}`;
 }
 
 function passExam(){

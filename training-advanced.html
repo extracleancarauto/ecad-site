@@ -726,6 +726,83 @@ const MODULES = [
       <div class="section-lbl">Why This Matters Before You Pick Up a Brush</div>
       <div class="point"><div class="point-dot"></div><div class="point-text"><strong>A wheel is a finish, just like paint is a finish — and different finishes tolerate different chemicals and pressure.</strong> The same acid-based "hot rims" style wheel cleaner that is safe on some bare or heavily-coated wheels can strip clear coat or pit chrome on others. Identifying the finish before selecting a product is the same discipline as checking paint condition before choosing a correction step.</div></div>
       <div class="section-lbl">Common Rim Types You Will See</div>
+      <div style="margin:18px 0;padding:14px;background:#111111;border:1px solid rgba(184,200,214,0.15);border-radius:8px;overflow-x:auto;">
+        <div style="min-width:640px;"><svg viewBox="0 0 940 300" xmlns="http://www.w3.org/2000/svg" font-family="Sora, sans-serif">
+  <defs>
+    <linearGradient id="metal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#8a949e"/>
+      <stop offset="100%" stop-color="#5a6470"/>
+    </linearGradient>
+  </defs>
+  <rect width="940" height="300" fill="#0a0a0a"/>
+
+  <!-- Column template repeated 6x: base metal block + top coating layer + labels -->
+  <!-- 1. Clear-coated alloy -->
+  <g transform="translate(20,30)">
+    <rect x="0" y="60" width="130" height="70" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="52" width="130" height="8" fill="#b8c8d6" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Clear-Coated Alloy</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Thin clearcoat over cast alloy</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">pH-neutral only</text>
+  </g>
+
+  <!-- 2. Painted steel/alloy -->
+  <g transform="translate(170,30)">
+    <rect x="0" y="55" width="130" height="75" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="45" width="130" height="12" fill="#586878" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Painted Steel/Alloy</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Solid paint layer, chip-prone</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">pH-neutral only</text>
+  </g>
+
+  <!-- 3. Polished/chrome -->
+  <g transform="translate(320,30)">
+    <rect x="0" y="62" width="130" height="68" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="58" width="130" height="4" fill="#d4e2ec" rx="1"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Polished / Chrome</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Plated surface, pits cumulatively</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">No repeated acid cleaner</text>
+  </g>
+
+  <!-- 4. Diamond-cut / machined face — the fragile one, exaggerated thin line -->
+  <g transform="translate(470,30)">
+    <rect x="0" y="65" width="130" height="65" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="63" width="130" height="2" fill="#e8a46a"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Diamond-Cut</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Bare aluminum, hairline clearcoat</text>
+    <text x="65" y="184" fill="#e8a46a" font-size="9" text-anchor="middle" font-weight="600">Most fragile — no abrasives</text>
+  </g>
+
+  <!-- 5. Powder-coated -->
+  <g transform="translate(620,30)">
+    <rect x="0" y="50" width="130" height="80" fill="url(#metal)" rx="3"/>
+    <rect x="0" y="38" width="130" height="14" fill="#7a9ebf" rx="2"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Powder-Coated</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Thick baked-on layer, durable</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">Matte = overspray risk</text>
+  </g>
+
+  <!-- 6. Plastic wheel cover -->
+  <g transform="translate(770,30)">
+    <rect x="20" y="55" width="90" height="75" fill="#3a3a3a" rx="4"/>
+    <circle cx="65" cy="92" r="10" fill="#1a1a1a"/>
+    <text x="65" y="150" fill="#f0ede6" font-size="12" text-anchor="middle" font-weight="600">Plastic Cover</text>
+    <text x="65" y="168" fill="#8a8378" font-size="10" text-anchor="middle">Steel wheel hidden beneath</text>
+    <text x="65" y="184" fill="#c9783c" font-size="9" text-anchor="middle">Clips damage easily</text>
+  </g>
+
+  <!-- Legend -->
+  <g transform="translate(20,220)">
+    <rect x="0" y="0" width="16" height="8" fill="url(#metal)" rx="1"/>
+    <text x="24" y="8" fill="#8a8378" font-size="10">Base metal (aluminum/steel)</text>
+    <rect x="220" y="0" width="16" height="8" fill="#e8a46a" rx="1"/>
+    <text x="244" y="8" fill="#8a8378" font-size="10">Protective layer — thickness shown to scale of real fragility</text>
+  </g>
+
+  <text x="20" y="260" fill="#5a574f" font-size="10" font-style="italic">Diagram for training reference only — layer thickness exaggerated for clarity, not to physical scale.</text>
+</svg></div>
+        <div style="font-size:10px;color:#5a574f;margin-top:8px;font-style:italic;">Reference diagram only — field photo examples of each finish type to be added here as real jobs are documented.</div>
+      </div>
       <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Clear-coated alloy</strong> — by far the most common modern wheel. A thin factory clearcoat sits over the alloy, essentially a miniature paint job. Treat it with the same respect as body paint: pH-balanced or non-acid cleaner only, no abrasive pads. Acid-based cleaners degrade this clearcoat over repeated use, leading to dulling, pitting, and eventual peeling.</div></div>
       <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Painted steel or alloy wheels</strong> — a solid painted finish, common on work vehicles and older or economy models. Vulnerable to chipping from curb contact and abrasive pad damage. Same pH-safe cleaner logic as clear-coated alloy.</div></div>
       <div class="point"><div class="point-dot"></div><div class="point-text"><strong>Polished / chrome wheels</strong> — a bare or plated reflective metal surface. Chrome is particularly vulnerable to pitting and corrosion from harsh acid cleaners used repeatedly over time. A one-time exposure may show no visible damage; the risk is cumulative across many washes.</div></div>
