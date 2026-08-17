@@ -368,6 +368,16 @@ nav {
         <div class="fg"><label>WhatsApp / Phone *</label><input type="tel" id="b-phone" placeholder="(876) 000-0000" autocomplete="tel"></div>
         <div class="fg"><label>Email *</label><input type="email" id="b-email" placeholder="email@example.com" autocomplete="email" required></div>
         <div class="fg full"><label>Service Address *</label><input type="text" id="b-addr" placeholder="Where should we come to?"></div>
+        <div class="fg full"><label>Shade / Coverage at the Location *</label>
+          <select id="b-shade">
+            <option value="">Select an option</option>
+            <option value="Full shade / garage or carport">Full shade — garage, carport, or covered parking</option>
+            <option value="Partial shade / some tree or building cover">Partial shade — some tree or building cover during the day</option>
+            <option value="No shade / full direct sun">No shade — vehicle sits in full direct sun</option>
+            <option value="Not sure">Not sure — I'll check</option>
+          </select>
+          <span class="soft" style="font-size:12px; opacity:.7; display:block; margin-top:4px;">Our waterless process needs to stay wet through the wipe-down — direct sun can affect results, so this helps us plan the right time and technique.</span>
+        </div>
         <div class="fg full"><label>Referral Code <span style="opacity:.5;font-weight:400;">(optional — got a code from a friend?)</span></label><input type="text" id="b-referral" placeholder="e.g. PERR482" style="text-transform:uppercase;" maxlength="10"></div>
       </div>
     </div>
@@ -1044,11 +1054,13 @@ async function submitIntake() {
   const svc   = document.getElementById('b-service').value;
   const email = document.getElementById('b-email').value.trim();
   const condition = document.getElementById('b-condition').value;
+  const shadeSel = document.getElementById('b-shade');
+  const shade = shadeSel ? shadeSel.value : '';
   const referralCode = document.getElementById('b-referral').value.trim().toUpperCase();
   document.getElementById('form-err').classList.remove('show');
 
-  if (!name || !phone || !addr || !vtype || !svc || !email || !condition) {
-    showErr('Please fill in all required fields marked *, including your email and when the vehicle was last detailed.');
+  if (!name || !phone || !addr || !vtype || !svc || !email || !condition || !shade) {
+    showErr('Please fill in all required fields marked *, including your email, when the vehicle was last detailed, and the shade/coverage at your location.');
     return;
   }
 
@@ -1141,6 +1153,7 @@ async function submitIntake() {
         date ? 'Requested date: ' + date : null,
         time ? 'Requested time: ' + time : null,
         conditionText ? 'Last detailed: ' + conditionText : null,
+        shade ? 'Shade/coverage: ' + shade : null,
         depositText && depositText !== '\u2014' ? 'Deposit required: ' + depositText : null,
         photoUrls.length ? 'Photos: ' + photoUrls.join(', ') : 'Photos: none uploaded (check manually)',
         notes || null
