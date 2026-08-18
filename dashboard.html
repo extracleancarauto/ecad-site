@@ -1573,6 +1573,43 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
           <h2>My Vehicle</h2>
           <p class="view-sub">Serena maintenance log. Separate from client service_records — this is your own cost tracking, for your eyes only.</p>
         </div>
+        <div class="cmd-card" style="margin-bottom:20px;border-color:rgba(214,80,80,.28);">
+          <div class="cmd-card-head"><span class="cmd-card-title">⚠️ Outstanding Priority Items — 2012 Serena S-Hybrid (HFC26)</span></div>
+          <div style="font-size:12px;color:var(--dim);margin-bottom:14px;">Reference baseline as of last logged mileage (~201,500 km, June 2026 — treat as a floor, actual mileage is higher). Log each item above once actioned so it moves into History.</div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+
+            <div style="padding:12px 14px;background:rgba(214,80,80,.08);border:1px solid rgba(214,80,80,.22);border-radius:8px;">
+              <div style="font-size:13px;font-weight:600;color:var(--silver-l);margin-bottom:4px;">P0300 — Random/Multiple Cylinder Misfire (unresolved)</div>
+              <div style="font-size:12px;color:var(--dim);line-height:1.5;">Physical diagnostic not yet completed. Correct order: <strong>1) vacuum leak check</strong> (hoses, PCV valve, intake gasket — statistically most common cause on Nissan engines) → <strong>2) spark plug inspection</strong> → <strong>3) coil swap test</strong> → <strong>4) fuel system last</strong> (injectors/pressure, only if paired with a lean code). Do not approve coil or injector replacement before steps 1–2 are ruled out.</div>
+            </div>
+
+            <div style="padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--bsoft);border-radius:8px;">
+              <div style="font-size:13px;font-weight:600;color:var(--silver-l);margin-bottom:4px;">ISG Belt &amp; Tensioner</div>
+              <div style="font-size:12px;color:var(--dim);line-height:1.5;">Inspect at 40,000 km / replace at 80,000 km per spec — unknown history, treat as overdue. Correct belt is <strong>7PK1272</strong> (an incorrect 5PK1270 was previously fitted in error by another shop — verify current belt matches spec before trusting it). Whoever does this work must have the <strong>JTC6601 tensioner tool</strong> specifically — confirm before booking. Belt failure disables hybrid functionality entirely.</div>
+            </div>
+
+            <div style="padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--bsoft);border-radius:8px;">
+              <div style="font-size:13px;font-weight:600;color:var(--silver-l);margin-bottom:4px;">CVT Fluid</div>
+              <div style="font-size:12px;color:var(--dim);line-height:1.5;"><strong>NS-3 spec only</strong> — wrong or old fluid is the #1 cause of CVT failure on this platform, and a replacement unit can cost more than the vehicle. No documented service history — treat as never done.</div>
+            </div>
+
+            <div style="padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--bsoft);border-radius:8px;">
+              <div style="font-size:13px;font-weight:600;color:var(--silver-l);margin-bottom:4px;">A/C System</div>
+              <div style="font-size:12px;color:var(--dim);line-height:1.5;">Previously blowing but not cooling. Requires a pressure test before any regas — refrigerant spec is <strong>R134a</strong>. Status since last check unconfirmed — verify current state before assuming resolved.</div>
+            </div>
+
+            <div style="padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--bsoft);border-radius:8px;">
+              <div style="font-size:13px;font-weight:600;color:var(--silver-l);margin-bottom:4px;">Trusted Service Contact</div>
+              <div style="font-size:12px;color:var(--dim);line-height:1.5;"><strong>Kipling Hybrid &amp; EV Services</strong> — 98b-100a Red Hills Road, Kingston 19 · 876-443-6293. Independent, hybrid-capable, has handled prior work on this vehicle. Fidelity Motors (Nissan authorized) confirmed too expensive for routine work — reserve for anything requiring CONSULT-III+ diagnostics specifically.</div>
+            </div>
+
+            <div style="padding:12px 14px;background:rgba(255,255,255,.03);border:1px solid var(--bsoft);border-radius:8px;">
+              <div style="font-size:13px;font-weight:600;color:var(--silver-l);margin-bottom:4px;">Standing Rule — Coolant &amp; Rubber</div>
+              <div style="font-size:12px;color:var(--dim);line-height:1.5;">Check <strong>both</strong> coolant loops (engine AND ISG inverter — most mechanics miss the second one entirely). All rubber (hoses, suspension bushings, CV boots) degrades faster in Jamaica's heat/humidity than standard intervals suggest — inspect on a shorter cycle than the manual states.</div>
+            </div>
+
+          </div>
+        </div>
         <div class="cmd-grid">
           <div class="cmd-card">
             <div class="cmd-card-head"><span class="cmd-card-title">🔧 Log an Entry</span></div>
