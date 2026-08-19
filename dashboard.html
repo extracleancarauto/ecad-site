@@ -1254,6 +1254,12 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
           </svg>
           Pricing
         </button>
+        <button class="nav-btn" id="nb-profitability" onclick="goTo('profitability')">
+          <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 3v18h18"/><path d="M18.7 8l-5.1 5.2-3-3L3 17.6"/>
+          </svg>
+          Profitability
+        </button>
         <button class="nav-btn" id="nb-vehiclelog" onclick="goTo('vehiclelog')">
           <svg class="nav-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M14 16H9m10 0h3v-3.15a1 1 0 0 0-.84-.99L16 11l-2.7-3.6a1 1 0 0 0-.8-.4H5.24a2 2 0 0 0-1.8 1.1l-.8 1.63A6 6 0 0 0 2 12.42V16h2"/>
@@ -1702,6 +1708,31 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
         </div>
       </div>
 
+      <!-- ── PROFITABILITY ─────────────────────────────────────── -->
+      <div class="view" id="v-profitability">
+        <div class="view-head">
+          <span class="view-eyebrow">Hyperion Only</span>
+          <h1 class="view-h1">Cost &amp; <em>Profit</em> Model</h1>
+          <p class="view-sub">Live tier-by-tier margins. Change your hourly rate or travel cost below — every tier recalculates instantly. Product costs are fixed baselines from the full reference sheet; update those in the spreadsheet, not here.</p>
+        </div>
+
+        <div class="cmd-card" style="margin-bottom:20px;">
+          <div class="cmd-card-head"><span class="cmd-card-title">Assumptions</span></div>
+          <div style="display:flex;gap:24px;flex-wrap:wrap;">
+            <div style="min-width:220px;">
+              <label style="font-size:11px;color:var(--dim);">Hourly labor rate (JMD)</label>
+              <input type="number" id="pf-hourly" class="minput" style="width:100%;" value="1250" step="50" oninput="renderProfitability()">
+            </div>
+            <div style="min-width:220px;">
+              <label style="font-size:11px;color:var(--dim);">Travel cost per job (JMD)</label>
+              <input type="number" id="pf-travel" class="minput" style="width:100%;" value="1500" step="100" oninput="renderProfitability()">
+            </div>
+          </div>
+        </div>
+
+        <div id="profitability-tiers"></div>
+      </div>
+
       <!-- ── DOCUMENTS ─────────────────────────────────────────── -->
       <div class="view" id="v-documents">
         <div class="view-head">
@@ -2117,7 +2148,7 @@ function playChime() {
 }
 
 // ── NAVIGATION ───────────────────────────────────────────────────
-const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'training', 'academy', 'command', 'pricing', 'documents', 'vehiclelog'];
+const VIEWS = ['overview', 'pending', 'bookings', 'clients', 'records', 'maintenance', 'training', 'academy', 'command', 'pricing', 'documents', 'vehiclelog', 'profitability'];
 
 function goTo(name) {
   if (name === 'pricing' && activeUser !== 'Hyperion') {
@@ -2128,7 +2159,12 @@ function goTo(name) {
     toast('This is a personal log — restricted', 'err');
     return;
   }
+  if (name === 'profitability' && activeUser !== 'Hyperion') {
+    toast('Cost & profit data is restricted', 'err');
+    return;
+  }
   if (name === 'vehiclelog') loadVehicleLog();
+  if (name === 'profitability') loadProfitability();
   VIEWS.forEach(v => {
     document.getElementById('v-' + v).classList.remove('active');
     document.getElementById('nb-' + v).classList.remove('active');
@@ -5167,6 +5203,76 @@ async function saveJournalEntry() {
     loadJournalEntries();
     toast('Entry saved', 'ok');
   } catch(e) { toast(e.message, 'err'); }
+}
+
+// ── PROFITABILITY (cost & profit model) ────────────────────────────
+// Product cost baselines pulled from the full reference sheet (ecad-cost-profit-model.xlsx).
+// Update the spreadsheet first if a product price/usage changes, then mirror the total here.
+const PROFIT_TIERS = [
+  {
+    key: 't0', name: 'Tier 0 — Foundation', timeHrs: 0.583, timeLabel: '30–40 min',
+    productCost: 564,
+    revenue: { 'Sedan': 5500, 'SUV': 6500, 'Pickup/Van': 7500 }
+  },
+  {
+    key: 't1', name: 'Tier 1 — Refined', timeHrs: 1.375, timeLabel: '75–90 min',
+    productCost: 1739,
+    revenue: { 'Sedan': 9000, 'SUV': 11000, 'Pickup/Van': 13000 }
+  },
+  {
+    key: 't2', name: 'Tier 2 — Elevated', timeHrs: 2.5, timeLabel: '2–3 hrs',
+    productCost: 2040,
+    revenue: { 'Sedan': 14500, 'SUV': 17500, 'Pickup/Van': 20500 }
+  },
+  {
+    key: 't3', name: 'Tier 3 — Sovereign', timeHrs: 3.5, timeLabel: '~3.5 hrs',
+    productCost: 4180,
+    revenue: { 'Sedan': 25500, 'SUV': 31500, 'Pickup/Van': 37000 }
+  }
+];
+
+function loadProfitability() {
+  renderProfitability();
+}
+
+function renderProfitability() {
+  const hourly = parseFloat(document.getElementById('pf-hourly').value) || 0;
+  const travel = parseFloat(document.getElementById('pf-travel').value) || 0;
+  const wrap = document.getElementById('profitability-tiers');
+
+  wrap.innerHTML = PROFIT_TIERS.map(tier => {
+    const labor = tier.timeHrs * hourly;
+    const totalCost = tier.productCost + labor + travel;
+
+    const rows = Object.entries(tier.revenue).map(([vclass, rev]) => {
+      const profit = rev - totalCost;
+      const margin = rev > 0 ? (profit / rev * 100) : 0;
+      const marginColor = margin >= 45 ? 'var(--green)' : margin >= 25 ? '#e8b84c' : 'var(--red)';
+      return `<tr>
+        <td>${vclass}</td>
+        <td>${fmtJMD(rev)}</td>
+        <td style="font-weight:600;">${fmtJMD(profit)}</td>
+        <td style="color:${marginColor};font-weight:600;">${margin.toFixed(1)}%</td>
+      </tr>`;
+    }).join('');
+
+    return `
+    <div class="cmd-card" style="margin-bottom:18px;">
+      <div class="cmd-card-head"><span class="cmd-card-title">${tier.name}</span><span style="font-size:11px;color:var(--dim);">${tier.timeLabel}</span></div>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-bottom:14px;font-size:12px;color:var(--dim);">
+        <span>Product cost: <strong style="color:var(--silver-l);">${fmtJMD(tier.productCost)}</strong></span>
+        <span>Labor: <strong style="color:var(--silver-l);">${fmtJMD(labor)}</strong></span>
+        <span>Travel: <strong style="color:var(--silver-l);">${fmtJMD(travel)}</strong></span>
+        <span>Total cost: <strong style="color:var(--text);">${fmtJMD(totalCost)}</strong></span>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+        <thead><tr style="text-align:left;color:var(--dim);border-bottom:1px solid var(--bsoft);">
+          <th style="padding:6px 4px;">Vehicle Class</th><th style="padding:6px 4px;">Revenue</th><th style="padding:6px 4px;">Profit</th><th style="padding:6px 4px;">Margin</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  }).join('');
 }
 
 // ── MY VEHICLE (personal maintenance log) ─────────────────────────
