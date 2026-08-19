@@ -59,6 +59,12 @@ body {
   --copper:    #c9783c;
   --copper-l:  #e8a46a;
   --copper-b:  rgba(201,120,60,0.22);
+  --gold:      #e8b84c;
+  --gold-l:    #f0cc78;
+  --gold-b:    rgba(232,184,76,0.4);
+  --purple:    #9b6ec8;
+  --purple-l:  #c4a3e8;
+  --purple-b:  rgba(155,110,200,0.4);
   --t0: #4a9e6b;
   --t1: #5b8ecf;
   --t2: #9b6ec8;
@@ -166,23 +172,24 @@ nav {
 
 /* ── PACKAGES ──────────────────────────────────────────────────── */
 .pkg-sec { padding: 80px 0 60px; position: relative; z-index: 1; }
-.tiers { display: grid; gap: 2px; }
+.tiers { display: grid; gap: 22px; }
 .tc {
-  background: var(--s1);
+  background: var(--s2);
   border: 1px solid var(--bsoft);
   border-radius: 10px;
   overflow: hidden;
   display: grid;
   grid-template-columns: 1fr auto;
   position: relative;
-  transition: border-color .3s, transform .3s;
+  transition: border-color .3s, transform .3s, box-shadow .3s;
   border-left-width: 3px;
   border-left-style: solid;
+  box-shadow: 0 14px 32px -10px rgba(0,0,0,.5), 0 2px 6px rgba(0,0,0,.3), inset 0 1px 0 rgba(255,255,255,.05);
 }
-.tc:hover { transform: translateY(-2px); border-color: rgba(184,200,214,.25); }
+.tc:hover { transform: translateY(-3px); border-color: rgba(184,200,214,.25); box-shadow: 0 20px 40px -10px rgba(0,0,0,.55), 0 3px 8px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.07); }
 .tc.t0 { border-left-color: var(--t0); }
 .tc.t1 { border-left-color: var(--t1); }
-.tc.t2 { border-left-color: var(--t2); border-color: rgba(155,110,200,.25); background: linear-gradient(135deg,#0d1520 0%,var(--s1) 100%); }
+.tc.t2 { border-left-color: var(--t2); border-color: rgba(155,110,200,.25); background: linear-gradient(135deg,#141b28 0%,var(--s2) 100%); }
 .tc.t3 { border-left-color: var(--t3); }
 .pop-tag { position: absolute; top: 14px; right: 14px; font-size: 9px; font-weight: 600; letter-spacing: .18em; color: #000; background: var(--t2); padding: 3px 9px; border-radius: 2px; }
 .tleft { padding: 28px 28px; }
@@ -190,11 +197,9 @@ nav {
 .tname { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 400; margin-bottom: 5px; line-height: 1; }
 .ttag { font-size: 12px; color: var(--silver); letter-spacing: .04em; margin-bottom: 16px; }
 .tincs { display: flex; flex-wrap: wrap; gap: 6px; }
-.inc { font-size: 11px; background: var(--s3); border: 1px solid var(--bsoft); color: var(--muted); padding: 3px 9px; border-radius: 2px; }
-.inc.hi { background: rgba(184,200,214,.07); border-color: rgba(184,200,214,.2); color: var(--silver-l); }
-.inc.ck { background: rgba(100,160,230,.1); border-color: rgba(100,160,230,.35); color: #8ec4f5; font-weight: 500; }
-.inc.cu { background: rgba(201,120,60,.07); border-color: rgba(201,120,60,.22); color: var(--copper-l); }
-.inc.nw { background: rgba(76,175,130,.07); border-color: rgba(76,175,130,.3); color: #6fcfa8; font-weight: 500; }
+.inc, .inc.hi, .inc.cu { font-size: 11px; background: var(--s3); border: 1px solid var(--bsoft); color: var(--silver-l); padding: 3px 9px; border-radius: 2px; }
+.inc.ck { font-size: 11px; background: rgba(232,184,76,.08); border: 1px solid var(--gold-b); color: var(--gold-l); padding: 3px 9px; border-radius: 2px; font-weight: 600; }
+.inc.nw { font-size: 11px; background: rgba(155,110,200,.08); border: 1px solid var(--purple-b); color: var(--purple-l); padding: 3px 9px; border-radius: 2px; font-weight: 500; }
 .tright { padding: 28px 22px; min-width: 188px; display: flex; flex-direction: column; justify-content: center; gap: 13px; border-left: 1px solid var(--bsoft); }
 .ptype { font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); margin-bottom: 3px; }
 .pval { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 400; color: var(--text); line-height: 1; }
@@ -593,7 +598,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="gcard">
           <span class="gc-label after">After</span>
           <span class="gc-vehicle">BMW 5 Series</span>
-          <span class="gc-service">Full Clean</span>
+          <span class="gc-service">Refined</span>
           <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/bmw-final.png" alt="BMW 5 Series after detailing" loading="lazy">
         </div>
       </div>
@@ -606,7 +611,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="gcard">
           <span class="gc-label after">After</span>
           <span class="gc-vehicle">Nissan Sport</span>
-          <span class="gc-service">Full Clean</span>
+          <span class="gc-service">Refined</span>
           <img src="https://xsyndxqrcnqsvxcrpkqx.supabase.co/storage/v1/object/public/Gallery/nissan_after.jpg" alt="Nissan after detailing" loading="lazy">
         </div>
       </div>
@@ -632,7 +637,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="gcard">
           <span class="gc-label after">After</span>
           <span class="gc-vehicle">Hyundai Creta</span>
-          <span class="gc-service">Full Clean</span>
+          <span class="gc-service">Refined</span>
           <img src="gallery-hyundai-after.jpg" alt="Hyundai Creta interior after detailing" loading="lazy">
         </div>
       </div>
@@ -739,14 +744,14 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
     <div class="sec-head fade">
       <span class="sec-label">Section 01</span>
       <h2>Exterior &amp; Full <span class="silver">Detail Packages</span></h2>
-      <p>Four clearly defined tiers — from a quick exterior refresh to a complete ceramic-protected Showroom Detail. Every package includes a walk-around inspection before and after service.</p>
+      <p>Four clearly defined tiers — from a quick exterior refresh to a complete ceramic-protected Sovereign package. Every package includes a walk-around inspection before and after service.</p>
     </div>
     <div class="tiers">
 
       <div class="tc t0 fade">
         <div class="tleft">
           <div class="tnum">Tier 0</div>
-          <div class="tname">Quick Wash</div>
+          <div class="tname">Foundation</div>
           <div class="ttag">Exterior only &middot; Fast &amp; efficient &middot; 30&ndash;40 min</div>
           <div class="tincs">
             <span class="inc">SiO2 waterless wash</span>
@@ -773,10 +778,10 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       <div class="tc t1 fade">
         <div class="tleft">
           <div class="tnum">Tier 1</div>
-          <div class="tname">Full Clean</div>
+          <div class="tname">Refined</div>
           <div class="ttag">Interior &amp; exterior &middot; Complete service &middot; 75&ndash;90 min</div>
           <div class="tincs">
-            <span class="inc">Everything in Quick Wash</span>
+            <span class="inc">Everything in Foundation</span>
             <span class="inc">Prewash dwell</span>
             <span class="inc hi">Interior vacuum</span>
             <span class="inc hi">APC dashboard &amp; console</span>
@@ -800,14 +805,14 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="pop-tag">MOST POPULAR</div>
         <div class="tleft">
           <div class="tnum">Tier 2</div>
-          <div class="tname">Deep Clean</div>
+          <div class="tname">Elevated</div>
           <div class="ttag">Full interior restoration &middot; Cerakote protection &middot; 2&ndash;3 hrs</div>
           <div class="tincs">
-            <span class="inc">Everything in Full Clean</span>
+            <span class="inc">Everything in Refined</span>
             <span class="inc hi">Seat shampoo &amp; fabric extraction</span>
             <span class="inc hi">Carpet deep clean &amp; stain treatment</span>
             <span class="inc hi">Leather clean &amp; condition</span>
-            <span class="inc hi">Cerakote interior detailer</span>
+            <span class="inc ck">Cerakote interior detailer</span>
             <span class="inc">Vent &amp; crevice detail</span>
             <span class="inc">Full interior restoration</span>
           </div>
@@ -824,10 +829,10 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       <div class="tc t3 fade">
         <div class="tleft">
           <div class="tnum">Tier 3</div>
-          <div class="tname">Showroom Detail</div>
+          <div class="tname">Sovereign</div>
           <div class="ttag">Elite finish &middot; Full decontamination &middot; 4-surface ceramic protection</div>
           <div class="tincs">
-            <span class="inc">Everything in Deep Clean</span>
+            <span class="inc">Everything in Elevated</span>
             <span class="inc hi">Clay bar decontamination</span>
             <span class="inc hi">Iron fallout removal</span>
             <span class="inc ck">Cerakote Ceramic Paint Sealant</span>
@@ -902,7 +907,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
             <span class="inc cu">Carpet deep clean &amp; extraction</span>
             <span class="inc cu">Stain removal treatment</span>
             <span class="inc cu">Leather cleaner &amp; conditioner</span>
-            <span class="inc cu">Cerakote interior detailer</span>
+            <span class="inc ck">Cerakote interior detailer</span>
             <span class="inc">Vent &amp; crevice brushwork</span>
             <span class="inc">Boot / trunk full clean</span>
             <span class="inc">Under-seat detail</span>
@@ -922,8 +927,8 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       <div class="bridge-arr">&#8593;</div>
       <div>
         <div class="bridge-l">After every interior service</div>
-        <div class="bridge-h">Add a Full Clean exterior for JMD 5,000&ndash;9,000 more</div>
-        <div class="bridge-b">Interior done? <strong>&ldquo;The outside takes 40 minutes &mdash; your car comes out completely transformed.&rdquo;</strong> Add a Full Clean to any Cabin Revival at a reduced rate.</div>
+        <div class="bridge-h">Add the Refined exterior package for JMD 5,000&ndash;9,000 more</div>
+        <div class="bridge-b">Interior done? <strong>&ldquo;The outside takes 40 minutes &mdash; your car comes out completely transformed.&rdquo;</strong> Add the Refined package to any Cabin Revival at a reduced rate.</div>
       </div>
     </div>
 
@@ -978,7 +983,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
           <div class="mplan-perk">10% off standard pricing &mdash; every single service</div>
           <div class="mplan-perk">Cancel anytime with 7 days notice, no penalty</div>
         </div>
-        <div class="mplan-note">Enrol in a recurring Full Clean every 4&ndash;6 weeks. Your pricing is locked in, your vehicle stays consistently maintained, and you never have to remember to book.</div>
+        <div class="mplan-note">Enrol in a recurring Refined package every 4&ndash;6 weeks. Your pricing is locked in, your vehicle stays consistently maintained, and you never have to remember to book.</div>
       </div>
       <div class="mplan-prices">
         <div class="mrow">
