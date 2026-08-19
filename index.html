@@ -309,13 +309,14 @@ nav {
 /* ── NOTES ─────────────────────────────────────────────────────── */
 .notes-sec { padding: 44px 0; position: relative; z-index: 1; }
 .notes-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap: 2px; }
-.ni { background: var(--s1); border: 1px solid var(--bsoft); border-radius: 4px; padding: 20px; }
+.ni { background: var(--s2); border: 1px solid var(--bsoft); border-radius: 4px; padding: 20px; }
+.policies-sec { padding: 70px 0; background: var(--s1); position: relative; z-index: 1; }
 .ni-icon { font-size: 18px; margin-bottom: 9px; }
 .ni-title { font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 5px; letter-spacing: .04em; }
 .ni-body { font-size: 11px; color: var(--muted); line-height: 1.65; }
 
 /* ── CONTACT ───────────────────────────────────────────────────── */
-.contact-sec { padding: 80px 0; position: relative; z-index: 1; }
+.contact-sec { padding: 80px 0; border-top: 1px solid var(--bsoft); position: relative; z-index: 1; }
 .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 44px; }
 .cc-card { background: var(--s1); border: 1px solid var(--bsoft); border-radius: 10px; padding: 26px; display: flex; align-items: flex-start; gap: 16px; text-decoration: none; transition: border-color .3s, transform .3s; }
 .cc-card:hover { border-color: rgba(184,200,214,.35); transform: translateY(-2px); }
@@ -488,7 +489,8 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
 }
 /* ── FAQ ACCORDION ────────────────────────────────────────────── */
 .faq-sec { padding: 60px 0 20px; }
-.faq-list { max-width: 640px; margin: 36px auto 0; }
+.faq-card { max-width: 680px; margin: 36px auto 0; background: var(--s1); border: 1px solid var(--bsoft); border-radius: 14px; padding: 12px 22px; box-shadow: 0 14px 32px -10px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.04); }
+.faq-list { }
 .faq-item { border: 1px solid var(--bsoft); border-radius: 8px; margin-bottom: 10px; overflow: hidden; background: var(--s1); }
 .faq-q { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; cursor: pointer; user-select: none; }
 .faq-q span:first-child { font-size: 13px; font-weight: 500; }
@@ -1112,6 +1114,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       </div>
     </div>
 
+    <span class="sec-label" style="display:block;margin-bottom:16px;">What To Expect</span>
     <div class="fleet-benefits fade">
       <div class="fb">
         <div class="fb-icon">&#128203;</div>
@@ -1154,7 +1157,13 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
     </div>
   </div>
 </section>
+
+<section id="policies" class="policies-sec">
   <div class="wrap">
+    <div class="sec-head fade" style="text-align:center;max-width:560px;margin:0 auto;">
+      <span class="sec-label" style="display:block;text-align:center;">Good to Know</span>
+      <h2>Service <span class="silver">Policies</span></h2>
+    </div>
     <div class="notes-grid fade">
       <div class="ni"><div class="ni-icon">&#9888;&#65039;</div><div class="ni-title">Vehicle Condition</div><div class="ni-body">Heavily soiled or neglected vehicles may attract a surcharge of JMD 2,000&ndash;5,000. Always communicated and agreed before work begins.</div></div>
       <div class="ni"><div class="ni-icon">&#128205;</div><div class="ni-title">Travel Surcharge</div><div class="ni-body">A travel fee applies for locations beyond our standard service radius. Confirmed at booking &mdash; never a surprise on the day.</div></div>
@@ -1223,7 +1232,8 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
       <span class="sec-label" style="display:block;text-align:center;">Before You Book</span>
       <h2>Quick <span class="silver">Questions</span></h2>
     </div>
-    <div class="faq-list fade">
+    <div class="faq-card fade">
+    <div class="faq-list">
       <div class="faq-item">
         <div class="faq-q" onclick="toggleFaq(this)"><span>How does the deposit work?</span><span class="faq-icon"></span></div>
         <div class="faq-a"><div class="faq-a-inner">A deposit secures your date and time slot, based on your vehicle's condition. It comes straight off your final total — it's a reservation, not an extra fee. The remaining balance is due on completion, paid by cash, bank transfer, or card.</div></div>
@@ -1252,6 +1262,7 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
         <div class="faq-q" onclick="toggleFaq(this)"><span>Can I cancel or reschedule?</span><span class="faq-icon"></span></div>
         <div class="faq-a"><div class="faq-a-inner">Your deposit is refundable with 24+ hours notice. Same-day cancellations or no-shows are non-refundable, since that slot could have gone to another client.</div></div>
       </div>
+    </div>
     </div>
   </div>
 </section>
