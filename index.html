@@ -348,6 +348,11 @@ textarea { resize: vertical; min-height: 88px; }
 
 /* ── WHATSAPP FLOAT ────────────────────────────────────────────── */
 .wa-float { position:fixed; bottom:22px; right:22px; z-index:999; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+.book-float { position:fixed; bottom:22px; left:22px; z-index:999; display:flex; align-items:center; gap:8px; padding:14px 22px; border-radius:50px; background:linear-gradient(135deg,var(--gold) 0%,var(--copper) 100%); color:#0a0a0a; font-size:13px; font-weight:700; letter-spacing:.03em; text-decoration:none; box-shadow:0 6px 24px rgba(232,184,76,.35); opacity:0; transform:translateY(16px); pointer-events:none; transition:opacity .35s ease, transform .35s ease, box-shadow .2s ease; }
+.book-float.show { opacity:1; transform:translateY(0); pointer-events:auto; }
+.book-float:hover { box-shadow:0 8px 30px rgba(232,184,76,.5); }
+.book-float svg { width:16px; height:16px; flex-shrink:0; }
+@media(max-width:480px){ .book-float{ padding:12px 18px; font-size:12px; left:16px; bottom:16px; } }
 .wa-btn { width:54px; height:54px; border-radius:50%; background:#25D366; display:flex; align-items:center; justify-content:center; box-shadow:0 4px 20px rgba(37,211,102,.45); text-decoration:none; transition:transform .2s,box-shadow .2s; }
 .wa-btn:hover { transform:scale(1.1); box-shadow:0 6px 28px rgba(37,211,102,.6); }
 .wa-btn svg { width:28px; height:28px; fill:#fff; }
@@ -1303,6 +1308,12 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
   <div class="foot-copy">All prices quoted in Jamaican Dollars (JMD) &middot; Subject to change with 30 days notice &middot; Vehicle condition surcharges apply where applicable<br>(876) 817-6193 &middot; extracleancarwash@gmail.com &middot; Instagram @extracleanautoja &middot; TikTok @extra.clean.auto &middot; ecadja.com</div>
 </footer>
 
+<!-- Floating Book Now -->
+<a href="/loading?dest=/book&label=Preparing%20your%20booking&sub=One%20moment%E2%80%A6&ms=1100" class="book-float" id="bookFloat" aria-label="Book Now">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+  Book Now
+</a>
+
 <!-- WhatsApp + Instagram Float -->
 <div class="wa-float">
   <div class="float-row">
@@ -1332,6 +1343,35 @@ const obs = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.07 });
 document.querySelectorAll('.fade').forEach(el => obs.observe(el));
+
+// Floating Book Now — appears once the hero scrolls out of view, and hides
+// again once Section 06 (the real booking button) comes into view, so it
+// never duplicates a CTA that's already on screen at either end
+(function initBookFloat() {
+  const btn = document.getElementById('bookFloat');
+  const hero = document.querySelector('.hero');
+  const bookingSec = document.getElementById('booking');
+  if (!btn || !hero) return;
+
+  let heroPassed = false;
+  let bookingSecReached = false;
+
+  function updateBookFloat() {
+    btn.classList.toggle('show', heroPassed && !bookingSecReached);
+  }
+
+  const heroObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => { heroPassed = !e.isIntersecting; updateBookFloat(); });
+  }, { threshold: 0 });
+  heroObs.observe(hero);
+
+  if (bookingSec) {
+    const bookingObs = new IntersectionObserver((entries) => {
+      entries.forEach(e => { bookingSecReached = e.isIntersecting; updateBookFloat(); });
+    }, { threshold: 0.1 });
+    bookingObs.observe(bookingSec);
+  }
+})();
 
 // Gallery carousel — peek preview with smooth center-snap
 (function initGalleryCarousel() {
