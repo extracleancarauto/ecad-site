@@ -1520,6 +1520,45 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
                 <button class="btn sm" onclick="addReviewFollowup()">Add</button>
               </div>
             </div>
+            <div class="cmd-card">
+              <div class="cmd-card-head"><span class="cmd-card-title">📤 Referral Outbox</span><span class="cmd-card-sub">Leads sent elsewhere</span></div>
+              <div id="ro-edit-banner" style="display:none;font-size:11px;color:var(--copper,#b87);background:rgba(184,135,119,.1);border:1px solid rgba(184,135,119,.25);border-radius:6px;padding:7px 10px;margin-bottom:10px;">
+                Editing entry — <a onclick="cancelReferralEdit()" style="color:var(--silver-l);text-decoration:underline;cursor:pointer;">cancel</a>
+              </div>
+              <div id="ro-summary" style="font-size:11px;color:var(--dim);margin-bottom:12px;">Loading</div>
+              <div id="ro-list" style="max-height:260px;overflow-y:auto;margin-bottom:14px;"><div class="loading">Loading</div></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                <input type="text" id="ro-client" class="minput" placeholder="Client name…" style="width:100%;">
+                <input type="date" id="ro-date" class="minput" style="width:100%;">
+              </div>
+              <input type="text" id="ro-job" class="minput" style="width:100%;margin-bottom:8px;" placeholder="Job requested — e.g. basic wash, PVC clean">
+              <input type="text" id="ro-referred-to" class="minput" style="width:100%;margin-bottom:8px;" placeholder="Referred to — e.g. thedetailguyja">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+                <select id="ro-reason" class="minput" style="width:100%;">
+                  <option value="">Reason —</option>
+                  <option value="Unavailable">Unavailable that day</option>
+                  <option value="Price objection">Price objection</option>
+                  <option value="Out of scope">Out of scope (basic wash only)</option>
+                  <option value="Outside service area">Outside service area</option>
+                  <option value="Other">Other</option>
+                </select>
+                <select id="ro-status" class="minput" style="width:100%;">
+                  <option value="sent">Sent</option>
+                  <option value="completed">Completed</option>
+                  <option value="unknown">Unknown</option>
+                </select>
+              </div>
+              <select id="ro-reciprocity" class="minput" style="width:100%;margin-bottom:8px;">
+                <option value="pending">Reciprocity — Pending</option>
+                <option value="yes">Reciprocity — Yes</option>
+                <option value="no">Reciprocity — No</option>
+              </select>
+              <textarea id="ro-notes" class="minput" rows="2" style="width:100%;resize:vertical;margin-bottom:10px;" placeholder="Notes — optional"></textarea>
+              <div style="display:flex;gap:8px;">
+                <button class="btn sm" id="ro-save-btn" onclick="saveReferralEntry()" style="width:100%;">Log Referral</button>
+                <button class="btn sm" id="ro-cancel-edit-btn" onclick="cancelReferralEdit()" style="display:none;width:auto;padding:0 16px;background:transparent;border:1px solid var(--bsoft);">Cancel</button>
+              </div>
+            </div>
           </div>
           <div class="cmd-col">
             <div class="cmd-card">
@@ -2206,7 +2245,7 @@ function goTo(name) {
   if (name === 'clients')     loadClients();
   if (name === 'records')     loadRecords();
   if (name === 'maintenance') loadMaintenance();
-  if (name === 'command')     { loadCommand(); loadTrainingProgress(); loadReviewFollowups(); }
+  if (name === 'command')     { loadCommand(); loadTrainingProgress(); loadReviewFollowups(); loadReferralOutbox(); }
   if (name === 'pricing')     { loadPricing(); loadCardPaymentToggle(); }
 
   // Close sidebar on mobile
@@ -2335,6 +2374,168 @@ async function markFollowup(id, field, value) {
   });
 
   loadReviewFollowups();
+}
+
+// ── REFERRAL OUTBOX (outbound referrals — separate from client referral_code system) ──
+let referralOutboxCache = [];
+let referralOutboxEditingId = null;
+
+async function loadReferralOutbox() {
+  const summaryWrap = document.getElementById('ro-summary');
+  const listWrap = document.getElementById('ro-list');
+  if (!listWrap) return;
+  try {
+    const { data, error } = await db.from('outbound_referrals')
+      .select('*').order('referred_date', { ascending: false }).order('created_at', { ascending: false });
+    if (error) throw error;
+    referralOutboxCache = data || [];
+
+    if (!data || !data.length) {
+      summaryWrap.innerHTML = 'No referrals logged yet.';
+      listWrap.innerHTML = '<div style="font-size:11px;color:var(--dim);text-align:center;padding:14px 0;">No referrals sent yet.</div>';
+      return;
+    }
+
+    const now = new Date();
+    const thisMonth = data.filter(r => {
+      const d = new Date(r.referred_date + 'T00:00:00');
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    const reciprocalYes = data.filter(r => r.reciprocity === 'yes').length;
+
+    summaryWrap.innerHTML = `
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>Sent this month</span><strong style="color:var(--text);">${thisMonth}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:4px 0;"><span>Marked reciprocal</span><strong style="color:var(--text);">${reciprocalYes} / ${data.length}</strong></div>
+    `;
+
+    const statusColor = { sent: 'var(--dim)', completed: 'var(--green,#4a9)', unknown: 'var(--dim)' };
+    const recipColor = { yes: 'var(--green,#4a9)', no: 'var(--red,#d65050)', pending: 'var(--dim)' };
+
+    listWrap.innerHTML = data.map(r => `
+      <div style="padding:9px 0;border-bottom:1px solid var(--bsoft);">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px;">
+          <span style="font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;">${fd(r.referred_date)}</span>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+            <span style="font-size:9px;color:${statusColor[r.status] || 'var(--dim)'};text-transform:uppercase;">${x(r.status)}</span>
+            <button onclick="editReferralEntry('${x(String(r.id))}')" title="Edit" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:12px;padding:0;line-height:1;">✎</button>
+            <button onclick="deleteReferralEntry('${x(String(r.id))}')" title="Delete" style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:12px;padding:0;line-height:1;">✕</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text);margin-top:3px;">${x(r.client_name)}${r.job_requested ? ' — ' + x(r.job_requested) : ''}</div>
+        <div style="font-size:11px;color:var(--dim);margin-top:2px;">→ ${x(r.referred_to)}${r.reason ? ' · ' + x(r.reason) : ''}</div>
+        <div style="font-size:10px;margin-top:4px;">
+          <span style="color:${recipColor[r.reciprocity] || 'var(--dim)'};">Reciprocity: ${x(r.reciprocity)}</span>
+        </div>
+        ${r.notes ? `<div style="font-size:11px;color:var(--dim);margin-top:4px;white-space:pre-wrap;">${x(r.notes)}</div>` : ''}
+      </div>
+    `).join('');
+  } catch(e) {
+    if (summaryWrap) summaryWrap.innerHTML = '<span style="color:var(--red);">Could not load summary.</span>';
+    listWrap.innerHTML = '<div style="font-size:11px;color:var(--red);">Could not load referrals.</div>';
+    console.log('loadReferralOutbox error:', e);
+  }
+}
+
+async function saveReferralEntry() {
+  const clientEl = document.getElementById('ro-client');
+  const dateEl = document.getElementById('ro-date');
+  const jobEl = document.getElementById('ro-job');
+  const referredToEl = document.getElementById('ro-referred-to');
+  const reasonEl = document.getElementById('ro-reason');
+  const statusEl = document.getElementById('ro-status');
+  const reciprocityEl = document.getElementById('ro-reciprocity');
+  const notesEl = document.getElementById('ro-notes');
+
+  const client_name = clientEl.value.trim();
+  const referred_to = referredToEl.value.trim();
+  if (!client_name) { toast('Enter the client name', 'err'); return; }
+  if (!referred_to) { toast('Enter who you referred them to', 'err'); return; }
+
+  const payload = {
+    referred_date: dateEl.value || new Date().toISOString().slice(0,10),
+    client_name,
+    job_requested: jobEl.value.trim() || null,
+    referred_to,
+    reason: reasonEl.value || null,
+    status: statusEl.value || 'sent',
+    reciprocity: reciprocityEl.value || 'pending',
+    notes: notesEl.value.trim() || null
+  };
+
+  try {
+    if (referralOutboxEditingId) {
+      const { error } = await db.from('outbound_referrals')
+        .update(payload).eq('id', referralOutboxEditingId);
+      if (error) throw error;
+      toast('Referral updated', 'ok');
+    } else {
+      const { error } = await db.from('outbound_referrals').insert([payload]);
+      if (error) throw error;
+      toast('Referral logged', 'ok');
+    }
+    resetReferralForm();
+    loadReferralOutbox();
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+function editReferralEntry(id) {
+  const entry = referralOutboxCache.find(r => String(r.id) === String(id));
+  if (!entry) { toast('Could not find that referral', 'err'); return; }
+
+  referralOutboxEditingId = entry.id;
+  document.getElementById('ro-client').value = entry.client_name || '';
+  document.getElementById('ro-date').value = entry.referred_date || '';
+  document.getElementById('ro-job').value = entry.job_requested || '';
+  document.getElementById('ro-referred-to').value = entry.referred_to || '';
+  document.getElementById('ro-reason').value = entry.reason || '';
+  document.getElementById('ro-status').value = entry.status || 'sent';
+  document.getElementById('ro-reciprocity').value = entry.reciprocity || 'pending';
+  document.getElementById('ro-notes').value = entry.notes || '';
+
+  const saveBtn = document.getElementById('ro-save-btn');
+  const cancelBtn = document.getElementById('ro-cancel-edit-btn');
+  const banner = document.getElementById('ro-edit-banner');
+  if (saveBtn) saveBtn.textContent = 'Update Referral';
+  if (cancelBtn) cancelBtn.style.display = 'inline-block';
+  if (banner) banner.style.display = 'block';
+
+  const clientEl = document.getElementById('ro-client');
+  if (clientEl) clientEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+function cancelReferralEdit() {
+  resetReferralForm();
+}
+
+function resetReferralForm() {
+  referralOutboxEditingId = null;
+  ['ro-client','ro-date','ro-job','ro-referred-to','ro-notes'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const reasonEl = document.getElementById('ro-reason');
+  if (reasonEl) reasonEl.value = '';
+  const statusEl = document.getElementById('ro-status');
+  if (statusEl) statusEl.value = 'sent';
+  const reciprocityEl = document.getElementById('ro-reciprocity');
+  if (reciprocityEl) reciprocityEl.value = 'pending';
+  const saveBtn = document.getElementById('ro-save-btn');
+  const cancelBtn = document.getElementById('ro-cancel-edit-btn');
+  const banner = document.getElementById('ro-edit-banner');
+  if (saveBtn) saveBtn.textContent = 'Log Referral';
+  if (cancelBtn) cancelBtn.style.display = 'none';
+  if (banner) banner.style.display = 'none';
+}
+
+async function deleteReferralEntry(id) {
+  if (!confirm('Delete this referral entry? This can\'t be undone.')) return;
+  try {
+    const { error } = await db.from('outbound_referrals').delete().eq('id', id);
+    if (error) throw error;
+    if (String(referralOutboxEditingId) === String(id)) resetReferralForm();
+    toast('Referral deleted', 'ok');
+    loadReferralOutbox();
+  } catch(e) { toast(e.message, 'err'); }
 }
 
 const docCache = {};
