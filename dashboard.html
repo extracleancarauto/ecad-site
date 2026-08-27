@@ -2649,6 +2649,7 @@ async function loadOverview() {
         'Pending',
         'Deposit Paid (WiPay — Verified)',
         'WiPay Unverified — Check Manually',
+        'Payment Failed (WiPay)',
         'Deposit Paid (WiPay)'
       ]),
       db.from('service_records').select('*', { count: 'exact', head: true }),
@@ -2695,6 +2696,22 @@ async function loadOverview() {
 }
 
 // ── PENDING BOOKINGS ─────────────────────────────────────────────
+// Prefer the structured `vehicles` row (make/model/year/color/plate) when
+// it exists; fall back to pulling the "Vehicle detail: ..." segment out of
+// job_notes for older records that predate the vehicle_id link.
+function vehicleCell(r) {
+  const v = r.vehicles;
+  if (v && (v.make || v.model || v.plate || v.color)) {
+    const line1 = [v.make, v.model, v.year].filter(Boolean).join(' ') || v.vehicle_type || '—';
+    const line2 = [v.color, v.plate].filter(Boolean).join(' · ');
+    return `<span class="td-m">${x(line1)}</span>${line2 ? `<div style="font-size:10px;color:var(--dim)">${x(line2)}</div>` : ''}`;
+  }
+  const notes = r.job_notes || '';
+  const match = notes.match(/Vehicle detail:\s*([^|]+)/);
+  if (match) return `<span class="td-m">${x(match[1].trim())}</span>`;
+  return '<span class="td-m">—</span>';
+}
+
 async function loadPending() {
   const wrap = document.getElementById('pending-wrap');
   const meta = document.getElementById('pending-meta');
@@ -2702,11 +2719,12 @@ async function loadPending() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone, service_address)')
+      .select('*, clients(full_name, phone, service_address), vehicles(make, model, year, color, plate, vehicle_type)')
       .in('payment_status', [
         'Pending',
         'Deposit Paid (WiPay — Verified)',
         'WiPay Unverified — Check Manually',
+        'Payment Failed (WiPay)',
         'Deposit Paid (WiPay)'
       ])
       .order('created_at', { ascending: false });
@@ -2724,7 +2742,7 @@ async function loadPending() {
     }
 
     wrap.innerHTML = tblHtml(
-      ['Client', 'Phone', 'Service', 'Date', 'Address', 'Notes', 'Actions'],
+      ['Client', 'Phone', 'Vehicle', 'Service', 'Date', 'Address', 'Notes', 'Actions'],
       data.map(r => {
         const inv = encodeURIComponent(JSON.stringify({
           name:    r.clients?.full_name        || '',
@@ -2738,6 +2756,7 @@ async function loadPending() {
         return [
           `<span class="td-name">${x(r.clients?.full_name || '—')}</span>`,
           `<span class="td-m">${x(r.clients?.phone || '—')}</span>`,
+          vehicleCell(r),
           `<span class="td-m">${x(r.service_tier || '—')}</span>`,
           `<span class="td-m">${fd(r.service_date)}</span>`,
           `<span class="td-m" style="max-width:140px;white-space:normal;display:inline-block;">${x(r.clients?.service_address || '—')}</span>`,
@@ -2763,6 +2782,7 @@ async function refreshBadge() {
         'Pending',
         'Deposit Paid (WiPay — Verified)',
         'WiPay Unverified — Check Manually',
+        'Payment Failed (WiPay)',
         'Deposit Paid (WiPay)'
       ]);
     const b = document.getElementById('badge-pending');
@@ -2806,7 +2826,7 @@ async function loadBookings() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone)')
+      .select('*, clients(full_name, phone), vehicles(make, model, year, color, plate, vehicle_type)')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
@@ -2818,7 +2838,7 @@ async function loadBookings() {
     }
 
     wrap.innerHTML = tblHtml(
-      ['Client', 'Phone', 'Service', 'Date', 'Status', ''],
+      ['Client', 'Phone', 'Vehicle', 'Service', 'Date', 'Status', ''],
       data.map(r => {
         const recData = encodeURIComponent(JSON.stringify({
           id: r.id,
@@ -2830,6 +2850,7 @@ async function loadBookings() {
         return [
           `<span class="td-name">${x(r.clients?.full_name || '—')}</span>`,
           `<span class="td-m">${x(r.clients?.phone || '—')}</span>`,
+          vehicleCell(r),
           `<span class="td-m">${x(r.service_tier || '—')}</span>`,
           `<span class="td-m">${fd(r.service_date)}</span>`,
           pBadge(r.payment_status),

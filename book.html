@@ -867,6 +867,17 @@ async function payWithWiPay() {
   const bDate = document.getElementById('b-date').value;
   const bTime = document.getElementById('b-time').value;
 
+  // Vehicle detail fields — same fields the manual/bank-transfer path already
+  // sends, now carried through the card-payment path too so nothing is lost.
+  const vtype   = document.getElementById('b-vtype').value;
+  const vdetail = document.getElementById('b-vdetail').value.trim();
+  const plate   = document.getElementById('b-plate').value.trim();
+  const color   = document.getElementById('b-color').value.trim();
+  const conditionSelWiPay = document.getElementById('b-condition');
+  const conditionText = conditionSelWiPay ? conditionSelWiPay.options[conditionSelWiPay.selectedIndex].text : '';
+  const shadeSelWiPay = document.getElementById('b-shade');
+  const shade = shadeSelWiPay ? shadeSelWiPay.value : '';
+
   if (!name || !email || !phone) {
     showErr('Please fill in your name, email, and phone before paying — we need these to confirm your booking.');
     return;
@@ -908,7 +919,10 @@ async function payWithWiPay() {
         svc, addr,
         booking_date: bDate, booking_time: bTime,
         ticket: ticketNo,
-        photo_urls: photoUrls.length ? photoUrls.join(', ') : null
+        photo_urls: photoUrls.length ? photoUrls.join(', ') : null,
+        vtype, vdetail, plate, color,
+        condition: conditionText,
+        shade
       })
     });
     const result = await resp.json();
