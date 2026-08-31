@@ -305,6 +305,13 @@ nav {
 .fcta-left p { font-size: 12px; color: var(--muted); line-height: 1.75; max-width: 540px; }
 .btn-fleet { background: var(--green); color: #000; font-family: 'Sora', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; padding: 13px 22px; border-radius: 4px; text-decoration: none; white-space: nowrap; transition: opacity .2s, transform .2s; display: inline-block; flex-shrink: 0; }
 .btn-fleet:hover { opacity: .88; transform: translateY(-1px); }
+.fb-card { background: var(--s1); border: 1px solid var(--bsoft); border-left: 3px solid var(--green); border-radius: 4px; padding: 26px 28px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 20px; max-width: 100%; }
+.fb-text { flex: 1 1 240px; min-width: 0; }
+.fb-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--green); margin-bottom: 8px; }
+.fb-h3 { font-family: 'Cormorant Garamond', serif; font-weight: 400; font-size: clamp(20px,3vw,26px); color: var(--text); margin: 0 0 8px; }
+.fb-sub { font-size: 13px; color: var(--text); line-height: 1.7; margin: 0; }
+.fb-ctas { display: flex; gap: 12px; flex-wrap: wrap; flex-shrink: 0; }
+.fb-ctas .btn-fleet, .fb-ctas .btn-s { white-space: normal; text-align: center; }
 
 /* ── NOTES ─────────────────────────────────────────────────────── */
 .notes-sec { padding: 44px 0; position: relative; z-index: 1; }
@@ -479,6 +486,9 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
   .fleet-tiers { grid-template-columns: 1fr; }
   .fleet-intro { grid-template-columns: 1fr; }
   .fleet-cta { flex-direction: column; gap: 18px; }
+  .fb-card { flex-direction: column; align-items: stretch; gap: 18px; }
+  .fb-ctas { flex-direction: column; width: 100%; }
+  .fb-ctas .btn-fleet, .fb-ctas .btn-s { width: 100%; text-align: center; }
 }
 @media (max-width: 640px) {
   .nav-links, .nav-cta { display: none; }
@@ -574,6 +584,20 @@ footer { padding: 48px 24px; text-align: center; border-top: 1px solid var(--bso
     <div class="hero-btns fade">
       <a class="btn-p" href="#booking">Book a Service</a>
       <a class="btn-s" href="#packages">View Packages</a>
+    </div>
+  </div>
+</section>
+
+<section id="fleet-banner" class="wrap" style="padding:22px 24px 0;">
+  <div class="fade fb-card">
+    <div class="fb-text">
+      <div class="fb-eyebrow">Now Accepting</div>
+      <h3 class="fb-h3">Built for Fleets. Still Built for You.</h3>
+      <p class="fb-sub">We're now taking on fleet and corporate contracts across Kingston, St. Andrew &amp; Portmore &mdash; same standard, at scale. Individual clients, book below.</p>
+    </div>
+    <div class="fb-ctas">
+      <a class="btn-fleet" href="fleet-quote.html">Fleet Pricing</a>
+      <a class="btn-s" href="#booking">Book Individual Service</a>
     </div>
   </div>
 </section>
