@@ -531,7 +531,7 @@ nav {
             <span class="dep-row-v" id="dep-balance">&mdash;</span>
           </div>
         </div>
-        <p class="ticket-terms">Refundable with <strong>24+ hours notice</strong>. Non-refundable for same-day cancellation or no-show.</p>
+        <p class="ticket-terms">Refundable with <strong>24+ hours notice</strong>. Non-refundable for same-day cancellation or no-show. This request holds your slot for <strong>48 hours</strong> — by <strong id="dep-deadline">&mdash;</strong> — after which it may be released if no deposit is received.</p>
         <div class="pay-options">
           <div class="pay-options-label">Secure Your Deposit Now</div>
           <div class="pay-options-row">
@@ -551,7 +551,7 @@ nav {
 
     <label class="consent-row fade" id="deposit-consent-row">
       <input type="checkbox" id="b-deposit-ack">
-      <span>I understand this is a <strong>booking request only</strong> — no deposit has been paid, and my slot is not held until my deposit is received.</span>
+      <span>I understand this is a <strong>booking request only</strong> — no deposit has been paid, and my slot is held for <strong>48 hours only</strong> (until <strong id="dep-deadline-ack">&mdash;</strong>), after which it may be released.</span>
     </label>
 
     <button class="btn fade" id="submit-btn" onclick="submitIntake()">Send Booking Request &rarr;</button>
@@ -655,6 +655,14 @@ if (dateEl) { const t = new Date(); t.setDate(t.getDate()+1); dateEl.min = t.toI
 /* Ticket number: EC- + last 5 of timestamp in base36, uppercased */
 document.getElementById('ticket-no').textContent =
   'NO. EC-' + Date.now().toString(36).slice(-5).toUpperCase();
+
+/* Deposit deadline: 48 hours from now, shown to the customer so the window is real and dated, not vague */
+const depositDeadline = new Date(Date.now() + 48 * 60 * 60 * 1000);
+const depositDeadlineStr = depositDeadline.toLocaleString('en-JM', {
+  weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+});
+document.getElementById('dep-deadline').textContent = depositDeadlineStr;
+document.getElementById('dep-deadline-ack').textContent = depositDeadlineStr;
 
 // ── DEPOSIT CALCULATOR ───────────────────────────────────────────
 // Fallback pricing — used instantly on load and if the live fetch below ever fails.
@@ -1235,7 +1243,7 @@ async function submitIntake() {
   await Promise.all(emailPromises);
 
   // Redirect through loading screen to thank you page
-  const tyParams   = new URLSearchParams({ name, svc, date: date || '', time: time || '', addr, dep: 'unpaid' });
+  const tyParams   = new URLSearchParams({ name, svc, date: date || '', time: time || '', addr, dep: 'unpaid', dl: depositDeadlineStr });
   const loadParams = new URLSearchParams({ dest: '/thankyou', q: tyParams.toString() });
   window.location.href = '/loading?' + loadParams.toString();
 }

@@ -138,7 +138,7 @@ body::after{
     within a few hours.
   </div>
   <div class="message" id="msg-deposit" style="display:none;font-style:normal;font-size:12px;color:#d6a3a3;margin-top:-16px;">
-    No deposit has been received yet. Your slot is not held until your deposit is paid — we'll send payment instructions on WhatsApp shortly.
+    No deposit has been received yet. Your slot is held for <strong>48 hours only</strong> — by <span id="dep-deadline-ty">&mdash;</span> — after which it may be released. We'll send payment instructions on WhatsApp shortly.
   </div>
 
   <div id="booking-summary" class="detail-box">
@@ -183,9 +183,11 @@ var date  = params.get('date');
 var time  = params.get('time');
 var addr  = params.get('addr');
 var dep   = params.get('dep');
+var dl    = params.get('dl');
 
 if (dep === 'unpaid') {
   document.getElementById('msg-deposit').style.display = 'block';
+  if (dl) document.getElementById('dep-deadline-ty').textContent = dl;
 }
 
 if (name || svc) {
