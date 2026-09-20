@@ -691,6 +691,8 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
 .b-rejected { background: var(--red-d);   color: var(--red);   border-color: rgba(207,91,91,.25); }
 .b-paid     { background: var(--green-d); color: var(--green); border-color: rgba(76,175,130,.25); }
 .b-unpaid   { background: var(--red-d);   color: var(--red);   border-color: rgba(207,91,91,.25); }
+.b-expired  { background: var(--red-d);   color: var(--red);   border-color: rgba(207,91,91,.45); font-weight: 700; }
+.b-expiring { background: var(--amber-d); color: var(--amber); border-color: rgba(212,168,67,.45); font-weight: 700; }
 
 /* ── ACTION BUTTONS ─────────────────────────────────────────────── */
 .btn-act {
@@ -2758,7 +2760,7 @@ async function loadPending() {
           `<span class="td-m">${x(r.clients?.phone || '—')}</span>`,
           vehicleCell(r),
           `<span class="td-m">${x(r.service_tier || '—')}</span>`,
-          `<span class="td-m">${fd(r.service_date)}</span>`,
+          `<span class="td-m">${fd(r.service_date)}${depositExpiryBadge(r) ? '<br>' + depositExpiryBadge(r) : ''}</span>`,
           `<span class="td-m" style="max-width:140px;white-space:normal;display:inline-block;">${x(r.clients?.service_address || '—')}</span>`,
           renderNotesCell(r.job_notes, 130),
           `<div style="display:flex;gap:6px;flex-wrap:wrap;">
@@ -3083,6 +3085,17 @@ function pBadge(s) {
   const v = (s || '').toLowerCase();
   if (v === 'paid') return '<span class="badge b-paid">Paid</span>';
   return `<span class="badge b-unpaid">${x(s || 'Pending')}</span>`;
+}
+
+/* Deposit-hold expiry: only fires on true unpaid 'Pending' rows — a WiPay
+   payment attempt (verified, unverified, or failed) means the customer
+   already engaged, so those statuses are never flagged as expired here. */
+function depositExpiryBadge(r) {
+  if ((r.payment_status || '').trim() !== 'Pending' || !r.created_at) return '';
+  const hoursLeft = 48 - (Date.now() - new Date(r.created_at).getTime()) / 3600000;
+  if (hoursLeft <= 0)  return '<span class="badge b-expired">EXPIRED — no deposit</span>';
+  if (hoursLeft <= 12) return `<span class="badge b-expiring">${Math.max(1, Math.round(hoursLeft))}h left</span>`;
+  return '';
 }
 
 function tblHtml(headers, rows) {

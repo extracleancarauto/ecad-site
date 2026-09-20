@@ -148,6 +148,7 @@ nav {
 .avail-cal-day.busy { background: rgba(210,160,90,.1); border-color: rgba(210,160,90,.22); color: rgba(220,180,120,.95); }
 .avail-cal-day.full { background: rgba(200,110,110,.1); border-color: rgba(200,110,110,.22); color: rgba(215,140,140,.95); }
 .avail-cal-day.today { box-shadow: 0 0 0 1px var(--silver-d); }
+.avail-cal-day.selected { background: rgba(120,190,150,.4) !important; border-color: rgba(120,190,150,.7) !important; color: #0a0f14 !important; font-weight: 700; box-shadow: 0 0 0 2px rgba(120,190,150,.5); }
 .avail-cal-note { font-size: 10px; color: var(--dim); margin-top: 12px; line-height: 1.6; }
 .fg input, .fg select, .fg textarea {
   background: var(--s3);
@@ -371,7 +372,9 @@ nav {
       <div class="form-grid">
         <div class="fg full"><label>Full Name *</label><input type="text" id="b-name" placeholder="Your full name" autocomplete="name"></div>
         <div class="fg"><label>WhatsApp / Phone *</label><input type="tel" id="b-phone" placeholder="(876) 000-0000" autocomplete="tel"></div>
-        <div class="fg"><label>Email *</label><input type="email" id="b-email" placeholder="email@example.com" autocomplete="email" required></div>
+        <div class="fg" id="email-fg"><label>Email *</label><input type="email" id="b-email" placeholder="email@example.com" autocomplete="email" required oninput="validateEmailLive()" onblur="validateEmailLive(true)">
+          <div id="email-hint" style="display:none;color:#e08b8b;font-size:11px;margin-top:5px;letter-spacing:.02em;">Please check this email — it doesn't look valid.</div>
+        </div>
         <div class="fg full"><label>Service Address *</label><input type="text" id="b-addr" placeholder="Where should we come to?"></div>
         <div class="fg full"><label>Shade / Coverage at the Location *</label>
           <select id="b-shade">
@@ -476,7 +479,7 @@ nav {
         <span class="step-hint">We confirm the exact slot via WhatsApp</span>
       </div>
       <div class="form-grid">
-        <div class="fg"><label>Preferred Date</label><input type="date" id="b-date"></div>
+        <div class="fg"><label>Preferred Date</label><input type="text" id="b-date" readonly placeholder="Tap an open day below" style="cursor:default;"></div>
         <div class="fg"><label>Preferred Time</label>
           <select id="b-time">
             <option value="" disabled selected>Select time</option>
@@ -489,10 +492,7 @@ nav {
         </div>
       </div>
 
-      <div class="avail-cal-toggle" id="avail-cal-toggle" onclick="toggleAvailCal()">
-        <span id="avail-cal-toggle-text">Not sure which day? See open days →</span>
-      </div>
-      <div class="avail-cal-wrap" id="avail-cal-wrap" style="display:none;">
+      <div class="avail-cal-wrap" id="avail-cal-wrap">
         <div class="avail-cal-head">
           <button type="button" class="avail-cal-nav" onclick="changeAvailMonth(-1)">&larr;</button>
           <span class="avail-cal-title" id="avail-cal-title">—</span>
@@ -649,9 +649,6 @@ async function uploadPhotos(phone) {
   return urls;
 }
 
-const dateEl = document.getElementById('b-date');
-if (dateEl) { const t = new Date(); t.setDate(t.getDate()+1); dateEl.min = t.toISOString().split('T')[0]; }
-
 /* Ticket number: EC- + last 5 of timestamp in base36, uppercased */
 document.getElementById('ticket-no').textContent =
   'NO. EC-' + Date.now().toString(36).slice(-5).toUpperCase();
@@ -736,34 +733,17 @@ const WIPAY = {
 // back to OFF (the safe default) rather than risking it being silently on.
 let CARD_PAYMENT_ENABLED = false;
 
-// ── AVAILABILITY CALENDAR (read-only, public) ────────────────────
+// ── AVAILABILITY CALENDAR (now the primary, public date picker) ──
 let availCalData = {};
 let availCalYear, availCalMonth;
-let availCalLoaded = false;
 const AVAIL_MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const AVAIL_DOW = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
 
-function toggleAvailCal() {
-  const wrap = document.getElementById('avail-cal-wrap');
-  const toggleText = document.getElementById('avail-cal-toggle-text');
-  const isOpen = wrap.style.display !== 'none';
-
-  if (isOpen) {
-    wrap.style.display = 'none';
-    toggleText.textContent = 'Not sure which day? See open days →';
-    return;
-  }
-
-  wrap.style.display = 'block';
-  toggleText.textContent = 'Hide calendar ↑';
-
-  if (!availCalLoaded) {
-    const now = new Date();
-    availCalYear = now.getFullYear();
-    availCalMonth = now.getMonth();
-    loadAvailCalData();
-  }
-}
+/* Availability calendar is now the only way to set a date — load it immediately. */
+const availInitNow = new Date();
+availCalYear = availInitNow.getFullYear();
+availCalMonth = availInitNow.getMonth();
+loadAvailCalData();
 
 async function loadAvailCalData() {
   const grid = document.getElementById('avail-cal-grid');
@@ -824,6 +804,7 @@ function renderAvailCal() {
     else if (avail && avail.status === 'fully-booked') cls += ' full';
     if (isPast) cls += ' past';
     if (dateObj.toDateString() === today.toDateString()) cls += ' today';
+    if (dateStr === document.getElementById('b-date').value) cls += ' selected';
     cell.className = cls;
     cell.textContent = d;
 
@@ -831,6 +812,7 @@ function renderAvailCal() {
       cell.onclick = () => {
         document.getElementById('b-date').value = dateStr;
         document.getElementById('b-date').dispatchEvent(new Event('change'));
+        renderAvailCal();
       };
     }
 
@@ -1078,6 +1060,30 @@ function showErr(msg) {
   e.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
+/* Simple sanity check, not full RFC validation — catches typos like
+   missing '@' or '.' without rejecting legitimate unusual addresses. */
+function isValidEmail(v) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+}
+
+/* Live email feedback while booking: clears the moment it becomes valid,
+   but only shows the error on blur so it doesn't flash mid-keystroke. */
+function validateEmailLive(onBlur) {
+  const val  = document.getElementById('b-email').value.trim();
+  const hint = document.getElementById('email-hint');
+  const fg   = document.getElementById('email-fg');
+
+  if (!val) { hint.style.display = 'none'; fg.classList.remove('field-error'); return; }
+
+  if (isValidEmail(val)) {
+    hint.style.display = 'none';
+    fg.classList.remove('field-error');
+  } else if (onBlur) {
+    hint.style.display = 'block';
+    fg.classList.add('field-error');
+  }
+}
+
 async function submitIntake() {
   const name  = document.getElementById('b-name').value.trim();
   const phone = document.getElementById('b-phone').value.trim();
@@ -1091,10 +1097,20 @@ async function submitIntake() {
   const referralCode = document.getElementById('b-referral').value.trim().toUpperCase();
   document.getElementById('form-err').classList.remove('show');
 
-  if (!name || !phone || !addr || !vtype || !svc || !email || !condition || !shade) {
-    showErr('Please fill in all required fields marked *, including your email, when the vehicle was last detailed, and the shade/coverage at your location.');
+  if (!name || !phone || !addr || !vtype || !svc || !email || !condition || !shade || !document.getElementById('b-date').value) {
+    showErr('Please fill in all required fields marked *, including your email, an open date from the calendar, when the vehicle was last detailed, and the shade/coverage at your location.');
     return;
   }
+
+  const emailFg = document.getElementById('email-fg');
+  if (!isValidEmail(email)) {
+    emailFg.classList.add('field-error');
+    document.getElementById('email-hint').style.display = 'block';
+    emailFg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showErr('That email address doesn\'t look right — please double-check it before sending.');
+    return;
+  }
+  emailFg.classList.remove('field-error');
 
   const depositAck = document.getElementById('b-deposit-ack');
   const consentRow = document.getElementById('deposit-consent-row');
