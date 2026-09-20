@@ -308,6 +308,11 @@ nav {
 .footer-note { text-align: center; font-size: 11px; color: var(--dim); margin: 18px 0 70px; line-height: 1.75; }
 .footer-note a { color: var(--silver-d); text-decoration: none; }
 .footer-note a:hover { color: var(--silver); }
+.consent-row { display: flex; align-items: flex-start; gap: 10px; margin: 22px 0 6px; padding: 14px 16px; background: rgba(176,82,82,.06); border: 1px solid rgba(176,82,82,.25); border-radius: 8px; cursor: pointer; }
+.consent-row input[type="checkbox"] { margin-top: 2px; width: 16px; height: 16px; flex-shrink: 0; accent-color: var(--silver-l); cursor: pointer; }
+.consent-row span { font-size: 11.5px; color: var(--muted); line-height: 1.65; }
+.consent-row span strong { color: #d6a3a3; }
+.consent-row.field-error { border-color: #b05252; background: rgba(176,82,82,.14); }
 
 /* ── SUCCESS ──────────────────────────────────────────────────── */
 .success { display: none; text-align: center; background: var(--s1); border: 1px solid var(--border); border-radius: 10px; padding: 56px 30px; margin-bottom: 70px; }
@@ -543,6 +548,11 @@ nav {
       <div class="bypass-l">Maintenance Plan Enrolment</div>
       <div class="bypass-b">Plan pricing and your recurring schedule are confirmed with you personally &mdash; submit your request and we'll finalise everything on <strong>WhatsApp within a few hours</strong>. Members save <strong>10% on every visit</strong>.</div>
     </div>
+
+    <label class="consent-row fade" id="deposit-consent-row">
+      <input type="checkbox" id="b-deposit-ack">
+      <span>I understand this is a <strong>booking request only</strong> — no deposit has been paid, and my slot is not held until my deposit is received.</span>
+    </label>
 
     <button class="btn fade" id="submit-btn" onclick="submitIntake()">Send Booking Request &rarr;</button>
     <div class="form-err" id="form-err"></div>
@@ -1078,6 +1088,16 @@ async function submitIntake() {
     return;
   }
 
+  const depositAck = document.getElementById('b-deposit-ack');
+  const consentRow = document.getElementById('deposit-consent-row');
+  if (!depositAck.checked) {
+    consentRow.classList.add('field-error');
+    consentRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    showErr('Please confirm you understand no deposit has been paid yet before sending your request.');
+    return;
+  }
+  consentRow.classList.remove('field-error');
+
   if (selectedPhotos.length === 0) {
     document.getElementById('photo-fg').classList.add('field-error');
     document.getElementById('photo-fg').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1215,7 +1235,7 @@ async function submitIntake() {
   await Promise.all(emailPromises);
 
   // Redirect through loading screen to thank you page
-  const tyParams   = new URLSearchParams({ name, svc, date: date || '', time: time || '', addr });
+  const tyParams   = new URLSearchParams({ name, svc, date: date || '', time: time || '', addr, dep: 'unpaid' });
   const loadParams = new URLSearchParams({ dest: '/thankyou', q: tyParams.toString() });
   window.location.href = '/loading?' + loadParams.toString();
 }

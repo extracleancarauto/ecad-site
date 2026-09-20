@@ -132,10 +132,13 @@ body::after{
   <div class="rule"></div>
   <div class="headline">Thank <em>You.</em></div>
   <div class="tagline">Extra Clean Auto Detailing</div>
-  <div class="message">
+  <div class="message" id="msg-received">
     Your booking request has been received.<br>
     We will confirm your appointment via WhatsApp<br>
     within a few hours.
+  </div>
+  <div class="message" id="msg-deposit" style="display:none;font-style:normal;font-size:12px;color:#d6a3a3;margin-top:-16px;">
+    No deposit has been received yet. Your slot is not held until your deposit is paid — we'll send payment instructions on WhatsApp shortly.
   </div>
 
   <div id="booking-summary" class="detail-box">
@@ -179,6 +182,11 @@ var svc   = params.get('svc');
 var date  = params.get('date');
 var time  = params.get('time');
 var addr  = params.get('addr');
+var dep   = params.get('dep');
+
+if (dep === 'unpaid') {
+  document.getElementById('msg-deposit').style.display = 'block';
+}
 
 if (name || svc) {
   document.getElementById('booking-summary').classList.add('show');
