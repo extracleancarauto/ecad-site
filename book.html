@@ -168,7 +168,26 @@ nav {
 .fg select option, .fg select optgroup { background: #1a1a1a; }
 .fg textarea { resize: vertical; min-height: 84px; }
 .fg input:focus-visible, .fg select:focus-visible, .fg textarea:focus-visible, .btn:focus-visible { outline: 2px solid var(--silver-d); outline-offset: 1px; }
-.fg.field-error input, .fg.field-error .photo-drop { border-color: #b05252; }
+.fg.field-error input, .fg.field-error select, .fg.field-error .photo-drop { border-color: #b05252; }
+
+/* ceramic coating question */
+.what-is { margin: 2px 0 4px; }
+.what-is summary {
+  display: inline-block; cursor: pointer; list-style: none;
+  font-size: 11px; font-weight: 500; letter-spacing: .02em;
+  color: var(--copper-l); background: var(--copper-b);
+  padding: 3px 10px; border-radius: 4px;
+  text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px;
+  transition: background .2s;
+}
+.what-is summary::-webkit-details-marker { display: none; }
+.what-is summary:hover { background: rgba(201,120,60,0.34); }
+.what-is summary:focus-visible { outline: 2px solid var(--silver-d); outline-offset: 2px; }
+.what-is p {
+  margin: 8px 0 4px; padding: 11px 13px;
+  font-size: 12px; line-height: 1.7; color: var(--muted);
+  background: var(--s2); border-left: 2px solid var(--copper); border-radius: 0 4px 4px 0;
+}
 
 /* photo upload */
 .photo-drop {
@@ -419,6 +438,24 @@ nav {
             <option value="neglected">Over 6 months ago</option>
             <option value="never">Never / Not sure</option>
           </select>
+        </div>
+        <div class="fg full" id="ceramic-fg"><label>Has this vehicle ever been ceramic coated? *</label>
+          <details class="what-is">
+            <summary>What is ceramic coating?</summary>
+            <p>Ceramic coating is a liquid protective layer applied to a car&rsquo;s paint that bonds to it and hardens into a clear, glass-like shield. It repels water and dirt, makes washing easier, and helps protect against sun damage and light chemical stains. Unlike regular wax, which wears off in weeks, a professionally applied coating can last for years.</p>
+          </details>
+          <select id="b-ceramic" onchange="toggleCeramicDetails()">
+            <option value="" disabled selected>Select an option</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="unsure">Not sure</option>
+          </select>
+        </div>
+        <div class="fg full" id="ceramic-extra-fg" style="display:none;"><label>Who applied it, roughly when, and what product? <span class="soft">(if you know)</span></label>
+          <input type="text" id="b-ceramic-details" placeholder="e.g. Shop name, about 8 months ago, 2-year coating" maxlength="200">
+        </div>
+        <div class="fg full"><label>Last time the paint was polished, waxed, or sealed? <span class="soft">(optional)</span></label>
+          <input type="text" id="b-protection" placeholder="e.g. 3 months ago, never, not sure" maxlength="120">
         </div>
         <div class="fg full" id="photo-fg">
           <label>Vehicle Condition Photos * <span class="soft">(2&ndash;3 photos &mdash; exterior, interior, any specific concerns)</span></label>
@@ -846,6 +883,31 @@ async function loadCardPaymentSetting() {
 
 document.addEventListener('DOMContentLoaded', loadCardPaymentSetting);
 
+// Ceramic coating answers — shared by the card (WiPay) and bank-transfer paths.
+function toggleCeramicDetails() {
+  const show = document.getElementById('b-ceramic').value === 'yes';
+  document.getElementById('ceramic-extra-fg').style.display = show ? '' : 'none';
+  if (!show) document.getElementById('b-ceramic-details').value = '';
+  document.getElementById('ceramic-fg').classList.remove('field-error');
+}
+
+function getCeramic() {
+  const status = document.getElementById('b-ceramic').value;
+  const details = status === 'yes' ? document.getElementById('b-ceramic-details').value.trim() : '';
+  const protection = document.getElementById('b-protection').value.trim();
+  const label = { yes: 'YES', no: 'No', unsure: 'Not sure (verify on arrival)' }[status] || '';
+  return { status, details, protection, label };
+}
+
+function requireCeramic() {
+  if (document.getElementById('b-ceramic').value) return true;
+  const fg = document.getElementById('ceramic-fg');
+  fg.classList.add('field-error');
+  fg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  showErr('Please tell us whether the vehicle has ever been ceramic coated (choose "Not sure" if you don\'t know) — it changes the products we bring.');
+  return false;
+}
+
 async function payWithWiPay() {
   if (!CARD_PAYMENT_ENABLED) {
     alert('Card payment is temporarily unavailable. Please use bank transfer — instructions will be sent via WhatsApp after you submit your booking.');
@@ -882,6 +944,9 @@ async function payWithWiPay() {
     showErr('Please fill in your name, email, and phone before paying — we need these to confirm your booking.');
     return;
   }
+
+  if (!requireCeramic()) return;
+  const ceramic = getCeramic();
 
   if (selectedPhotos.length === 0) {
     document.getElementById('photo-fg').classList.add('field-error');
@@ -922,7 +987,10 @@ async function payWithWiPay() {
         photo_urls: photoUrls.length ? photoUrls.join(', ') : null,
         vtype, vdetail, plate, color,
         condition: conditionText,
-        shade
+        shade,
+        ceramic_status: ceramic.status,
+        ceramic_details: ceramic.details,
+        last_protection: ceramic.protection
       })
     });
     const result = await resp.json();
@@ -1122,6 +1190,9 @@ async function submitIntake() {
   }
   consentRow.classList.remove('field-error');
 
+  if (!requireCeramic()) return;
+  const ceramic = getCeramic();
+
   if (selectedPhotos.length === 0) {
     document.getElementById('photo-fg').classList.add('field-error');
     document.getElementById('photo-fg').scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1195,7 +1266,9 @@ async function submitIntake() {
           client_id: clientId,
           make: parts[0] || null, model: parts[1] || null,
           year, color: color || null, plate: plate || null,
-          vehicle_type: vtype
+          vehicle_type: vtype,
+          ceramic_status: ceramic.status,
+          ceramic_details: ceramic.details || null
         }]).select('id').single();
         vehicleId = veh?.id;
       }
@@ -1208,6 +1281,8 @@ async function submitIntake() {
         'Booking ref: ' + ticketNo,
         referralCode ? 'Referral code used: ' + referralCode : null,
         vehicleStr ? 'Vehicle detail: ' + vehicleStr : null,
+        'Ceramic coating: ' + ceramic.label + (ceramic.details ? ' (' + ceramic.details + ')' : ''),
+        ceramic.protection ? 'Last protected: ' + ceramic.protection : null,
         date ? 'Requested date: ' + date : null,
         time ? 'Requested time: ' + time : null,
         conditionText ? 'Last detailed: ' + conditionText : null,

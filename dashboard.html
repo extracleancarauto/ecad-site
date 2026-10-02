@@ -704,6 +704,17 @@ tbody tr:hover td { background: rgba(255,255,255,.025); }
   cursor: pointer; white-space: nowrap;
   transition: all .2s;
 }
+/* ── CERAMIC COATING CELL ───────────────────────────────────────── */
+.cer-cell { display: flex; flex-direction: column; gap: 6px; min-width: 128px; }
+.cer-claim { font-size: 10px; font-weight: 600; letter-spacing: .04em; color: var(--muted); }
+.cer-claim.yes { color: var(--amber); }
+.cer-claim.warn { color: var(--red); }
+.cer-sel {
+  font-family: 'Sora', sans-serif; font-size: 10px;
+  background: var(--s3, #1e1e1e); color: var(--text, #f0ede6);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 4px;
+  padding: 5px 6px; cursor: pointer;
+}
 .btn-approve { background: var(--green-d); color: var(--green); border-color: rgba(76,175,130,.3); }
 .btn-approve:hover { background: rgba(76,175,130,.25); }
 .btn-reject  { background: var(--red-d);   color: var(--red);   border-color: rgba(207,91,91,.3); }
@@ -2721,7 +2732,7 @@ async function loadPending() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone, service_address), vehicles(make, model, year, color, plate, vehicle_type)')
+      .select('*, clients(full_name, phone, service_address), vehicles(make, model, year, color, plate, vehicle_type, ceramic_status, ceramic_details)')
       .in('payment_status', [
         'Pending',
         'Deposit Paid (WiPay — Verified)',
@@ -2744,7 +2755,7 @@ async function loadPending() {
     }
 
     wrap.innerHTML = tblHtml(
-      ['Client', 'Phone', 'Vehicle', 'Service', 'Date', 'Address', 'Notes', 'Actions'],
+      ['Client', 'Phone', 'Vehicle', 'Ceramic', 'Service', 'Date', 'Address', 'Notes', 'Actions'],
       data.map(r => {
         const inv = encodeURIComponent(JSON.stringify({
           name:    r.clients?.full_name        || '',
@@ -2759,6 +2770,7 @@ async function loadPending() {
           `<span class="td-name">${x(r.clients?.full_name || '—')}</span>`,
           `<span class="td-m">${x(r.clients?.phone || '—')}</span>`,
           vehicleCell(r),
+          ceramicCell(r),
           `<span class="td-m">${x(r.service_tier || '—')}</span>`,
           `<span class="td-m">${fd(r.service_date)}${depositExpiryBadge(r) ? '<br>' + depositExpiryBadge(r) : ''}</span>`,
           `<span class="td-m" style="max-width:140px;white-space:normal;display:inline-block;">${x(r.clients?.service_address || '—')}</span>`,
@@ -2992,7 +3004,7 @@ async function loadRecords() {
 
   try {
     const { data, error } = await db.from('service_records')
-      .select('*, clients(full_name, phone)')
+      .select('*, clients(full_name, phone), vehicles(ceramic_status, ceramic_details)')
       .order('service_date', { ascending: false });
 
     if (error) throw error;
@@ -3004,7 +3016,7 @@ async function loadRecords() {
     }
 
     wrap.innerHTML = tblHtml(
-      ['Client', 'Phone', 'Service / Tier', 'Service Date', 'Payment', 'Notes', ''],
+      ['Client', 'Phone', 'Service / Tier', 'Service Date', 'Payment', 'Ceramic', 'Notes', ''],
       data.map(r => {
         const recData = encodeURIComponent(JSON.stringify({
           id: r.id,
@@ -3021,6 +3033,7 @@ async function loadRecords() {
           `<span class="td-m">${x(r.service_tier || '—')}</span>`,
           `<span class="td-m">${fd(r.service_date)}</span>`,
           pBadge(r.payment_status),
+          ceramicCell(r),
           renderNotesCell(r.job_notes, 180),
           `<div style="display:flex;gap:6px;flex-wrap:wrap;">
              <button class="btn-act btn-edit" data-rec="${recData}" onclick="openRecordModal(this)">Edit</button>
@@ -3038,6 +3051,38 @@ async function loadRecords() {
 }
 
 // ── HELPERS ───────────────────────────────────────────────────────
+// Ceramic coating: shows what the customer claimed on the booking form and
+// lets you record what you actually found on arrival (water-bead test).
+// ceramic_verified_on_site: null = not checked, true = coating confirmed,
+// false = checked, no coating found.
+function ceramicCell(r) {
+  const claim = r.vehicles?.ceramic_status || '';
+  const verified = r.ceramic_verified_on_site;
+  const claimTxt = { yes: 'Claims: YES', no: 'Claims: No', unsure: 'Claims: Not sure' }[claim] || 'No answer';
+  const mismatch = (verified === true && claim === 'no') || (verified === false && claim === 'yes');
+  const cls = mismatch ? 'warn' : (claim === 'yes' || verified === true ? 'yes' : '');
+  const val = verified === true ? 'true' : verified === false ? 'false' : '';
+  const detail = r.vehicles?.ceramic_details ? ` title="${x(r.vehicles.ceramic_details)}"` : '';
+  return `<div class="cer-cell">
+    <span class="cer-claim ${cls}"${detail}>${x(claimTxt)}${mismatch ? ' ⚠ differs' : ''}</span>
+    <select class="cer-sel" onchange="setCeramicVerified('${r.id}', this)" aria-label="Ceramic coating found on site">
+      <option value=""${val === '' ? ' selected' : ''}>Not checked</option>
+      <option value="true"${val === 'true' ? ' selected' : ''}>✓ Coating confirmed</option>
+      <option value="false"${val === 'false' ? ' selected' : ''}>✗ No coating found</option>
+    </select>
+  </div>`;
+}
+
+async function setCeramicVerified(id, sel) {
+  const v = sel.value === '' ? null : sel.value === 'true';
+  try {
+    const { error } = await db.from('service_records').update({ ceramic_verified_on_site: v }).eq('id', id);
+    if (error) throw error;
+    toast(v === null ? 'Ceramic check cleared' : v ? 'Coating confirmed on site' : 'No coating found — recorded', 'ok');
+    loadPending();
+    loadRecords();
+  } catch (e) { toast(e.message, 'err'); }
+}
 function x(s) {
   return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
