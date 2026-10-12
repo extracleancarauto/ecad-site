@@ -216,6 +216,31 @@ nav {
 }
 .photo-thumb .rm:hover { color: #e08b8b; border-color: #b05252; }
 
+/* ── ADD-ON CHECKBOXES ────────────────────────────────────────── */
+#addons-fg { display: none; }
+#addons-fg.show { display: flex; }
+.addon-hint { font-size: 11px; color: var(--muted); line-height: 1.6; margin-bottom: 4px; }
+.addon-group-label { font-size: 9px; font-weight: 600; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); margin: 10px 0 6px; }
+.addon-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.addon-item {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--s3); border: 1px solid var(--bsoft); border-radius: 6px;
+  padding: 11px 12px; cursor: pointer; transition: border-color .2s, background .2s;
+}
+.addon-item:hover { border-color: var(--border); }
+.addon-item.checked { border-color: var(--silver-d); background: #232323; }
+.addon-item.locked { opacity: .45; cursor: not-allowed; }
+.fg .addon-item input[type="checkbox"] {
+  -webkit-appearance: auto; appearance: auto;
+  width: 16px; height: 16px; padding: 0; margin: 0; flex-shrink: 0;
+  accent-color: var(--silver-l); background: none; border: none; cursor: pointer;
+}
+.addon-item.locked input[type="checkbox"] { cursor: not-allowed; }
+.addon-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.addon-name { font-size: 12px; color: var(--text); line-height: 1.3; }
+.addon-price { font-size: 10.5px; color: var(--muted); }
+.addon-why { font-size: 10px; color: var(--copper-l); }
+
 /* ── LIVE ESTIMATE ROW ────────────────────────────────────────── */
 .est-row {
   display: none;
@@ -344,6 +369,7 @@ nav {
 
 @media (max-width: 560px) {
   .form-grid { grid-template-columns: 1fr; }
+  .addon-grid { grid-template-columns: 1fr; }
   .step-card, .ticket-body { padding: 22px 20px; }
   .step-hint { display: none; }
   .est-row.show { flex-direction: column; align-items: flex-start; gap: 8px; }
@@ -494,7 +520,14 @@ nav {
             </optgroup>
           </select>
         </div>
-        <div class="fg full"><label>Add-Ons or Special Instructions</label><textarea id="b-notes" placeholder="Pet hair, stains, odour, anything we should know..."></textarea></div>
+        <div class="fg full" id="addons-fg"><label>Add-Ons <span class="soft">(optional &mdash; added to your estimate and deposit)</span></label>
+          <div class="addon-hint" id="addon-hint">Tick any extras you&rsquo;d like with your package.</div>
+          <div class="addon-group-label">Exterior</div>
+          <div class="addon-grid" id="addon-grid-ext"></div>
+          <div class="addon-group-label">Interior</div>
+          <div class="addon-grid" id="addon-grid-int"></div>
+        </div>
+        <div class="fg full"><label>Special Instructions <span class="soft">(optional)</span></label><textarea id="b-notes" placeholder="Stains, problem areas, gate codes, anything we should know..."></textarea></div>
       </div>
       <div class="est-row" id="est-row">
         <div>
@@ -748,6 +781,93 @@ const SVC_ACCENT = {
 };
 const DEPOSIT_RATE = 0.35;
 
+// ── ADD-ONS ──────────────────────────────────────────────────────
+// Prices mirror the Add-On Services menu on index.html — keep the two in sync.
+// [low, high]: fixed prices have low === high. "from" = open-ended price, low end used.
+// needsWash: exterior decon work that can't be done on an unwashed car, so it's
+//   locked for interior-only (Cabin Revival) bookings.
+// includedIn: service keys whose package already contains this — locked there.
+const ADDONS = [
+  { id: 'iron',     name: 'Iron Fallout Removal',       group: 'ext', price: [2500, 2500], needsWash: true, includedIn: ['t3'] },
+  { id: 'clay',     name: 'Clay Bar Decontamination',   group: 'ext', price: [3000, 3000], needsWash: true, includedIn: ['t3'] },
+  { id: 'spots',    name: 'Water Spot Removal',         group: 'ext', price: [2500, 4000], needsWash: true, includedIn: [] },
+  { id: 'sealant',  name: 'Cerakote Ceramic Sealant',   group: 'ext', price: [3500, 3500], needsWash: true, includedIn: ['t3'] },
+  { id: 'pethair',  name: 'Pet Hair Removal',           group: 'int', price: [2000, 4000], includedIn: [] },
+  { id: 'odour',    name: 'Odour / Ozone Treatment',    group: 'int', price: [3000, 3000], from: true, includedIn: [] },
+  { id: 'mould',    name: 'Mould / Mildew Treatment',   group: 'int', price: [3000, 3000], from: true, includedIn: [] },
+  { id: 'intdet',   name: 'Cerakote Interior Detailer', group: 'int', price: [2500, 2500], includedIn: ['t2', 't3', 'crs'] },
+  { id: 'childseat',name: 'Child Seat Detail',          group: 'int', price: [1500, 1500], includedIn: [] }
+];
+const INTERIOR_ONLY = ['cr', 'crs'];
+
+function addonPriceLabel(a) {
+  const [lo, hi] = a.price;
+  if (a.from) return 'from JMD ' + fmtNum(lo);
+  return lo === hi ? 'JMD ' + fmtNum(lo) : 'JMD ' + fmtNum(lo) + '–' + fmtNum(hi);
+}
+
+function renderAddons() {
+  ['ext', 'int'].forEach(g => {
+    const grid = document.getElementById('addon-grid-' + g);
+    grid.innerHTML = ADDONS.filter(a => a.group === g).map(a =>
+      '<label class="addon-item" id="addon-row-' + a.id + '">' +
+        '<input type="checkbox" value="' + a.id + '" onchange="onAddonToggle()">' +
+        '<span class="addon-txt"><span class="addon-name">' + a.name + '</span>' +
+        '<span class="addon-price">' + addonPriceLabel(a) + '</span>' +
+        '<span class="addon-why" id="addon-why-' + a.id + '"></span></span>' +
+      '</label>'
+    ).join('');
+  });
+}
+
+// Lock add-ons that don't fit the chosen service; clears any that became invalid.
+function syncAddonAvailability() {
+  const svc = document.getElementById('b-service').value;
+  const key = SVC_KEY[svc];
+  const fg  = document.getElementById('addons-fg');
+  // Hidden until a priced service is chosen (and never for Maintenance Plan)
+  fg.classList.toggle('show', !!key);
+  const interiorOnly = INTERIOR_ONLY.includes(key);
+  document.getElementById('addon-hint').textContent = interiorOnly
+    ? 'Exterior decontamination needs a wash first, so it’s only available with an exterior package (Tier 0–3).'
+    : 'Tick any extras you’d like with your package.';
+
+  ADDONS.forEach(a => {
+    const row = document.getElementById('addon-row-' + a.id);
+    const box = row.querySelector('input');
+    let why = '';
+    if (key && a.includedIn.includes(key)) why = 'Included in your package';
+    else if (interiorOnly && a.needsWash)  why = 'Needs an exterior package';
+    box.disabled = !!why;
+    if (why) box.checked = false;
+    row.classList.toggle('locked', !!why);
+    row.classList.toggle('checked', box.checked);
+    document.getElementById('addon-why-' + a.id).textContent = why;
+  });
+}
+
+function onAddonToggle() {
+  ADDONS.forEach(a => {
+    const row = document.getElementById('addon-row-' + a.id);
+    row.classList.toggle('checked', row.querySelector('input').checked);
+  });
+  updateDeposit();
+}
+
+function getSelectedAddons() {
+  return ADDONS.filter(a => {
+    const box = document.querySelector('#addon-row-' + a.id + ' input');
+    return box && box.checked && !box.disabled;
+  });
+}
+
+// One readable line for job notes, emails and the WiPay record
+function addonsSummary() {
+  const sel = getSelectedAddons();
+  return sel.length ? sel.map(a => a.name + ' (' + addonPriceLabel(a) + ')').join(', ') : '';
+}
+renderAddons();
+
 // ── WIPAY CONFIGURATION ──────────────────────────────────────────
 // Switch ENVIRONMENT to 'live' only after a successful sandbox test end-to-end.
 const WIPAY = {
@@ -990,7 +1110,10 @@ async function payWithWiPay() {
         shade,
         ceramic_status: ceramic.status,
         ceramic_details: ceramic.details,
-        last_protection: ceramic.protection
+        last_protection: ceramic.protection,
+        // Add-ons and special instructions — previously lost on the card path
+        addons: addonsSummary() || null,
+        notes:  document.getElementById('b-notes').value.trim() || null
       })
     });
     const result = await resp.json();
@@ -1071,6 +1194,8 @@ function updateDeposit() {
   const bypass    = document.getElementById('bypass-note');
   const estRow    = document.getElementById('est-row');
 
+  syncAddonAvailability();
+
   if (!svc) {
     box.classList.remove('show'); bypass.classList.remove('show'); estRow.classList.remove('show');
     return;
@@ -1099,12 +1224,24 @@ function updateDeposit() {
     return;
   }
 
-  const [lo, hi] = PRICES[vtype][key];
+  const [svcLo, svcHi] = PRICES[vtype][key];
   const weight    = CONDITION_WEIGHT[condition] !== undefined ? CONDITION_WEIGHT[condition] : 0.5;
+
+  // Add-ons stack on top of the package: ranges add to both ends, and the
+  // condition weighting applies to them the same way it does to the package.
+  const addons    = getSelectedAddons();
+  const addLo     = addons.reduce((s, a) => s + a.price[0], 0);
+  const addHi     = addons.reduce((s, a) => s + a.price[1], 0);
+  const lo        = svcLo + addLo;
+  const hi        = svcHi + addHi;
+
   const estimate  = lo + (hi - lo) * weight;
   const deposit   = estimate * DEPOSIT_RATE;
   const balance   = estimate - deposit;
 
+  document.getElementById('est-svc').textContent = addons.length
+    ? svc + ' + ' + addons.length + ' add-on' + (addons.length > 1 ? 's' : '')
+    : svc;
   document.getElementById('est-val').innerHTML = '<small>JMD</small>' + fmtNum(lo) + '\u2013' + fmtNum(hi);
   document.getElementById('est-note').textContent = condition
     ? 'Estimate weighted to your vehicle\u2019s condition'
@@ -1206,6 +1343,10 @@ async function submitIntake() {
   const date    = document.getElementById('b-date').value;
   const time    = document.getElementById('b-time').value;
   const notes   = document.getElementById('b-notes').value.trim();
+  const addonsText = addonsSummary();
+  const addonNames = getSelectedAddons().map(a => a.name).join(', ');
+  // Service line for emails — shows add-ons so neither side misses them
+  const svcWithAddons = addonNames ? svc + ' + ' + addonNames : svc;
   const ticketNo = document.getElementById('ticket-no').textContent.replace('NO. ', '');
 
   // Build a single vehicle string for invoice prefill and job notes
@@ -1287,6 +1428,7 @@ async function submitIntake() {
         time ? 'Requested time: ' + time : null,
         conditionText ? 'Last detailed: ' + conditionText : null,
         shade ? 'Shade/coverage: ' + shade : null,
+        addonsText ? 'Add-ons: ' + addonsText : null,
         depositText && depositText !== '\u2014' ? 'Deposit required: ' + depositText : null,
         photoUrls.length ? 'Photos: ' + photoUrls.join(', ') : 'Photos: none uploaded (check manually)',
         notes || null
@@ -1310,7 +1452,7 @@ async function submitIntake() {
     emailjs.send('service_zesixiz', 'template_gya3qb7', {
       to_email:    email,
       client_name: name,
-      service:     svc,
+      service:     svcWithAddons,
       date:        date || 'To be confirmed',
       time:        time || 'To be confirmed',
       address:     addr,
@@ -1324,7 +1466,7 @@ async function submitIntake() {
       to_email:    'extracleancarwash@gmail.com',
       client_name: name,
       phone:       phone,
-      service:     svc,
+      service:     svcWithAddons,
       date:        date || 'To be confirmed',
       time:        time || 'To be confirmed',
       address:     addr
@@ -1334,7 +1476,7 @@ async function submitIntake() {
   await Promise.all(emailPromises);
 
   // Redirect through loading screen to thank you page
-  const tyParams   = new URLSearchParams({ name, svc, date: date || '', time: time || '', addr, dep: 'unpaid', dl: depositDeadlineStr });
+  const tyParams   = new URLSearchParams({ name, svc: svcWithAddons, date: date || '', time: time || '', addr, dep: 'unpaid', dl: depositDeadlineStr });
   const loadParams = new URLSearchParams({ dest: '/thankyou', q: tyParams.toString() });
   window.location.href = '/loading?' + loadParams.toString();
 }
