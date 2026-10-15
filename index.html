@@ -15,6 +15,7 @@
 <meta name="twitter:description" content="Premium mobile car detailing in Kingston, St. Andrew & Portmore. Not just a wash — a standard.">
 <meta name="twitter:image" content="https://ecadja.com/hero-detail.jpg">
 <title>Extra Clean Auto Detailing — Jamaica</title>
+<script>/* Breast Cancer Awareness Month: pink theme runs automatically in October only */(function(){try{if(new Date().getMonth()===9)document.documentElement.classList.add('pink');}catch(e){}})();</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <link rel="icon" type="image/x-icon" href="https://ecadja.com/favicon.ico">
@@ -26,7 +27,7 @@
 <style>
 :root{
   --black:#0a0a0a;--s0:#0d0e11;--s1:#111215;--s2:#16171b;--s3:#1d1f24;
-  --navy:#162340;--navy-d:#0c1528;--navy-x:#070b14;
+  --navy:#162340;--navy-d:#0c1528;--navy-x:#070b14;--navy-rgb:22,35,64;
   --silver:#b8c8d6;--silver-l:#d4e2ec;--silver-d:#6c7c8c;
   --text:#f0ede6;--muted:#9a948a;
   --gold:#e8b84c;--gold-l:#f0cc78;--gold-b:rgba(232,184,76,.38);
@@ -74,7 +75,7 @@ header{position:sticky;top:0;z-index:30;background:rgba(10,10,10,.86);backdrop-f
 
 /* ───── SHOWCASE (hero) ───── */
 .stage{min-height:calc(100vh - var(--nav) - 34px);display:grid;grid-template-columns:61fr 39fr}
-.left{position:relative;background:radial-gradient(120% 80% at 50% 110%,rgba(22,35,64,.55),transparent 60%),radial-gradient(60% 40% at 50% 0%,rgba(232,184,76,.05),transparent 70%),var(--s0);display:flex;flex-direction:column;align-items:center;padding:30px 56px 30px 92px;overflow:hidden}
+.left{position:relative;background:radial-gradient(120% 80% at 50% 110%,rgba(var(--navy-rgb),.55),transparent 60%),radial-gradient(60% 40% at 50% 0%,rgba(232,184,76,.05),transparent 70%),var(--s0);display:flex;flex-direction:column;align-items:center;padding:30px 56px 30px 92px;overflow:hidden}
 .cls{position:absolute;right:28px;top:26px;display:flex;border:1px solid var(--line-2);border-radius:999px;padding:3px}
 .cls button{min-height:34px;padding:0 14px;border-radius:999px;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--silver)}
 .cls button[aria-pressed="true"]{background:var(--gold);color:var(--black)}
@@ -150,6 +151,15 @@ header{position:sticky;top:0;z-index:30;background:rgba(10,10,10,.86);backdrop-f
 .right .copy{margin-top:0}
 /* bold section titles 01-04 */
 #packages .sh h2,#interior .sh h2,#addons .sh h2,#fleet .sh h2{font-weight:600}
+
+/* Breast Cancer Awareness Month — pink replaces navy (applied only in October) */
+html.pink{--navy:#4d1733;--navy-d:#2d0d1e;--navy-x:#160610;--navy-rgb:77,23,51;--pink:#f29bbd}
+.aware{display:none}
+html.pink .aware{display:flex}
+.aware{align-items:center;justify-content:center;gap:12px;padding:11px 20px;background:linear-gradient(90deg,var(--navy-x),var(--navy-d) 50%,var(--navy-x));border-bottom:1px solid rgba(242,155,189,.25);font-size:12.5px;color:var(--silver-l);text-align:center}
+.aware svg{flex:0 0 auto;width:18px;height:24px}
+.aware b{font-weight:500;color:var(--pink)}
+html.pink .stage{min-height:calc(100vh - var(--nav) - 80px)}
 /* claims + notices */
 .claims{display:grid;grid-template-columns:repeat(4,1fr);border-bottom:1px solid var(--line)}
 .claims div{padding:20px 22px;border-right:1px solid var(--line);font-size:12px;color:var(--muted)}
@@ -457,6 +467,10 @@ footer{border-top:1px solid var(--line);background:var(--black)}
 
 <!-- ═════════ SHOWCASE ═════════ -->
 <main id="top">
+<div class="aware" role="note" aria-label="Breast Cancer Awareness Month">
+  <svg viewBox="0 0 24 32" aria-hidden="true"><path d="M12 3c-3 0-5 2.2-5 5 0 2.3 1.4 4.6 3.1 7.2L4 27l3.4 1.6 5-8.6 5 8.6L20.8 27l-6.1-11.8C16.4 12.6 17 10.3 17 8c0-2.8-2-5-5-5zm0 3c1.2 0 2 .9 2 2.1 0 1.4-.8 3-2 4.9-1.2-1.9-2-3.5-2-4.9C10 6.9 10.8 6 12 6z" fill="#f29bbd"/></svg>
+  <span><b>October is Breast Cancer Awareness Month.</b> Early detection saves lives — check yourself, and check on the women you love.</span>
+</div>
 <section class="stage hero" aria-label="Find your detail">
   <div class="left" aria-roledescription="carousel">
     <div class="cls" role="group" aria-label="Vehicle class">
@@ -620,6 +634,7 @@ footer{border-top:1px solid var(--line);background:var(--black)}
       <div>Pet hair removal<b>+2,000–4,000</b></div><div>Odour / ozone treatment<b>+3,000+</b></div><div>Iron fallout removal<b>2,500</b></div>
       <div>Clay bar decontamination<b>3,000</b></div><div>Water spot removal<b>2,500–4,000</b></div><div>Cerakote ceramic sealant<b>3,500</b></div>
       <div>Cerakote interior detailer<b>2,500</b></div><div>Heavy neglect surcharge<b>+2,000–5,000</b></div><div>Engine bay clean<b class="req">On request</b></div>
+      <div>Child seat detail<b>+1,500</b></div><div>Mould / mildew treatment<b>+3,000+</b></div><div>Exterior wash (with Cabin Revival)<b>+5,000–9,000</b></div>
       <div>Headlight restoration<b class="req">On request</b></div><div>Polish &amp; paint correction<b class="req">On request</b></div><div style="color:var(--muted)">More on enquiry<b class="req">WhatsApp</b></div>
     </div>
     <div class="callout rv"><strong>Transparent pricing, always.</strong> Surcharges and add-on costs are discussed and confirmed before any work begins. What you're quoted is what you pay — no surprises on the day.</div>
@@ -651,11 +666,7 @@ footer{border-top:1px solid var(--line);background:var(--black)}
       </article>
     </div>
     <div class="bridge rv"><b>+ JMD 5,000–9,000</b><p><em>“The outside takes 40 minutes — your car comes out completely transformed.”</em><br>Add the Refined exterior package to any Cabin Revival at a reduced rate.</p></div>
-    <div class="subhead rv">Cabin add-ons</div>
-    <div class="addgrid rv">
-      <div>Pet hair removal<b>+2,000–4,000</b></div><div>Odour / ozone treatment<b>+3,000+</b></div><div>Cerakote interior detailer<b>2,500</b></div>
-      <div>Child seat detail<b>+1,500</b></div><div>Mould / mildew treatment<b>+3,000+</b></div><div>Exterior wash add-on<b>+5,000–9,000</b></div>
-    </div>
+    <p class="rv" style="margin:18px 0 0;font-size:13px;color:var(--silver)">Pet hair, odour, child seat, mould &amp; mildew and other cabin extras are listed in <a href="#addons" style="color:var(--gold);border-bottom:1px solid var(--gold-b)">Add-on services</a>.</p>
   </div>
 </section>
 
@@ -696,7 +707,7 @@ footer{border-top:1px solid var(--line);background:var(--black)}
     <div class="sec-head rv"><div class="eyebrow">Section 04 · Corporate &amp; fleet</div><div class="sh"><i></i><h2>Fleet &amp; corporate accounts</h2></div><p class="lede">Structured, scheduled detailing for businesses operating three or more vehicles. Fixed rates, consolidated invoicing, and a rotation built around how your operation actually runs.</p></div>
     <div class="ftrio rv">
       <div><small>Who qualifies</small>Any business with <strong>3 or more vehicles</strong> — rental companies, delivery fleets, corporate pools, JUTA &amp; charter operators, taxis, contractors</div>
-      <div><small>How it works</small>Choose a service tier per vehicle. We build a rotation around your schedule. <strong>One invoice. One contact. One standard.</strong></div>
+      <div><small>How it works</small>Choose a service tier per vehicle. We build a rotation around your schedule, with <strong>one consolidated invoice and a single point of contact.</strong></div>
       <div><small>Pricing structure</small>Volume discount applied per vehicle. Rates locked in for the agreement term. <strong>No mid-visit surprises.</strong></div>
     </div>
     <div class="ftiers">
@@ -945,7 +956,7 @@ const SIT = [
  {k:'All-round upkeep', q:"I just want it kept right, inside and out.", p:1, img:IMG.nissan, why:'Our complete service — 10% off every visit on the Maintenance Plan.', hl:['Interior & exterior','Wheels, jambs & trim','Save 10% on a plan'], go:'#packages'},
  {k:'Selling or neglected', q:"I'm selling it — or it's been neglected.", p:2, img:IMG.bmw, why:'First impressions sell cars. A full interior restoration, sealed with Cerakote.', hl:['Shampoo & extraction','Stain treatment','Cerakote protection'], go:'#packages'},
  {k:'New, or protect it', q:"It's new — I want it protected.", p:3, img:IMG.ext, why:'Full decontamination, then ceramic protection on paint, plastics, wheels and tyres.', hl:['Clay & iron decon','Ceramic paint sealant','Ceramic wheels & tyres'], go:'#packages'},
- {k:'Three or more vehicles', q:"I run three or more vehicles.", fleet:true, img:IMG.ext, why:'Scheduled detailing on-site at your lot — one invoice, one contact, one standard.', hl:['10–20% off per vehicle','Rotation built around you','Rate sheet in 24 hrs'], go:'#fleet'}
+ {k:'Three or more vehicles', q:"I run three or more vehicles.", fleet:true, img:IMG.ext, why:'Scheduled detailing on-site at your lot, with consolidated invoicing and a single point of contact.', hl:['10–20% off per vehicle','Rotation built around you','Rate sheet in 24 hrs'], go:'#fleet'}
 ];
 let i = 0, cls = 0;
 const curPkg = () => SIT[i].fleet ? 2 : SIT[i].p;
